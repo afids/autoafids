@@ -50,7 +50,7 @@ Brief summary of the workflow along with its Directed Acyclic Graph (DAG) can be
 2. Generate a landmark Euclidean distance/probability map with each voxel communicating distance to an AFID of interest
 
 ## Train
-Currently, the pre-processing and training workflows are separate, so you will need to feed your imaging data into the [autoafids_prep](https://github.com/afids/autoafids_prep) pipeline before using it to train the model. For more details, see [Known Issues](#known-issues).
+Currently, we support generating your own models (i.e., training) in a sperate workflow (i.e., afids-cnn: <LINK>). For more details, see [Known Issues](#known-issues).
 
 
 ## Apply
