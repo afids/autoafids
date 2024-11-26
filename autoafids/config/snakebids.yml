@@ -1,0 +1,47 @@
+#list of analysis levels in the bids app
+analysis_levels:
+ - participant
+
+
+# mapping from analysis_level to set of target rules or files
+targets_by_analysis_level:
+  participant:
+    - 'all'  # if '', then the first rule is run
+
+# Configure components:
+# Each entry creates a new component that can be retreived within the workflow
+# via `generate_inputs`.
+# Filters are used to select paths: each filter has an `entity` key and a
+# single value or list of values to select.
+# Wildcards are used to mark variable parts of paths. Each wildcard is an
+# entity, such as `subject` or `session`, that may vary across component paths.
+pybids_inputs:
+  t1w:
+    filters:
+      suffix: T1w
+    wildcards:
+      - subject
+  bold:
+    filters:
+      suffix: bold
+    wildcards:
+      - subject
+      - run
+
+# configuration for the command-line parameters to make available
+# passed on the argparse add_argument()
+parse_args:
+  --skip-bids-validation:
+    help: |
+      Skip validation of BIDS dataset. BIDS validation is performed by default
+      using the bids-validator plugin (if installed/enabled) or with the pybids
+      validator implementation (if bids-validator is not installed/enabled).
+    dest: "plugins.validator.skip"
+    action: "store_true"
+    default: False
+
+
+
+# Docker and singularity containers may be defined here
+containers:
+    # fsl: 'docker://brainlife/fsl/6.0.0'
