@@ -1,47 +1,108 @@
-#list of analysis levels in the bids app
-analysis_levels:
- - participant
+bids_dir: "/path/to/bids/dir"
+output_dir: "/path/to/output/dir"
 
+debug: False
+derivatives: False
 
-# mapping from analysis_level to set of target rules or files
+analysis_levels: &analysis_levels
+  - participant
+
 targets_by_analysis_level:
   participant:
-    - 'all'  # if '', then the first rule is run
+    - "all"
 
-# Configure components:
-# Each entry creates a new component that can be retreived within the workflow
-# via `generate_inputs`.
-# Filters are used to select paths: each filter has an `entity` key and a
-# single value or list of values to select.
-# Wildcards are used to mark variable parts of paths. Each wildcard is an
-# entity, such as `subject` or `session`, that may vary across component paths.
+# from autoafids_prep
 pybids_inputs:
   t1w:
     filters:
-      suffix: T1w
+      suffix: [T1w, T2w]
+      extension: .nii.gz
+      datatype: anat
     wildcards:
       - subject
-  bold:
-    filters:
-      suffix: bold
-    wildcards:
-      - subject
+      - session
+      - acquisition
+      - reconstruction
       - run
 
-# configuration for the command-line parameters to make available
-# passed on the argparse add_argument()
 parse_args:
-  --skip-bids-validation:
-    help: |
-      Skip validation of BIDS dataset. BIDS validation is performed by default
-      using the bids-validator plugin (if installed/enabled) or with the pybids
-      validator implementation (if bids-validator is not installed/enabled).
-    dest: "plugins.validator.skip"
-    action: "store_true"
-    default: False
+#---  core BIDS-app options ---
+  bids_dir:
+    help: The directory with the input dataset formatted according to the BIDS standard.
+  
+  output_dir:
+    help: The directory where the output files should be stored. If you are running
+      group level analysis this folder should be prepopulated with the results of
+      the participant level analysis.
+      
+  analysis_level:
+    help: Level of the analysis that will be performed
+    choices: *analysis_levels
 
+  --participant_label:
+      help: The label(s) of the participant(s) that should be analyzed. The label
+            corresponds to sub-<participant_label> from the BIDS spec (so it does
+            not include "sub-"). If this parameter is not provided, all subjects
+            will be analyzed. Multiple participants can be specified with a space
+            seperated list.
+      nargs: "+"
 
+  --exclude_participant_label:
+      help: The label(s) of the participant(s) that should be excluded. The label
+            corresponds to sub-<participant_label> from the BIDS spec (so it does
+            not include "sub-"). If this parameter is not provided, all subjects
+            will be analyzed. Multiple participants can be specified with a space
+            sepearated list.
+      nargs: "+"
 
-# Docker and singularity containers may be defined here
-containers:
-    # fsl: 'docker://brainlife/fsl/6.0.0'
+  --acq:
+      help: 'The acquisition sequence of the T1w image (e.g. MP2RAGE). (default: %(default)s)'
+      default: MP2RAGE
+      nargs: "?"
+
+  --profile:
+      help: 'Specify the profile and configration for preprocessing. If custom is chosen, then an interactive mode is triggered (default: %(default)s)'
+      choices: ['slow','medium','fast','superfast','custom']
+      default: 'fast'
+
+  --norm:
+      help: 'Specify the normalization scheme for images as a binary choice. {0 = z-score, 1 = min-max , 2 = tissue-based [notavailable]}. (default: %(default)s)'
+      choices: ['0', '1']
+      default: '0'  # Default to 0, which represents z-score normalization
+
+  --res:
+      help: 'Specify the resampling resolution (e.g. "100" for 1mm) for images, any resolution is supported but limited to isotropic resampling. (default: %(default)s)'
+      default: '100'  # Default to 1 
+    
+  --template: 
+      help: 'Specify the template to use (e.g., T1w or T2w).'
+      default: 'T1w'
+
+  --derivatives:
+      help: 'Path(s) to a derivatives dataset, for folder(s) that contains multiple
+        derivatives datasets (default: %(default)s) '
+      default: false
+      nargs: +
+
+  --model:
+      help: 'Path to the machine learning model to apply.'
+      required: false
+      default: '/path/to/model'
+      type: Path
+
+#--- workflow specific configuration ---
+
+# Nifti template
+templatet1w: 'resources/tpl-MNI152NLin2009cAsym_res-01_T1w.nii.gz'
+templatet2w: 'resources/tpl-MNI152NLin2009cAsym_res-01_T2w.nii.gz'
+
+# AFIDs fcsv template
+fcsv: 'resources/dummy.fcsv'
+fcsv_mni: 'resources/tpl-MNI152NLin2009cAsym_res-01_desc-groundtruth_afids.fcsv'
+
+singularity:
+  synthstrip: docker://freesurfer/synthstrip:1.3
+
+# It will be downloaded to ~/.cache/autoafids
+resource_urls:
+  cnn_model: 'zenodo'
