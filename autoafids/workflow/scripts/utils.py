@@ -22,6 +22,7 @@ AFIDS_FIELDNAMES = [
     "desc",
     "associatedNodeID",
 ]
+
 FCSV_TEMPLATE = (
     Path(__file__).parent / ".." / ".." / "resources" / "tpl-MNI152NLin2009cAsym_res-01_T1w.fcsv"
 )
@@ -31,7 +32,22 @@ def afids_to_fcsv(
     afid_coords: dict[int, NDArray],
     fcsv_output: PathLike[str] | str,
 ) -> None:
-    """AFIDS to Slicer-compatible .fcsv file."""
+    """
+    AFIDS to Slicer-compatible .fcsv file.
+    
+    Parameters
+    ----------
+
+        afids_coords :: dict
+            AFIDS coordinates
+
+        fcsv_output :: str
+            Path to output fcsv file
+
+    Returns
+    -------
+        None
+    """
     # Read in fcsv template
     with FCSV_TEMPLATE.open(encoding="utf-8", newline="") as fcsv_file:
         header = [fcsv_file.readline() for _ in range(3)]

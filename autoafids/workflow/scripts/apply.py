@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+# Forces TensorFlow to use CPU only 
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = ""  # Forces TensorFlow to use CPU only
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 import json
 import logging
@@ -27,19 +28,38 @@ logger = logging.getLogger(__name__)
 
 
 def load_fcsv(fcsv_path: PathLike[str] | str) -> pd.DataFrame:
+    """
+    Loads fcsv.
+
+    Parameters
+    ----------
+        fcsv_path :: str
+            Path to a fcsv file
+
+    Returns
+    -------
+        pd.DataFrame
+            A DataFrame containing the data from the FCSV file
+    """
     return pd.read_csv(fcsv_path, sep=",", header=2)
 
 
 # utils to factor out
 def get_fid(fcsv_df: pd.DataFrame, fid_label: int) -> NDArray:
-    """Extract specific fiducial's spatial coordinates.
+    """
+    Extract specific fiducial's spatial coordinates.
 
     Parameters
     ----------
-    fcsv_df
-        Dataframe with the FCSV data.
-    fid_label
-        Label (1-32) of the fiducial to grab.
+        fcsv_df :: pd.DataFrame
+            Dataframe with the FCSV data.
+        fid_label :: int
+            Label (1-32) of the fiducial to grab.
+
+    Returns
+    -------
+        NDArray
+            (fill description)
     """
     return fcsv_df.loc[fid_label - 1, ["x", "y", "z"]].to_numpy(
         dtype="single",
@@ -48,7 +68,22 @@ def get_fid(fcsv_df: pd.DataFrame, fid_label: int) -> NDArray:
 
 
 def fid_voxel2world(fid_voxel: NDArray, nii_affine: NDArray) -> NDArray:
-    """Transform fiducials in voxel coordinates to world coordinates."""
+    """
+    Transform fiducials in voxel coordinates to world coordinates.
+    
+    Parameters
+    ----------
+        fid_voxel :: NDArray
+            (fill description)
+
+        nii_affine :: NDArray
+            (fill description)
+
+    Returns
+    -------
+        fid_world :: NDArray
+            (fill description)
+    """
     translation = nii_affine[:3, 3]
     rotation = nii_affine[:3, :3]
     fid_world = rotation.dot(fid_voxel)+translation
@@ -58,7 +93,22 @@ def fid_world2voxel(
     fid_world: NDArray,
     nii_affine: NDArray,
 ) -> NDArray:
-    """Transform fiducials in world coordinates to voxel coordinates."""
+    """
+    Transform fiducials in world coordinates to voxel coordinates.
+    
+    Parameters
+    ----------
+        fid_world :: NDArray
+            (fill description)
+
+        nii_affine :: NDArray
+            (fill description)
+        
+    Returns
+    -------
+        fid_voxel :: NDArray
+            (fill description)
+    """
     inv_affine =  np.linalg.inv(nii_affine)
     translation = inv_affine[:3, 3]
     rotation = inv_affine[:3, :3]
@@ -68,10 +118,45 @@ def fid_world2voxel(
 
 
 def gen_patch_slices(centre: NDArray, radius: int) -> tuple[slice, slice, slice]:
+    """
+    Generate patch slices
+
+    Parameters
+    ----------
+        centre :: NDArray
+            (fill description)
+
+        radius :: NDArray
+            (fill description)
+
+    Returns
+    -------
+        (fill Returns)
+    """
     return tuple(slice(coord - radius, coord + radius + 1) for coord in centre[:3])
 
 
 def slice_img(img: NDArray, centre: NDArray, radius: int) -> NDArray:
+    """
+    Slice images
+
+    Parameters
+    ----------
+        img :: NDArray
+            (fill description)
+        
+        centre :: NDArray
+            (fill description)
+
+        radius :: int
+            (fill description)
+
+    Returns
+    -------
+        NDArray 
+            (fill desciption)
+
+    """
     slices = gen_patch_slices(centre, radius)
     return img[slices[0], slices[1], slices[2]]
 
@@ -82,6 +167,28 @@ def predict_distances(
     mni_fid: NDArray,
     img: NDArray,
 ) -> NDArray:
+    """
+    Predict distances (elaborate)
+
+    Parameters
+    ----------
+        radius :: int
+            (fill description)
+
+        model :: keras.model
+            (fill description)
+
+        mni_fid :: NDArray
+            (fill description)
+        
+        img :: NDArray
+            (fill description)
+
+    Returns
+    -------
+        NDArray 
+            (fill description)
+    """
     dim = (2 * radius) + 1
     pred = np.reshape(slice_img(img, mni_fid, radius), (1, dim, dim, dim, 1))
     return model.predict(pred)
@@ -93,6 +200,28 @@ def process_distances(
     mni_fid: NDArray,
     radius: int,
 ) -> NDArray:
+    """
+    Process distances (elaborate)
+
+    Parameters
+    ----------
+        distances :: NDArray
+            (fill description)
+
+        img :: NDArray
+            (fill description)
+
+        mni_fid :: NDArray
+            (fill description)
+
+        radius :: int
+            (fill description)
+
+    Returns
+    -------
+        NDArray
+            (fill description)
+    """
     dim = (2 * radius) + 1
     print(f'min distance: {distances.min()}')
     arr_dis = np.reshape(distances[0], (dim, dim, dim))
@@ -129,6 +258,31 @@ def apply_model(
     radius: int,
     prior: PathLike[str] | str,
 ) -> NDArray:
+    """
+    Apply model
+
+    Parameters
+    ----------
+        img :: nib.nifti1.Nifti1Image | nib.nifti1.Nifti1Pair
+            (fill description)
+
+        fid_label :: int
+            (fill description)
+
+        model :: keras.model
+            (fill description)
+
+        radius :: int
+            (fill description)
+
+        prior :: str 
+            (fill description)
+
+    Returns
+    -------
+        NDArray
+            (fill description)
+    """
     mni_fid_world = get_fid(load_fcsv(prior), fid_label)
     mni_img = img
     mni_fid_resampled = fid_world2voxel(
@@ -172,6 +326,25 @@ def apply_all(
     img: nib.nifti1.Nifti1Image | nib.nifti1.Nifti1Pair,
     prior: PathLike[str] | str,
 ) -> dict[int, NDArray]:
+    """
+    Apply all (elaborate)
+
+    Parameters
+    ----------
+        model_path :: str
+            (fill description)
+        
+        img :: nib.nifti1.Nifti1Image | nib.nifti1.Nifti1Pair
+            (fill description)
+
+        prior :: str
+            (fill description)
+
+    Returns
+    -------
+        afid_dict :: dict
+            (fill description)
+    """
     with tarfile.open(model_path, "r:gz") as tar_file:
         config_file = extract_config(tar_file)
         radius = int(json.load(config_file)["radius"])
@@ -193,6 +366,19 @@ def apply_all(
 
 
 def extract_config(tar_file: tarfile.TarFile) -> IO[bytes]:
+    """
+    Extract config (elaborate)
+
+    Parameters
+    ----------
+        tar_file :: arfile.TarFile
+            (fill description)
+
+    Returns
+    -------
+        config_file :: IO[bytes]
+            (fill description)
+    """
     try:
         config_file = tar_file.extractfile("config.json")
     except KeyError as err:
@@ -209,6 +395,24 @@ def extract_afids_model(
     out_path: PathLike[str] | str,
     afid_label: int,
 ) -> Path:
+    """
+    Extract afids model
+
+    Parameters
+    ----------
+        tar_file :: tarfile.TarFile
+            (fill description)
+        
+        out_path :: str
+            (fill description)
+
+        afid_label :: int
+            (fill description)
+
+    Returns
+    -------
+        None
+    """
     for member in tar_file.getmembers():
         if member.isdir() and f"afid-{afid_label:02}" in member.name:
             tar_file.extractall(
@@ -233,6 +437,18 @@ class ArchiveMissingDataError(Exception):
 
 
 def gen_parser() -> ArgumentParser:
+    """
+    Gen parser (elaborate)
+
+    Parameters
+    ----------
+        None
+    
+    Returns
+    -------
+        parser :: ArgumentParser
+            (fill description)
+    """
     parser = ArgumentParser()
     parser.add_argument("img", help="The image for which to produce an FCSV.")
     parser.add_argument("model", help="The afids-CNN model to apply.")
@@ -242,6 +458,17 @@ def gen_parser() -> ArgumentParser:
 
 
 def main():
+    """
+    Main
+
+    Parameters
+    ----------
+        None
+
+    Returns
+    -------
+        None
+    """
     args = gen_parser().parse_args()
     img = nib.nifti1.load(args.img)
 
