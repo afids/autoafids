@@ -87,7 +87,7 @@ parse_args:
   --model:
       help: 'Path to the machine learning model to apply.'
       required: false
-      default: '/path/to/model'
+      default: '../../Downloads/model-combined.afidsmodel'
       type: Path
 
 #--- workflow specific configuration ---
