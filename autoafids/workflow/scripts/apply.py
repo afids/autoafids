@@ -4,7 +4,7 @@ from __future__ import annotations
 
 # Forces TensorFlow to use CPU only 
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
+#os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 import json
 import logging
@@ -58,8 +58,8 @@ def get_fid(fcsv_df: pd.DataFrame, fid_label: int) -> NDArray:
 
     Returns
     -------
-        NDArray
-            (fill description)
+        NDArray :: np.array
+            Array with x,y,z coordinates of selected fiducial
     """
     return fcsv_df.loc[fid_label - 1, ["x", "y", "z"]].to_numpy(
         dtype="single",
@@ -74,15 +74,15 @@ def fid_voxel2world(fid_voxel: NDArray, nii_affine: NDArray) -> NDArray:
     Parameters
     ----------
         fid_voxel :: NDArray
-            (fill description)
+            Voxel coordiantes for selected fiducial 
 
         nii_affine :: NDArray
-            (fill description)
+            Image affine matrix for mapping between voxel to world coords 
 
     Returns
     -------
         fid_world :: NDArray
-            (fill description)
+            Coordinates in world space 
     """
     translation = nii_affine[:3, 3]
     rotation = nii_affine[:3, :3]
@@ -99,15 +99,15 @@ def fid_world2voxel(
     Parameters
     ----------
         fid_world :: NDArray
-            (fill description)
+            World coordiantes for selected fiducial
 
         nii_affine :: NDArray
-            (fill description)
+            Image affine matrix for mapping between voxel to world coords 
         
     Returns
     -------
         fid_voxel :: NDArray
-            (fill description)
+            Coordinates in voxel space 
     """
     inv_affine =  np.linalg.inv(nii_affine)
     translation = inv_affine[:3, 3]
@@ -124,14 +124,14 @@ def gen_patch_slices(centre: NDArray, radius: int) -> tuple[slice, slice, slice]
     Parameters
     ----------
         centre :: NDArray
-            (fill description)
+            Center of patch
 
         radius :: NDArray
-            (fill description)
+            Radius around center of patch (model defined)
 
     Returns
     -------
-        (fill Returns)
+        Image patches around center coordinate
     """
     return tuple(slice(coord - radius, coord + radius + 1) for coord in centre[:3])
 
@@ -143,13 +143,13 @@ def slice_img(img: NDArray, centre: NDArray, radius: int) -> NDArray:
     Parameters
     ----------
         img :: NDArray
-            (fill description)
+            input image to be predicted
         
         centre :: NDArray
-            (fill description)
+            Center of patch
 
         radius :: int
-            (fill description)
+            patch radius
 
     Returns
     -------
@@ -173,21 +173,21 @@ def predict_distances(
     Parameters
     ----------
         radius :: int
-            (fill description)
+            patch radius
 
         model :: keras.model
-            (fill description)
+            ML model for predicting within patch 
 
         mni_fid :: NDArray
-            (fill description)
+            MNI fid prior to limit scope of prediction
         
         img :: NDArray
-            (fill description)
+            full image
 
     Returns
     -------
         NDArray 
-            (fill description)
+            predicted label map 
     """
     dim = (2 * radius) + 1
     pred = np.reshape(slice_img(img, mni_fid, radius), (1, dim, dim, dim, 1))
@@ -206,24 +206,23 @@ def process_distances(
     Parameters
     ----------
         distances :: NDArray
-            (fill description)
+            predicted distance map (i.e., ML model output)
 
         img :: NDArray
-            (fill description)
+            input image to be predicted
 
         mni_fid :: NDArray
-            (fill description)
+            MNI fid prior
 
         radius :: int
-            (fill description)
+            Radius of configured model 
 
     Returns
     -------
         NDArray
-            (fill description)
+            processed prediction to x,y,z coordinates
     """
     dim = (2 * radius) + 1
-    print(f'min distance: {distances.min()}')
     arr_dis = np.reshape(distances[0], (dim, dim, dim))
     new_pred = np.full((img.shape), 100, dtype=float)
     slices = gen_patch_slices(mni_fid, radius)
@@ -264,24 +263,24 @@ def apply_model(
     Parameters
     ----------
         img :: nib.nifti1.Nifti1Image | nib.nifti1.Nifti1Pair
-            (fill description)
+            input image to be predicted
 
         fid_label :: int
-            (fill description)
+            fiducial label of interest as defined by the protocol 
 
         model :: keras.model
-            (fill description)
+            ML model for predicting within patch 
 
         radius :: int
-            (fill description)
+            patch radius
 
         prior :: str 
-            (fill description)
+            MNI fid prior fiducal file
 
     Returns
     -------
         NDArray
-            (fill description)
+            processed prediction to x,y,z coordinates
     """
     mni_fid_world = get_fid(load_fcsv(prior), fid_label)
     mni_img = img
@@ -289,7 +288,6 @@ def apply_model(
         mni_fid_world,
         mni_img.affine,
     )
-    print('itr #1')
     img_data = img.get_fdata()
     distances = predict_distances(
         radius,
@@ -304,7 +302,6 @@ def apply_model(
         radius,
     )
     #do it again to improve prediction
-    print(f'itr #2')
     fid_pred = np.rint(fid_resampled).astype(int)
     distances2 = predict_distances(
         radius,
@@ -332,24 +329,25 @@ def apply_all(
     Parameters
     ----------
         model_path :: str
-            (fill description)
+            ML model for predicting within patch 
         
         img :: nib.nifti1.Nifti1Image | nib.nifti1.Nifti1Pair
-            (fill description)
+            input image to be predicted
 
         prior :: str
-            (fill description)
+            MNI fid prior fiducal file
 
     Returns
     -------
         afid_dict :: dict
-            (fill description)
+            dictionary of all predicted landmarks
     """
     with tarfile.open(model_path, "r:gz") as tar_file:
         config_file = extract_config(tar_file)
         radius = int(json.load(config_file)["radius"])
         afid_dict: dict[int, NDArray] = {}
         for afid_label in range(1, 33):
+            print(f'AFID Label: {afid_label}')
             with tempfile.TemporaryDirectory() as model_dir:
                 model = keras.models.load_model(
                     extract_afids_model(tar_file, model_dir, afid_label),
@@ -372,12 +370,12 @@ def extract_config(tar_file: tarfile.TarFile) -> IO[bytes]:
     Parameters
     ----------
         tar_file :: arfile.TarFile
-            (fill description)
+            ML model .tar file genereated from train workflow 
 
     Returns
     -------
         config_file :: IO[bytes]
-            (fill description)
+            ML model configration file 
     """
     try:
         config_file = tar_file.extractfile("config.json")
@@ -401,13 +399,13 @@ def extract_afids_model(
     Parameters
     ----------
         tar_file :: tarfile.TarFile
-            (fill description)
+            ML model .tar file genereated from train workflow 
         
         out_path :: str
-            (fill description)
+            Output path for predicted fiducails
 
         afid_label :: int
-            (fill description)
+            fiducial label of interest as defined by the protocol 
 
     Returns
     -------
@@ -447,7 +445,7 @@ def gen_parser() -> ArgumentParser:
     Returns
     -------
         parser :: ArgumentParser
-            (fill description)
+            parser to help navigate paths and configure functions
     """
     parser = ArgumentParser()
     parser.add_argument("img", help="The image for which to produce an FCSV.")
