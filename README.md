@@ -24,12 +24,10 @@ We use poetry tool for dependency management and to package the python project. 
 After installing poetry, clone this repository via:
 
 ```bash
-git clone https://github.com/afids/afids-CNN.git
+git clone https://github.com/afids/autoafids.git
 ```
 
-You can then install the python package using one of the following commands, which should be executed within the repository folder (i.e., afids-CNN/).
-
-To install the autoafids_prep package "normally", use:
+You can then install the python package using one of the following commands, which should be executed within the repository folder (i.e., autoafids/).
 
 ```bash
 poetry install
@@ -54,10 +52,9 @@ Currently, we support generating your own models (i.e., training) in a sperate w
 
 
 ## Apply
-Similar to the [Train](#train) section, the pre-processing is currently detached and you'll need to feed your data through the pre-processing pipeline and then use the model for inference.   
-
+<TODO>
+  
 ## Known Issues
-- Synchronize pre-processing workflow [autoafids_prep](https://github.com/afids/autoafids_prep) with training and appylying
 - Factorize apply workflow to run per landmark of interest
 
 ## Roadmap
@@ -66,4 +63,4 @@ Similar to the [Train](#train) section, the pre-processing is currently detached
 - Extension to incorporate new modalities (i.e., CT scans)
 
 ## Questions, Issues, Suggestions, and Other Feedback
-Please reach out if you have any questions, suggestions, or other feedback related to this software—either through email (dbansal7@uwo.ca) or the discussions page. Larger issues or feature requests can be posted and tracked via the issues page. Finally, you can also reach out to Alaa Taha, the Science Lead for autoafids_prep.
+Please reach out if you have any questions, suggestions, or other feedback related to this software—either through email (dbansal7@uwo.ca) or the discussions page. Larger issues or feature requests can be posted and tracked via the issues page. Finally, you can also reach out to Alaa Taha, the Science Lead.
