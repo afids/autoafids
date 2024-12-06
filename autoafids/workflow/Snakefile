@@ -1,4 +1,5 @@
 from snakebids import bids, generate_inputs, get_wildcard_constraints
+from appdirs import AppDirs
 
 configfile: 'snakebids.yml'
 
@@ -15,6 +16,16 @@ inputs = generate_inputs(
 wildcard_constraints:
     **get_wildcard_constraints(config["pybids_inputs"]),
 
+def get_download_dir():
+    if "AUTOAFIDS_CACHE_DIR" in os.environ.keys():
+        download_dir = os.environ["AUTOAFIDS_CACHE_DIR"]
+    else:
+        # create local download dir if it doesn't exist
+        dirs = AppDirs("autoafids", "jclauneurolab")
+        download_dir = dirs.user_cache_dir
+    return download_dir
+
+download_dir = get_download_dir()
 # ---- begin preproc profile pathways --------------------------------------------
 
 processing_steps = {
@@ -172,26 +183,7 @@ rule preprocessing_result:
         samp = inputs["t1w"].expand(rules.resample_im.output.resam_im),
         mni = inputs["t1w"].expand(rules.mni2subfids.output.fcsv_new),
 
-rule gen_fcsv:
-    input:
-        t1w=rules.preprocessing_result.input.samp, 
-        model=config["model"],
-        prior=rules.preprocessing_result.input.mni,
-    output:
-        fcsv=bids(
-            root=str(Path(config["output_dir"]) / "afids-cnn"),
-            desc="afidscnn",
-            suffix="afids.fcsv",
-            **inputs["t1w"].wildcards
-        ),
-    log:
-        bids(
-            root="logs",
-            suffix="landmark.log",
-            **inputs["t1w"].wildcards
-        ),
-    shell:
-        'auto_afids_cnn_apply {input.t1w} {input.model} {output.fcsv} {input.prior}'
+include: "rules/cnn.smk"
 
 rule all:
     input:

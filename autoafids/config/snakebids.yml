@@ -85,10 +85,9 @@ parse_args:
       nargs: +
 
   --model:
-      help: 'Path to the machine learning model to apply.'
+      help: 'Type of machine learning model to apply.'
+      default: 'default'
       required: false
-      default: '../../Downloads/model-combined.afidsmodel'
-      type: Path
 
 #--- workflow specific configuration ---
 
@@ -105,4 +104,5 @@ singularity:
 
 # It will be downloaded to ~/.cache/autoafids
 resource_urls:
-  cnn_model: 'zenodo'
+  default: 'zenodo.org/records/14284289/files/model-combined.afidsmodel'
+  synthSR: 'zenodo.org/records/14284290/files/model-combined.afidsmodel' # dummy file which doesn't exist
