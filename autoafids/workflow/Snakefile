@@ -17,49 +17,22 @@ wildcard_constraints:
 
 # ---- begin preproc profile pathways --------------------------------------------
 
-# Determine if custom profile is selected for interactive configuration
-if config["profile"] == 'custom':
-    print('# ---- begin interactive snakebids mode -----------------------------------------')
+processing_steps = {
+    "slow": ["freesurfer_preproc", "skull_strip", "norm_im"],
+    "medium": ["n4_bias_correction", "skull_strip", "norm_im", "resample_im"],
+    "fast": ["n4_bias_correction", "norm_im", "resample_im"],
+    "superfast": ["norm_im", "resample_im"]
+}
 
-    def prompt_for_configuration_options():
-        configs = {
-            "freesurfer_preproc": {"message": "Do you want to run freesurfer's autorecon 1? (y/n)", "type": "bool"},
-            "run_n4_bias_correction": {"message": "Do you want to run N4BiasFieldCorrection? (y/n)", "type": "bool"},
-            # Ensure each option is unique and correctly conditional
-            "skull_strip": {"message": "Do you want to skull strip your data? (y/n)", "type": "bool", "condition": "freesurfer_preproc"}
-        }
-        config_responses = {}
-
-        for config_option, config_info in configs.items():
-            # Skip questions based on conditions
-            if config_info.get("condition") and not config_responses.get(config_info["condition"], False):
-                continue
-
-            user_input = input(config_info["message"]).strip().lower()
-            while user_input not in ["y", "n"]:
-                print("Invalid input. Please choose 'y' for yes or 'n' for no.")
-                user_input = input(config_info["message"]).strip().lower()
-            config_responses[config_option] = user_input == "y"
-        return config_responses
-
-    user_configurations = prompt_for_configuration_options()
-else:
-    processing_steps = {
-        "slow": ["freesurfer_preproc", "skull_strip", "norm_im"],
-        "medium": ["n4_bias_correction", "skull_strip", "norm_im", "resample_im"],
-        "fast": ["n4_bias_correction", "norm_im", "resample_im"],
-        "superfast": ["norm_im", "resample_im"]
-    }
-
-    profile_settings = processing_steps[config["profile"]]
+profile_settings = processing_steps[config["profile"]]
 
 # Normalization scheme 
 norm_methods = {
-    0: "zscore", #best for multi-contrast data
-    1: "minmax", #best for data from the same center
-    2: "percentile", #best for CT imaging [notavail]
-    3: "wm", #triggers FS WM tissue normalization then z-scores output (only for T1w)[notavail]
-    4: "other" #user must provide a python funtion (custom)[notavail]
+0: "zscore", #best for multi-contrast data
+1: "minmax", #best for data from the same center
+2: "percentile", #best for CT imaging [notavail]
+3: "wm", #triggers FS WM tissue normalization then z-scores output (only for T1w)[notavail]
+4: "other" #user must provide a python funtion (custom)[notavail]
 }
 
 # Chosen norm method

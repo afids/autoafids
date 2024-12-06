@@ -4,7 +4,9 @@ from __future__ import annotations
 
 # Forces TensorFlow to use CPU only 
 import os
-#os.environ["CUDA_VISIBLE_DEVICES"] = ""
+os.environ["CUDA_VISIBLE_DEVICES"] = "" #only use CPU, makes generealization to any machine easier.
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Suppresses INFO, WARNING, and ERROR logs
+
 
 import json
 import logging
@@ -14,17 +16,13 @@ from argparse import ArgumentParser
 from os import PathLike
 from pathlib import Path
 from typing import IO
-
 import nibabel as nib
 import numpy as np
 import pandas as pd
 import skimage.measure
 from numpy.typing import NDArray
-from tensorflow import keras
-
+import tensorflow as tf
 from .utils import afids_to_fcsv
-
-logger = logging.getLogger(__name__)
 
 
 def load_fcsv(fcsv_path: PathLike[str] | str) -> pd.DataFrame:
@@ -163,7 +161,7 @@ def slice_img(img: NDArray, centre: NDArray, radius: int) -> NDArray:
 
 def predict_distances(
     radius: int,
-    model: keras.model,
+    model: tf.keras.model,
     mni_fid: NDArray,
     img: NDArray,
 ) -> NDArray:
@@ -175,7 +173,7 @@ def predict_distances(
         radius :: int
             patch radius
 
-        model :: keras.model
+        model :: tf.keras.model
             ML model for predicting within patch 
 
         mni_fid :: NDArray
@@ -234,7 +232,7 @@ def process_distances(
     thresholded = (thresholded * 1000000).astype(int)
     new = skimage.measure.regionprops(thresholded)
     if not new:
-        logger.warning("No centroid found for this afid. Results may be suspect.")
+        print("No centroid found for this afid. Results may be suspect.")
         return np.array(
             np.unravel_index(
                 np.argmax(transformed, axis=None),
@@ -253,7 +251,7 @@ def process_distances(
 def apply_model(
     img: nib.nifti1.Nifti1Image | nib.nifti1.Nifti1Pair,
     fid_label: int,
-    model: keras.model,
+    model: tf.keras.model,
     radius: int,
     prior: PathLike[str] | str,
 ) -> NDArray:
@@ -268,7 +266,7 @@ def apply_model(
         fid_label :: int
             fiducial label of interest as defined by the protocol 
 
-        model :: keras.model
+        model :: tf.keras.model
             ML model for predicting within patch 
 
         radius :: int
@@ -317,41 +315,56 @@ def apply_model(
     )
     return fid_voxel2world(fid_resampled2, img.affine)
 
-
 def apply_all(
-    model_path: PathLike[str] | str,
-    img: nib.nifti1.Nifti1Image | nib.nifti1.Nifti1Pair,
-    prior: PathLike[str] | str,
-) -> dict[int, NDArray]:
+    model_path: PathLike,
+    img: nib.nifti1.Nifti1Image,
+    prior: PathLike,
+) -> Dict[int, NDArray]:
     """
-    Apply all (elaborate)
+    Apply all models using a single architecture with dynamically loaded weights.
 
     Parameters
     ----------
-        model_path :: str
-            ML model for predicting within patch 
+        model_path : PathLike
+            Path to tarfile containing model weights
         
-        img :: nib.nifti1.Nifti1Image | nib.nifti1.Nifti1Pair
-            input image to be predicted
+        img : nib.nifti1.Nifti1Image
+            Input image to be predicted
 
-        prior :: str
-            MNI fid prior fiducal file
+        prior : PathLike
+            Path to MNI fid prior fiducial file
 
     Returns
     -------
-        afid_dict :: dict
-            dictionary of all predicted landmarks
+        afid_dict : dict
+            Dictionary of all predicted landmarks
     """
     with tarfile.open(model_path, "r:gz") as tar_file:
+        # Extract configuration
         config_file = extract_config(tar_file)
         radius = int(json.load(config_file)["radius"])
-        afid_dict: dict[int, NDArray] = {}
+        
+        # Extract the shared model architecture
+        with tempfile.TemporaryDirectory() as model_dir:
+            model_architecture_path = extract_afids_model(tar_file, model_dir, 1)
+            model = tf.keras.models.load_model(model_architecture_path)
+
+        # Create an empty dictionary for storing predictions
+        afid_dict: Dict[int, NDArray] = {}
+
+        # Iterate through labels
         for afid_label in range(1, 33):
-            print(f'AFID Label: {afid_label}')
-            with tempfile.TemporaryDirectory() as model_dir:
-                model = keras.models.load_model(
-                    extract_afids_model(tar_file, model_dir, afid_label),
-                )
+            print(f"Processing AFID Label: {afid_label}")
+
+            # Locate the weight file for the current label directly in the tarfile
+            weight_file_name = extract_afids_model(tar_file, model_dir, afid_label)
+            
+            
+            # Load weights into memory (avoid disk I/O)
+           # weight_file_data = BytesIO(tar_file.extractfile(weight_file_name).read())
+            model.load_weights(weight_file_name).expect_partial()
+
+            # Apply the model to make predictions
             afid_dict[afid_label] = apply_model(
                 img,
                 afid_label,

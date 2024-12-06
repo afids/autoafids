@@ -61,8 +61,8 @@ parse_args:
       nargs: "?"
 
   --profile:
-      help: 'Specify the profile and configration for preprocessing. If custom is chosen, then an interactive mode is triggered (default: %(default)s)'
-      choices: ['slow','medium','fast','superfast','custom']
+      help: 'Specify the profile and configration for preprocessing. (default: %(default)s)'
+      choices: ['slow','medium','fast','superfast']
       default: 'fast'
 
   --norm:
