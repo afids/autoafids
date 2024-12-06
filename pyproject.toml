@@ -1,0 +1,77 @@
+[tool.poetry]
+name = "autoafids"
+version = "0.1.0"
+description = "End-to-end SnakeBIDS workflow for landmark regression and derivative apps "
+authors = ["Alaa Taha <ataha24@uwo.ca>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.8, <3.12"
+snakebids = "^0.13.1"
+pandas = "^2.0.3"
+nilearn = "^0.10.3"
+antspyx = "^0.5.3"
+tensorflow = "^2.12.0"
+tensorflow-io-gcs-filesystem = "^0.31.0"
+pulp = "<2.6.0"
+scikit-image = "^0.19.3"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
+isort = "^5.12.0"
+poethepoet = "^0.21.1"
+ruff = "^0.0.282"
+snakefmt = "^0.8.4"
+yamlfix = "^1.11.0"
+
+[tool.poetry.scripts]
+auto_afids_cnn_apply = 'autoafids.workflow.scripts.apply:main'
+autoafids = 'autoafids.run:app.run'
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poe.tasks]
+isort = "isort autoafids"
+isort-check = "isort -c autoafids"
+black = "black autoafids"
+black-check = "black --check autoafids"
+ruff = "ruff --fix autoafids"
+ruff-check = "ruff autoafids"
+snakefmt = "snakefmt autoafids"
+snakefmt-check = "snakefmt --check autoafids"
+quality = ["yamlfix", "isort", "black", "ruff", "snakefmt"]
+quality-check = [
+    "yamlfix-check",
+    "isort-check",
+    "black-check",
+    "ruff-check",
+    "snakefmt-check",
+]
+
+[tool.poe.tasks.yamlfix]
+shell = """
+find . -type f \\( \
+    -iname \\*.yaml -o -iname \\*.yml ! -iname snakemake* \
+    ! -iname snakebids* \
+\\) -exec yamlfix {} \\;
+"""
+
+[tool.poe.tasks.yamlfix-check]
+shell = """
+find . -type f \\( \
+    -iname \\*.yaml -o -iname \\*.yml ! -iname snakemake* \
+    ! -iname snakebids* \
+\\) -exec yamlfix --check {} \\;
+"""
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.ruff]
+builtins = [ "snakemake" ]
+
+[tool.snakefmt]
+include = '\.smk$|^Snakefile'
