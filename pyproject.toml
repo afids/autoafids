@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.8, <3.12"
-snakebids = "^0.13.1"
+snakebids = ">=0.13.1"
 pandas = "^2.0.3"
 nilearn = "^0.10.3"
 antspyx = "^0.5.3"
