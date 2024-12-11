@@ -1,77 +1,34 @@
 [tool.poetry]
 name = "autoafids"
 version = "0.1.0"
-description = "End-to-end SnakeBIDS workflow for landmark regression and derivative apps "
-authors = ["Alaa Taha <ataha24@uwo.ca>"]
+description = "End-to-end SnakeBIDS workflow for landmark regression and derivative apps"
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = ">=3.8, <3.12"
-snakebids = "^0.13.1"
-pandas = "^2.0.3"
-nilearn = "^0.10.3"
-antspyx = "^0.5.3"
-tensorflow = "^2.12.0"
-pulp = "<2.6.0"
-scikit-image = "^0.19.3"
-appdirs = "^1.4.4"
-
-[tool.poetry.group.dev.dependencies]
-black = "^23.7.0"
-isort = "^5.12.0"
-poethepoet = "^0.21.1"
-ruff = "^0.0.282"
-snakefmt = "^0.8.4"
-yamlfix = "^1.11.0"
-
-[tool.poetry.scripts]
-auto_afids_cnn_apply = 'autoafids.workflow.scripts.apply:main'
-autoafids = 'autoafids.run:app.run'
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poe.tasks]
-isort = "isort autoafids"
-isort-check = "isort -c autoafids"
-black = "black autoafids"
-black-check = "black --check autoafids"
-ruff = "ruff --fix autoafids"
-ruff-check = "ruff autoafids"
-snakefmt = "snakefmt autoafids"
-snakefmt-check = "snakefmt --check autoafids"
-quality = ["yamlfix", "isort", "black", "ruff", "snakefmt"]
-quality-check = [
-    "yamlfix-check",
-    "isort-check",
-    "black-check",
-    "ruff-check",
-    "snakefmt-check",
+license = "MIT"
+authors = [
+    "Alaa Taha <ataha24@uwo.ca>"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
 ]
 
-[tool.poe.tasks.yamlfix]
-shell = """
-find . -type f \\( \
-    -iname \\*.yaml -o -iname \\*.yml ! -iname snakemake* \
-    ! -iname snakebids* \
-\\) -exec yamlfix {} \\;
-"""
+[tool.poetry.dependencies]
+python = ">=3.9,<3.12"
+snakemake = [
+    { version=">=7.20,<8", python = "<3.11" },
+    { version=">=8.1.2", python = ">=3.11" },
+]
+snakebids = ">=0.13.1"
+pulp = { version="<2.8.0", python = "<3.11" }
+pandas = [
+    { version = ">=2.1.1", python = ">=3.12" },
+]
+tensorflow = "^2.12.0"
 
-[tool.poe.tasks.yamlfix-check]
-shell = """
-find . -type f \\( \
-    -iname \\*.yaml -o -iname \\*.yml ! -iname snakemake* \
-    ! -iname snakebids* \
-\\) -exec yamlfix --check {} \\;
-"""
+[tool.poetry.scripts]
+autoafids = "autoafids.run:app.run"
 
-[tool.isort]
-profile = "black"
-multi_line_output = 3
 
-[tool.ruff]
-builtins = [ "snakemake" ]
-
-[tool.snakefmt]
-include = '\.smk$|^Snakefile'
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
