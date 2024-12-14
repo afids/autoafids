@@ -1,6 +1,8 @@
 bids_dir: "/path/to/bids/dir"
 output_dir: "/path/to/output/dir"
 
+force: True
+
 debug: False
 derivatives: False
 
@@ -89,6 +91,15 @@ parse_args:
       default: 'default'
       required: false
 
+  --enable-bids-validation:
+    help: |
+      Enable validation of BIDS dataset. BIDS validation would be performed
+      using the bids-validator plugin (if installed/enabled) or with the pybids
+      validator implementation (if bids-validator is not installed/enabled).
+    dest: "plugins.validator.skip"
+    action: "store_false"
+    default: True
+
 #--- workflow specific configuration ---
 
 # Nifti template
@@ -106,3 +117,5 @@ singularity:
 resource_urls:
   default: 'zenodo.org/records/14284289/files/model-combined.afidsmodel'
   synthSR: 'zenodo.org/records/14284290/files/model-combined.afidsmodel' # dummy file which doesn't exist
+
+plugins.validator.skip: False
