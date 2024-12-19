@@ -1,4 +1,4 @@
-# Automatic Anatomical Fiducials (autoAFIDs)
+# Automatic Anatomical Fiducials (AutoAFIDs)
 AIMS Lab Research Team at the Robarts Research Institute - 2023-2024
 
 *This package is under active development. It should be stable and reproducible, but please let any of the active contributing members know if there are any bugs or unusual behaviour.*
@@ -48,11 +48,17 @@ Brief summary of the workflow along with its Directed Acyclic Graph (DAG) can be
 2. Generate a landmark Euclidean distance/probability map with each voxel communicating distance to an AFID of interest
 
 ## Train
-Currently, we support generating your own models (i.e., training) in a sperate workflow (i.e., afids-cnn: <LINK>). For more details, see [Known Issues](#known-issues).
+Currently, we support generating your own models (i.e., training) in a sperate workflow (i.e., afids-cnn: https://github.com/afids/afids-CNN). For more details, see [Known Issues](#known-issues).
 
 
 ## Apply
-<TODO>
+Use the classic BIDS App syntax to genereate output AFID .fcsv files. For other derivative outputs, the following flags will be supported: 
+
+--regqc: for quality control of registration on a BIDS dataset and its derivatives (e.g., fMRIPrep or LeadDBS derivative outputs) 
+
+--stereotaxy: predicts a .fcsv file with stereotactic targets (e.g., subthalamaic nucelus) also providing AC-PC transform files in the process 
+
+--charing: to make use of AFID charting analysis on a given dataset 
   
 ## Known Issues
 - Factorize apply workflow to run per landmark of interest
