@@ -191,11 +191,6 @@ rule mni2subfids:
     script:
         "scripts/tform_script.py"
 
-rule preprocessing_result:
-    input:
-        samp = inputs["t1w"].expand(rules.resample_im.output.resam_im),
-        mni = inputs["t1w"].expand(rules.mni2subfids.output.fcsv_new),
-
 include: "rules/cnn.smk"
 
 rule all:

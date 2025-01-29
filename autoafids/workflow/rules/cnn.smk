@@ -20,9 +20,9 @@ rule download_cnn_model:
 
 rule gen_fcsv:
     input:
-        t1w=rules.preprocessing_result.input.samp, 
+        t1w=rules.resample_im.output.resam_im, 
         model=get_model(),
-        prior=rules.preprocessing_result.input.mni,
+        prior=rules.mni2subfids.output.fcsv_new,
     output:
         fcsv=bids(
             root=str(Path(config["output_dir"]) / "afids-cnn"),
