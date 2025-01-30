@@ -39,9 +39,9 @@ poetry install -e
 ```
 
 ## Workflow
-Brief summary of the workflow along with its Directed Acyclic Graph (DAG) can be found below. 
+Below is a simplified example of the workflow along with its Directed Acyclic Graph (DAG) for the --profile fast. Each rounded rectangle (vertex) in the DAG represents a rule, which encompasses some code or script that produces output file(s), and the arrows (edges) represent file inputs and outputs to these rules. 
 
-*Insert DAG image - inspired by khanlab/scattr*
+<img src="docs/dag.svg" alt="Workflow DAG" width="600">
 
 ### Processing landmark data (AFIDs)
 1. Extract fiducial points from the landmark files (.fcsv is supported)
