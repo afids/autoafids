@@ -39,7 +39,7 @@ poetry install -e
 ```
 
 ## Workflow
-Below is a simplified example of the workflow along with its Directed Acyclic Graph (DAG) for the --profile fast. Each rounded rectangle (vertex) in the DAG represents a rule, which encompasses some code or script that produces output file(s), and the arrows (edges) represent file inputs and outputs to these rules. 
+Below is a simplified example of the workflow along with its Directed Acyclic Graph (DAG) for the `--profile` fast. Each rounded rectangle (vertex) in the DAG represents a rule, which encompasses some code or script that produces output file(s), and the arrows (edges) represent file inputs and outputs to these rules. 
 
 <img src="docs/dag.svg" alt="Workflow DAG" width="600">
 
@@ -54,11 +54,11 @@ Currently, we support generating your own models (i.e., training) in a sperate w
 ## Apply
 Use the classic BIDS App syntax to genereate output AFID .fcsv files. For other derivative outputs, the following flags will be supported: 
 
---regqc: for quality control of registration on a BIDS dataset and its derivatives (e.g., fMRIPrep or LeadDBS derivative outputs) 
+`--regqc`: for quality control of registration on a BIDS dataset and its derivatives (e.g., fMRIPrep or LeadDBS derivative outputs) 
 
---stereotaxy: predicts a .fcsv file with stereotactic targets (e.g., subthalamaic nucelus) also providing AC-PC transform files in the process 
+`--stereotaxy`: predicts a .fcsv file with stereotactic targets (e.g., subthalamaic nucelus) also providing AC-PC transform files in the process 
 
---charing: to make use of AFID charting analysis on a given dataset 
+`--charing`: to make use of AFID charting analysis on a given dataset 
   
 ## Known Issues
 - Factorize apply workflow to run per landmark of interest
