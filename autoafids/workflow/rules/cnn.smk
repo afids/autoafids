@@ -21,8 +21,8 @@ rule download_cnn_model:
 rule gen_fcsv:
     input:
         t1w = bids(
-                root=str(Path(config["output_dir"]) / "resample"),
-                datatype="anat",
+                root=work,
+                datatype="resample",
                 desc=chosen_norm_method,
                 res=config["res"],
                 suffix="T1w.nii.gz",
@@ -30,8 +30,8 @@ rule gen_fcsv:
                 ), 
         model = get_model(),
         prior = bids(
-            root=str(Path(config["output_dir"]) / "registration"),
-            datatype="anat",
+            root=work,
+            datatype="registration",
             space="native",
             desc="MNI",
             suffix="afids.fcsv",
@@ -39,7 +39,8 @@ rule gen_fcsv:
         ),
     output:
         fcsv = bids(
-            root=str(Path(config["output_dir"]) / "afids-cnn"),
+            root=root,
+            datatype="afids-cnn",
             desc="afidscnn",
             suffix="afids.fcsv",
             **inputs["t1w"].wildcards

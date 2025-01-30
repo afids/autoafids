@@ -29,6 +29,9 @@ wildcard_constraints:
     autotop="[a-zA-Z0-9]+",
     template="[a-zA-Z0-9]+",
 
+root = os.path.expandvars(config["root"])
+work = os.path.expandvars(config["workdir"])
+
 def get_download_dir():
     if "AUTOAFIDS_CACHE_DIR" in os.environ.keys():
         download_dir = os.environ["AUTOAFIDS_CACHE_DIR"]
@@ -81,15 +84,15 @@ if "n4_bias_correction" in profile_settings:
     rule n4_bias_correction:
         input:
             im=bids(
-            root=str(Path(config["bids_dir"])),
-            datatype="anat",
-            suffix="T1w.nii.gz",
-            **inputs["t1w"].wildcards
+                root=str(Path(config["bids_dir"])),
+                datatype="anat",
+                suffix="T1w.nii.gz",
+                **inputs["t1w"].wildcards
             ),
         output:
             corrected_im=bids(
-                root=str(Path(config["output_dir"]) / "n4biascorr"),
-                datatype="anat",
+                root=work,
+                datatype="n4biascorr",
                 desc="n4corrected",
                 suffix="T1w.nii.gz",
                 **inputs["t1w"].wildcards
@@ -100,26 +103,28 @@ if "n4_bias_correction" in profile_settings:
 
 rule norm_im:
     input:
-        im_raw= lambda wildcards: bids(
-            root=str(Path(config["output_dir"]) / "synthstrip"),
-            datatype="anat",
-            desc="synthstrip",
-            suffix="T1w.nii.gz",
-            **inputs["t1w"].wildcards,
-        ) if "skull_strip" in profile_settings else
-            bids(root=str(Path(config["output_dir"]) / "n4biascorr"),
-                 datatype="anat",
-                 desc="n4corrected",
-                 suffix="T1w.nii.gz",
-                 **inputs["t1w"].wildcards) if "n4_bias_correction" in profile_settings else
+        im_raw = lambda wildcards: bids(
+                root=work,
+                datatype="synthstrip",
+                desc="synthstrip",
+                suffix="T1w.nii.gz",
+                **inputs["t1w"].wildcards
+            ) if "skull_strip" in profile_settings else
+            bids(
+                root=work,
+                datatype="n4biascorr",
+                desc="n4corrected",
+                suffix="T1w.nii.gz",
+                **inputs["t1w"].wildcards
+            ) if "n4_bias_correction" in profile_settings else
             bids(root=str(Path(config["bids_dir"])),
             datatype="anat",
             suffix="T1w.nii.gz",
             **inputs["t1w"].wildcards)
     output:
         im_norm=bids(
-            root=str(Path(config["output_dir"]) / "normalize"),
-            datatype="anat",
+            root=work,
+            datatype="normalize",
             desc=chosen_norm_method,
             suffix="T1w.nii.gz",
             **inputs["t1w"].wildcards,
@@ -134,8 +139,8 @@ if "resample_im" in profile_settings:
     rule resample_im:
         input:
             im_normed=bids(
-            root=str(Path(config["output_dir"]) / "normalize"),
-            datatype="anat",
+            root=work,
+            datatype="normalize",
             desc=chosen_norm_method,
             suffix="T1w.nii.gz",
             **inputs["t1w"].wildcards,
@@ -144,8 +149,8 @@ if "resample_im" in profile_settings:
             res=resolution
         output:
             resam_im=bids(
-                root=str(Path(config["output_dir"]) / "resample"),
-                datatype="anat",
+                root=work,
+                datatype="resample",
                 desc=chosen_norm_method,
                 res=config["res"],
                 suffix="T1w.nii.gz",
@@ -158,8 +163,8 @@ if "resample_im" in profile_settings:
 rule mni2sub:
     input:
         im_resamp = bids(
-                root=str(Path(config["output_dir"]) / "n4biascorr"),
-                datatype="anat",
+                root=work,
+                datatype="n4biascorr",
                 desc="n4corrected",
                 suffix="T1w.nii.gz",
                 **inputs["t1w"].wildcards
@@ -170,22 +175,22 @@ rule mni2sub:
             **inputs["t1w"].wildcards)
     output: 
         xfm_slicer = bids(
-            root=str(Path(config["output_dir"]) / "registration"),
-            datatype="anat",
+            root=work,
+            datatype="registration",
             space="native",
             suffix="slicer.mat",
             **inputs["t1w"].wildcards,
         ),
         xfm_ras = bids(
-            root=str(Path(config["output_dir"]) / "registration"),
-            datatype="anat",
+            root=work,
+            datatype="registration",
             space="native",
             suffix="xfm.txt",
             **inputs["t1w"].wildcards,
         ),
         out_im = bids(
-            root=str(Path(config["output_dir"]) / "registration"),
-            datatype="anat",
+            root=work,
+            datatype="registration",
             space="native",
             suffix="MNI.nii.gz",
             **inputs["t1w"].wildcards,
@@ -198,8 +203,8 @@ rule mni2sub:
 rule mni2subfids:
     input:
         xfm_new = bids(
-            root=str(Path(config["output_dir"]) / "registration"),
-            datatype="anat",
+            root=work,
+            datatype="registration",
             space="native",
             suffix="xfm.txt",
             **inputs["t1w"].wildcards,
@@ -209,8 +214,8 @@ rule mni2subfids:
         fcsv_mni = str(Path(workflow.basedir).parent / config["fcsv_mni"])
     output:
         fcsv_new= bids(
-            root=str(Path(config["output_dir"]) / "registration"),
-            datatype="anat",
+            root=work,
+            datatype="registration",
             space="native",
             desc="MNI",
             suffix="afids.fcsv",
@@ -225,7 +230,8 @@ rule all:
     input:
         models = inputs["t1w"].expand(
            bids(
-                root=str(Path(config["output_dir"]) / "afids-cnn"),
+                root=root,
+                datatype="afids-cnn",
                 desc="afidscnn",
                 suffix="afids.fcsv",
                 **inputs["t1w"].wildcards
