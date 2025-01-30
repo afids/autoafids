@@ -76,40 +76,6 @@ chosen_template =  templates[config['template']]
 print(f'..... {config["profile"]} preprocessing configration .....')
 print(f' the folowing squence will be triggered {profile_settings}')
 
-
-registration_bids = partial(
-    bids,
-    root=str(Path(config["output_dir"]) / "registration"),
-    datatype="anat",
-    space="native",
-    **inputs["t1w"].wildcards,
-)
-
-synthstrip_bids = partial(
-    bids,
-    root=str(Path(config["output_dir"]) / "synthstrip"),
-    datatype="anat",
-    desc="synthstrip",
-    **inputs["t1w"].wildcards,
-)
-
-im_normed = partial(
-    bids,
-    root=str(Path(config["output_dir"]) / "normalize"),
-    datatype="anat",
-    desc=chosen_norm_method,
-    **inputs["t1w"].wildcards,
-)
-
-im_resamp = partial(
-    bids,
-    root=str(Path(config["output_dir"]) / "resample"),
-    datatype="anat",
-    desc=chosen_norm_method,
-    res=config["res"],
-    **inputs["t1w"].wildcards,
-)
-
 if "n4_bias_correction" in profile_settings:
 
     rule n4_bias_correction:
@@ -134,7 +100,13 @@ if "n4_bias_correction" in profile_settings:
 
 rule norm_im:
     input:
-        im_raw= lambda wildcards: synthstrip_bids(suffix="T1w.nii.gz") if "skull_strip" in profile_settings else
+        im_raw= lambda wildcards: bids(
+            root=str(Path(config["output_dir"]) / "synthstrip"),
+            datatype="anat",
+            desc="synthstrip",
+            suffix="T1w.nii.gz",
+            **inputs["t1w"].wildcards,
+        ) if "skull_strip" in profile_settings else
             bids(root=str(Path(config["output_dir"]) / "n4biascorr"),
                  datatype="anat",
                  desc="n4corrected",
@@ -145,7 +117,13 @@ rule norm_im:
             suffix="T1w.nii.gz",
             **inputs["t1w"].wildcards)
     output:
-        im_norm=im_normed(suffix="T1w.nii.gz"),
+        im_norm=bids(
+            root=str(Path(config["output_dir"]) / "normalize"),
+            datatype="anat",
+            desc=chosen_norm_method,
+            suffix="T1w.nii.gz",
+            **inputs["t1w"].wildcards,
+            ),
     params:
         norm_method=chosen_norm_method
     script:
@@ -155,26 +133,63 @@ if "resample_im" in profile_settings:
 
     rule resample_im:
         input:
-            im_normed=rules.norm_im.output.im_norm,
+            im_normed=bids(
+            root=str(Path(config["output_dir"]) / "normalize"),
+            datatype="anat",
+            desc=chosen_norm_method,
+            suffix="T1w.nii.gz",
+            **inputs["t1w"].wildcards,
+            ),
         params:
             res=resolution
         output:
-            resam_im=im_resamp(suffix="T1w.nii.gz"),
+            resam_im=bids(
+                root=str(Path(config["output_dir"]) / "resample"),
+                datatype="anat",
+                desc=chosen_norm_method,
+                res=config["res"],
+                suffix="T1w.nii.gz",
+                **inputs["t1w"].wildcards,
+                ),
         script:
             "scripts/resample_img.py"
 
 
 rule mni2sub:
     input:
-        im_resamp = rules.n4_bias_correction.output.corrected_im if "n4_bias_correction" in profile_settings else
+        im_resamp = bids(
+                root=str(Path(config["output_dir"]) / "n4biascorr"),
+                datatype="anat",
+                desc="n4corrected",
+                suffix="T1w.nii.gz",
+                **inputs["t1w"].wildcards
+            ) if "n4_bias_correction" in profile_settings else
             bids(root=str(Path(config["bids_dir"])),
             datatype="anat",
             suffix="T1w.nii.gz",
             **inputs["t1w"].wildcards)
     output: 
-        xfm_slicer = registration_bids(suffix="slicer.mat"),
-        xfm_ras = registration_bids(suffix="xfm.txt"),
-        out_im = registration_bids(suffix="MNI.nii.gz")
+        xfm_slicer = bids(
+            root=str(Path(config["output_dir"]) / "registration"),
+            datatype="anat",
+            space="native",
+            suffix="slicer.mat",
+            **inputs["t1w"].wildcards,
+        ),
+        xfm_ras = bids(
+            root=str(Path(config["output_dir"]) / "registration"),
+            datatype="anat",
+            space="native",
+            suffix="xfm.txt",
+            **inputs["t1w"].wildcards,
+        ),
+        out_im = bids(
+            root=str(Path(config["output_dir"]) / "registration"),
+            datatype="anat",
+            space="native",
+            suffix="MNI.nii.gz",
+            **inputs["t1w"].wildcards,
+        ),
     params:
         moving = str(Path(workflow.basedir).parent / chosen_template)
     script: 
@@ -182,12 +197,25 @@ rule mni2sub:
 
 rule mni2subfids:
     input:
-        xfm_new = rules.mni2sub.output.xfm_ras
+        xfm_new = bids(
+            root=str(Path(config["output_dir"]) / "registration"),
+            datatype="anat",
+            space="native",
+            suffix="xfm.txt",
+            **inputs["t1w"].wildcards,
+        )
     params:
         fcsv=str(Path(workflow.basedir).parent / config["fcsv"]),
         fcsv_mni = str(Path(workflow.basedir).parent / config["fcsv_mni"])
     output:
-        fcsv_new=registration_bids(desc="MNI", suffix="afids.fcsv"),
+        fcsv_new= bids(
+            root=str(Path(config["output_dir"]) / "registration"),
+            datatype="anat",
+            space="native",
+            desc="MNI",
+            suffix="afids.fcsv",
+            **inputs["t1w"].wildcards,
+        ),
     script:
         "scripts/tform_script.py"
 
@@ -195,7 +223,12 @@ include: "rules/cnn.smk"
 
 rule all:
     input:
-        models=inputs["t1w"].expand(
-            rules.gen_fcsv.output.fcsv,
+        models = inputs["t1w"].expand(
+           bids(
+                root=str(Path(config["output_dir"]) / "afids-cnn"),
+                desc="afidscnn",
+                suffix="afids.fcsv",
+                **inputs["t1w"].wildcards
         ),
+    ),
     default_target: True

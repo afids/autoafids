@@ -20,11 +20,25 @@ rule download_cnn_model:
 
 rule gen_fcsv:
     input:
-        t1w=rules.resample_im.output.resam_im, 
-        model=get_model(),
-        prior=rules.mni2subfids.output.fcsv_new,
+        t1w = bids(
+                root=str(Path(config["output_dir"]) / "resample"),
+                datatype="anat",
+                desc=chosen_norm_method,
+                res=config["res"],
+                suffix="T1w.nii.gz",
+                **inputs["t1w"].wildcards,
+                ), 
+        model = get_model(),
+        prior = bids(
+            root=str(Path(config["output_dir"]) / "registration"),
+            datatype="anat",
+            space="native",
+            desc="MNI",
+            suffix="afids.fcsv",
+            **inputs["t1w"].wildcards,
+        ),
     output:
-        fcsv=bids(
+        fcsv = bids(
             root=str(Path(config["output_dir"]) / "afids-cnn"),
             desc="afidscnn",
             suffix="afids.fcsv",
