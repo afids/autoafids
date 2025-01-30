@@ -2029,8 +2029,8 @@ files = [
 
 [package.dependencies]
 numpy = [
-    {version = ">=1.20.3", markers = "python_version < \"3.10\""},
     {version = ">=1.21.0", markers = "python_version >= \"3.10\""},
+    {version = ">=1.20.3", markers = "python_version < \"3.10\""},
 ]
 python-dateutil = ">=2.8.2"
 pytz = ">=2020.1"
@@ -3414,13 +3414,13 @@ files = [
 
 [[package]]
 name = "snakebids"
-version = "0.13.1"
+version = "0.14.0"
 description = "BIDS integration into snakemake workflows"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "snakebids-0.13.1-py3-none-any.whl", hash = "sha256:3c68251d54e0615c3bdbf5b8050c0c0a3a58b9789a44c5e1bf75b3ec310cd7a5"},
-    {file = "snakebids-0.13.1.tar.gz", hash = "sha256:97395a8dfe225e1a15f66dd3562e07afa48370318cba932f0b375f860ff9c2c4"},
+    {file = "snakebids-0.14.0-py3-none-any.whl", hash = "sha256:b799eceb16d644cf3481ebb4e2008a5a00b3d290619ac2503867aed71a7e53b8"},
+    {file = "snakebids-0.14.0.tar.gz", hash = "sha256:acb987df3f9e763dd20a3398ac199282ff9443796ab115f610c7d06d0a831ece"},
 ]
 
 [package.dependencies]
@@ -4218,4 +4218,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9, <3.11"
-content-hash = "89beef7afd93f3e8600538ba4032907cef5e82a11f636675993781713de426b9"
+content-hash = "b55fd2a39db8b7da9d63483c76ba9bc1884090920ba22b0206f5b560bb62cd73"
