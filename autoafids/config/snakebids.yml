@@ -17,7 +17,19 @@ targets_by_analysis_level:
 pybids_inputs:
   t1w:
     filters:
-      suffix: [T1w, T2w]
+      suffix: T1w
+      extension: .nii.gz
+      datatype: anat
+    wildcards:
+      - subject
+      - session
+      - acquisition
+      - reconstruction
+      - run
+    
+  not_t1w:
+    filters:
+      suffix: T2w
       extension: .nii.gz
       datatype: anat
     wildcards:
@@ -76,9 +88,9 @@ parse_args:
       help: 'Specify the resampling resolution (e.g. "100" for 1mm) for images, any resolution is supported but limited to isotropic resampling. (default: %(default)s)'
       default: '100'  # Default to 1 
     
-  --template: 
+  --modality: 
       help: 'Specify the template to use (e.g., T1w or T2w).'
-      default: 'T1w'
+      default: 't1w'
 
   --derivatives:
       help: 'Path(s) to a derivatives dataset, for folder(s) that contains multiple
