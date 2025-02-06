@@ -96,7 +96,8 @@ if config['modality'] != "t1w":
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
             ),
-        shell: 'singularity run docker://mackenzieasnyder/synthsr:latest python /app/scripts/predict_command_line.py {input.im} {output.preprocessed_im} --cpu'
+        container: config['singularity']['synthsr']
+        shell: 'python /app/scripts/predict_command_line.py {input.im} {output.preprocessed_im} --cpu'
 
 if "n4_bias_correction" in profile_settings:
 

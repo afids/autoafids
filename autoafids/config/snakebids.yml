@@ -131,7 +131,8 @@ fcsv: 'resources/dummy.fcsv'
 fcsv_mni: 'resources/tpl-MNI152NLin2009cAsym_res-01_desc-groundtruth_afids.fcsv'
 
 singularity:
-  synthstrip: docker://freesurfer/synthstrip:1.3
+  synthstrip: 'docker://freesurfer/synthstrip:1.3'
+  synthsr: 'docker://mackenzieasnyder/synthsr:latest'
 
 # It will be downloaded to ~/.cache/autoafids
 resource_urls:
