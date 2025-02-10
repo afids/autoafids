@@ -68,13 +68,7 @@ chosen_norm_method =  norm_methods[int(config['norm'])]
 # Chosen resampling resolution
 resolution = float(config['res'])
 
-# Chosen template 
-templates = {
-    "t1w": config['templatet1w'], 
-    "not_t1w": config['templatet2w']
-}
-
-chosen_template =  templates[config['modality']]
+templatet1w =  config['templatet1w']
 
 print(f'..... {config["profile"]} preprocessing configration .....')
 print(f' the folowing squence will be triggered {profile_settings}')
@@ -240,7 +234,7 @@ rule mni2sub:
             **inputs[config['modality']].wildcards,
         ),
     params:
-        moving = str(Path(workflow.basedir).parent / chosen_template)
+        moving = str(Path(workflow.basedir).parent / templatet1w)
     script: 
         "scripts/regis_script.py"
 
