@@ -13,7 +13,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9, <3.11"
+python = ">=3.10, <3.11"
 snakebids = "0.14.0"
 nilearn = "^0.10.3"
 antspyx = "^0.5.3"
