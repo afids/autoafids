@@ -89,7 +89,7 @@ parse_args:
       default: '100'  # Default to 1 
     
   --modality: 
-      help: 'Specify the template to use (e.g., T1w or T2w).'
+      help: 'Specify the modality to use (e.g., T1w or T2w).'
       default: 't1w'
 
   --derivatives:
@@ -124,7 +124,6 @@ parse_args:
 
 # Nifti template
 templatet1w: 'resources/tpl-MNI152NLin2009cAsym_res-01_T1w.nii.gz'
-templatet2w: 'resources/tpl-MNI152NLin2009cAsym_res-01_T2w.nii.gz'
 
 # AFIDs fcsv template
 fcsv: 'resources/dummy.fcsv'
