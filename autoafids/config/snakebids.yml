@@ -89,7 +89,7 @@ parse_args:
       default: '100'  # Default to 1 
     
   --modality: 
-      help: 'Specify the modality to use (e.g., T1w or T2w).'
+      help: 'Specify the modality to use (e.g., T1w or alternative).'
       default: 't1w'
 
   --derivatives:
