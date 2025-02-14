@@ -100,6 +100,13 @@ parse_args:
     action: "store_false"
     default: True
 
+  --stereotaxy:
+    help: 'Predict stereotactic target coordinates from output AFIDs. Also supplies AC-PC transform matrix (4x4) in the process.{STN = subthalamic nucelus, cZI = caudal zona incerta}'
+    choices: ['STN','cZI']
+    default: false
+    required: false
+
+
   --workdir:
     help: |
       Folder for storing working files. If not specified, will be in "work/" subfolder 
@@ -125,6 +132,11 @@ singularity:
 resource_urls:
   default: 'zenodo.org/records/14284289/files/model-combined.afidsmodel'
   synthSR: 'zenodo.org/records/14284290/files/model-combined.afidsmodel' # dummy file which doesn't exist
+
+#Stereotaxy models 
+STN: 'resources/stereotaxy/STN.pkl'
+cZI: 'resources/stereotaxy/STN.pkl' #change to czi model but dummy here for testing
+template_fcsv: 'resources/stereotaxy/target_template.fcsv'
 
 plugins.validator.skip: False
 root: results

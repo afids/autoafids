@@ -79,6 +79,13 @@ chosen_template =  templates[config['template']]
 print(f'..... {config["profile"]} preprocessing configration .....')
 print(f' the folowing squence will be triggered {profile_settings}')
 
+if config["stereotaxy"] in ['STN','cZI']:
+    stereotaxy_target = config["stereotaxy"]
+    print("stereotaxy feature enabled") 
+    include: "rules/stereotaxy.smk"
+else: 
+    stereotaxy = False
+
 if "n4_bias_correction" in profile_settings:
 
     rule n4_bias_correction:
@@ -229,12 +236,22 @@ include: "rules/cnn.smk"
 rule all:
     input:
         models = inputs["t1w"].expand(
-           bids(
+            bids(
                 root=root,
                 datatype="afids-cnn",
                 desc="afidscnn",
                 suffix="afids.fcsv",
                 **inputs["t1w"].wildcards
+            )
         ),
-    ),
+        afidspred = inputs["t1w"].expand(
+            bids(
+                root=root,
+                datatype= "stereotaxy",
+                desc=stereotaxy_target,
+                suffix="native.fcsv",
+                **inputs["t1w"].wildcards
+            )   
+
+        ) if config["stereotaxy"] else [],
     default_target: True

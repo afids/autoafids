@@ -42,6 +42,7 @@ yamlfix = "^1.11.0"
 
 [tool.poetry.scripts]
 auto_afids_cnn_apply = 'autoafids.workflow.scripts.apply:main'
+stereotaxy = 'autoafids.workflow.scripts.stereotaxy:main'
 autoafids = "autoafids.run:app.run"
 
 
