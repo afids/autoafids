@@ -31,5 +31,5 @@ rule afidspred:
         model=str(Path(workflow.basedir).parent / config[stereotaxy_target]),
         midpoint="PMJ",
         target_fcsv = str(Path(workflow.basedir).parent / config['template_fcsv'])
-    script:
-        "../scripts/stereotaxy.py"
+    shell:
+        'stereotaxy {input.afidfcsv} {params.model} {params.midpoint} {output.ACPC_txt} {params.target_fcsv} {output.fcsv_mcp} {output.fcsv_native}'
