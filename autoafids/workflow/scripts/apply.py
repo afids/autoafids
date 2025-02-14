@@ -22,6 +22,7 @@ import pandas as pd
 import skimage.measure
 from numpy.typing import NDArray
 import tensorflow as tf
+tf.autograph.set_verbosity(0) #turn off epoch progress
 from .utils import afids_to_fcsv
 
 
@@ -354,7 +355,7 @@ def apply_all(
 
         # Iterate through labels
         for afid_label in range(1, 33):
-            print(f"Processing AFID Label: {afid_label}")
+            #print(f"Processing AFID Label: {afid_label}")
 
             # Locate the weight file for the current label directly in the tarfile
             weight_file_name = extract_afids_model(tar_file, model_dir, afid_label)
