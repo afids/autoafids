@@ -75,7 +75,7 @@ def dftodfml(fcsvdf):
     df_xyz = fcsvdf[['x','y','z']].melt().transpose()
 
     #Use number of row in fcsv to make number points
-    colnames = [f'{axis}_{i % int(fcsvdf.shape[0]) + 1}' for axis in ['x', 'y', 'z'] for i in range(int(df_raw.shape[0]))]
+    colnames = [f'{axis}_{i % int(fcsvdf.shape[0]) + 1}' for axis in ['x', 'y', 'z'] for i in range(int(fcsvdf.shape[0]))]
     
     #Reassign features to be descriptive of coordinate
     df_xyz.columns = colnames
@@ -198,7 +198,7 @@ def generate_slicer_file(matrix, filename):
     with open(filename, 'w') as file:
         file.write(tfm_content)
 
-def acpcmatrix(fcsv_path, midline, center_on_mcp = True, write_matrix = False, transform_file_name = None):
+def acpcmatrix(fcsv_path, midline, center_on_mcp = False, write_matrix = True, transform_file_name = None):
     """
     Computes a 4x4 transformation matrix aligning with the AC-PC axis.
     
@@ -252,6 +252,13 @@ def acpcmatrix(fcsv_path, midline, center_on_mcp = True, write_matrix = False, t
 def mcp_origin(df_afids):
     """
     sets MCP as the origin point for each of the subjects
+
+    Parameters:
+    - df_afids: pandas.DataFrame
+    
+    Returns:
+    - df_afids_ori_mcp: pandas.DataFrame, mcp centered points.
+    - mcp coordinates: tuple, x,y,z coordiantes of mcp point.
     """
     # extract MCP coordinates; defined as average point between AC and PC
     MCPx = (df_afids['x_1'] + df_afids['x_2'])/2
@@ -293,7 +300,7 @@ def transform_afids(fcsv_path, slicer_tfm, midpoint):
     """
     
     # Compute the 4x4 AC-PC transformation matrix
-    xfm_txt = acpcmatrix(fcsv_path, midpoint, slicer_tfm, center_on_mcp = False, write_matrix = True)
+    xfm_txt = acpcmatrix(fcsv_path = fcsv_path, midline = midpoint, transform_file_name = slicer_tfm)
 
     # Read coordinates from the file
     fcsv_df = pd.read_table(fcsv_path, sep=",", header=2)

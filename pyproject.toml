@@ -42,6 +42,7 @@ snakefmt = "^0.8.4"
 yamlfix = "^1.11.0"
 
 [tool.poetry.scripts]
+stereotaxy = 'autoafids.workflow.scripts.stereotaxy:main'
 autoafids = "autoafids.run:app.run"
 
 

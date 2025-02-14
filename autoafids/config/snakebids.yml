@@ -163,7 +163,7 @@ resource_urls:
 #Stereotaxy models 
 STN: 'resources/stereotaxy/STN.pkl'
 cZI: 'resources/stereotaxy/STN.pkl' #change to czi model but dummy here for testing
-template_fcsv: 'resources/stereotaxy/target_template'
+template_fcsv: 'resources/stereotaxy/target_template.fcsv'
 
 plugins.validator.skip: False
 root: results
