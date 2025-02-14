@@ -18,6 +18,7 @@ import pandas as pd
 import skimage.measure
 from numpy.typing import NDArray
 import tensorflow as tf
+tf.autograph.set_verbosity(0) #turn off epoch progress
 from utils import afids_to_fcsv
 
 

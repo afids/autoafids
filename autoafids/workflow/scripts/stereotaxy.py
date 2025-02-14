@@ -12,6 +12,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA  
 from sklearn.linear_model import Ridge
 
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
+
 from .utils import transform_afids, fids_to_fcsv, mcp_origin, dftodfml, make_zero
 
 #hardcoding right and left hemisphere afids for reflecting
@@ -55,68 +58,80 @@ def model_pred(
     -------
         None
     """
-
+    # Transform input fiducial data using the specified transformation matrix
     fcsvdf_xfm = transform_afids(in_fcsv, slicer_tfm, midpoint)
-    xfm_txt = fcsvdf_xfm[1]
+    xfm_txt = fcsvdf_xfm[1]  # Transformation matrix in array form
     df_sub = dftodfml(fcsvdf_xfm[0])[0]
-    df_sub_mcp , mcp = mcp_origin(df_sub) #compute MCP and center on MCP
 
-    #reflect left side to the right (only works because coordiante data has been already ACPC transformed and MCP centered)
+    # Compute MCP (midpoint of the collicular plate) and center the fiducials on the MCP
+    df_sub_mcp, mcp = mcp_origin(df_sub)
+
+    # Reflect left hemisphere fiducials onto the right hemisphere.
+    # This works because the data has already been ACPC-aligned and MCP-centered.
     df_sub_mcp_l = df_sub_mcp.copy()
-    for column in df_sub_mcp_l.columns:
-        if 'x' in column:
-            df_sub_mcp_l[column] *= -1
+    df_sub_mcp_l.loc[:, df_sub_mcp_l.columns.str.contains('x')] *= -1  # Flip 'x' coordinates to mirror
 
-    #drop left labels from right df vice versa; note now "midline" points have a sign depending on where they were placed (i.e., little to the right vs left). Hypothesis is that this information may be meaningful and should NOT be controlled
-    df_sub_mcp = df_sub_mcp.drop(left_afids,axis =1 )
-    df_sub_mcp_l = df_sub_mcp_l.drop(right_afids,axis=1)
+    # Drop left hemisphere fiducials from the original and right hemisphere fiducials from the mirrored copy.
+    # This retains the midline points with their original signs.
+    df_sub_mcp = df_sub_mcp.drop(left_afids, axis=1)
+    df_sub_mcp_l = df_sub_mcp_l.drop(right_afids, axis=1)
+
+    # Standardize column names for concatenation
     df_sub_mcp.columns = combined_lables
     df_sub_mcp_l.columns = combined_lables
-    combined = [df_sub_mcp, df_sub_mcp_l]
 
-    df_sub_mcp = pd.concat(combined, ignore_index=True)
-    cols_to_modify = (df_sub_mcp.select_dtypes(include='number') > -0.0001).all() & (df_sub_mcp.select_dtypes(include='number') < 0.0001).all()
+    # Combine the original and mirrored dataframes into a single dataset
+    df_sub_mcp = pd.concat([df_sub_mcp, df_sub_mcp_l], ignore_index=True)
+
+    # Replace near-zero values with exact zero to avoid floating-point precision issues
+    cols_to_modify = (
+        (df_sub_mcp.select_dtypes(include='number') > -0.0001).all() & 
+        (df_sub_mcp.select_dtypes(include='number') < 0.0001).all()
+    )
     df_sub_mcp.loc[:, cols_to_modify] = df_sub_mcp.loc[:, cols_to_modify].applymap(make_zero)
 
-    # Load the bundled objects dictionary
+    # Load the trained model components from the pickle file
     with open(model, 'rb') as file:
         objects_dict = pickle.load(file)
 
-    # Extract the objects from the dictionary
+    # Extract preprocessing objects and Ridge regression models
     standard_scaler = objects_dict['standard_scaler']
     pca = objects_dict['pca']
-    ridge_inference = [objects_dict['x'],objects_dict['y'],objects_dict['z']]
+    ridge_inference = [objects_dict['x'], objects_dict['y'], objects_dict['z']]
 
-
+    # Apply standard scaling and PCA transformation to the data
     df_sub_mcp = standard_scaler.transform(df_sub_mcp.values)
     df_sub_mcp = pca.transform(df_sub_mcp)
 
+    # Make predictions using Ridge regression models for x, y, z coordinates
+    y_sub = np.column_stack([ridge.predict(df_sub_mcp) for ridge in ridge_inference])
 
-    y_sub = np.column_stack([ridge.predict(df_sub_mcp) for ridge in ridge_inference]) #make prediction on transformed data
+    # Adjust the second predicted x-coordinate to reflect the left hemisphere
+    y_sub[1, 0] *= -1
 
-    #relative to MCP in acpc space
-    stncoords = np.zeros((2,3)) #init a empty matrix for native space coordaintes
+    # Save the predicted MCP-centered coordinates to a CSV file
+    fids_to_fcsv(y_sub, template_fcsv, target_mcp)
 
-    y_sub[1,0] = y_sub[1,0] * -1
-
-    fids_to_fcsv(y_sub, template_fcsv, target_mcp) #save model outputs
-
-    #in native space
+    # Convert MCP-centered coordinates to native space
     stn_r_mcp = y_sub[0, :] + mcp.ravel()
     stn_l_mcp = y_sub[1, :] + mcp.ravel()
 
+    # Create vectors for right and left fiducials with homogeneous coordinates
     vecr = np.hstack([stn_r_mcp.ravel(), 1])
     vecl = np.hstack([stn_l_mcp.ravel(), 1])
 
+    # Apply the inverse transformation matrix to convert coordinates to native space
+    stn_r_native = np.linalg.inv(xfm_txt) @ vecr.T
+    stn_l_native = np.linalg.inv(xfm_txt) @ vecl.T
 
-    stn_r_native = np.linalg.inv(xfm_txt) @ vecr.T #applying tranformations to coordiantes
-    stn_l_native = np.linalg.inv(xfm_txt) @ vecl.T #applying tranformations to coordiantes 
+    # Store the final native-space coordinates in a matrix
+    stncoords = np.zeros((2, 3))
+    stncoords[0, :] = stn_r_native[:3]
+    stncoords[1, :] = stn_l_native[:3]
 
+    # Save the native-space coordinates to the output file
+    fids_to_fcsv(stncoords, template_fcsv, target_native)
 
-    stncoords[0,:] = stn_r_native[:3]
-    stncoords[1,:] = stn_l_native[:3]
-
-    fids_to_fcsv(stncoords, template_fcsv,target_native) #save model outputs
 
 
 def gen_parser() -> ArgumentParser:
