@@ -317,6 +317,7 @@ def apply_model(
 
 def apply_all(
     model_path: PathLike,
+    extracted_model: PathLike,
     img: nib.nifti1.Nifti1Image,
     prior: PathLike,
 ) -> Dict[int, NDArray]:
@@ -327,6 +328,9 @@ def apply_all(
     ----------
         model_path : PathLike
             Path to tarfile containing model weights
+
+        extracted_model : PathLike
+            Path to model weights
         
         img : nib.nifti1.Nifti1Image
             Input image to be predicted
@@ -339,15 +343,16 @@ def apply_all(
         afid_dict : dict
             Dictionary of all predicted landmarks
     """
+    # Extract configuration
     with tarfile.open(model_path, "r:gz") as tar_file:
-        # Extract configuration
         config_file = extract_config(tar_file)
         radius = int(json.load(config_file)["radius"])
+
+        afid_label_1 = 1
+        model_architecture_path = extracted_model + "/" + f"afid-{afid_label_1:02}.model"
         
         # Extract the shared model architecture
-        with tempfile.TemporaryDirectory() as model_dir:
-            model_architecture_path = extract_afids_model(tar_file, model_dir, 1)
-            model = tf.keras.models.load_model(model_architecture_path)
+        model = tf.keras.models.load_model(model_architecture_path)
 
         # Create an empty dictionary for storing predictions
         afid_dict: Dict[int, NDArray] = {}
@@ -357,11 +362,11 @@ def apply_all(
             print(f"Processing AFID Label: {afid_label}")
 
             # Locate the weight file for the current label directly in the tarfile
-            weight_file_name = extract_afids_model(tar_file, model_dir, afid_label)
+            weight_file_name = extracted_model + "/" + f"afid-{afid_label:02}.model"
             
             
             # Load weights into memory (avoid disk I/O)
-           # weight_file_data = BytesIO(tar_file.extractfile(weight_file_name).read())
+            # weight_file_data = BytesIO(tar_file.extractfile(weight_file_name).read())
             model.load_weights(weight_file_name).expect_partial()
 
             # Apply the model to make predictions
@@ -401,45 +406,6 @@ def extract_config(tar_file: tarfile.TarFile) -> IO[bytes]:
     return config_file
 
 
-def extract_afids_model(
-    tar_file: tarfile.TarFile,
-    out_path: PathLike[str] | str,
-    afid_label: int,
-) -> Path:
-    """
-    Extract afids model
-
-    Parameters
-    ----------
-        tar_file :: tarfile.TarFile
-            ML model .tar file genereated from train workflow 
-        
-        out_path :: str
-            Output path for predicted fiducails
-
-        afid_label :: int
-            fiducial label of interest as defined by the protocol 
-
-    Returns
-    -------
-        None
-    """
-    for member in tar_file.getmembers():
-        if member.isdir() and f"afid-{afid_label:02}" in member.name:
-            tar_file.extractall(
-                path=out_path,
-                members=[
-                    candidate
-                    for candidate in tar_file.getmembers()
-                    if candidate.name.startswith(f"{member.name}/")
-                ],
-            )
-
-            return Path(out_path) / member.name
-    msg = f"AFID {afid_label:02} model"
-    raise ArchiveMissingDataError(msg, tar_file)
-
-
 class ArchiveMissingDataError(Exception):
     def __init__(self, missing_data: str, tar_file: tarfile.TarFile) -> None:
         super().__init__(
@@ -462,7 +428,8 @@ def gen_parser() -> ArgumentParser:
     """
     parser = ArgumentParser()
     parser.add_argument("img", help="The image for which to produce an FCSV.")
-    parser.add_argument("model", help="The afids-CNN model to apply.")
+    parser.add_argument("model_path", help="The afids-CNN model to apply.")
+    parser.add_argument("extracted_model", help="The afids-CNN model to apply.")
     parser.add_argument("fcsv_path", help="The path to write the output FCSV.")
     parser.add_argument("sub_prior", help="The coordinates to define model prediction space")
     return parser
@@ -483,7 +450,7 @@ def main():
     args = gen_parser().parse_args()
     img = nib.nifti1.load(args.img)
 
-    predictions = apply_all(args.model, img,args.sub_prior)
+    predictions = apply_all(args.model_path, args.extracted_model, img,args.sub_prior)
     afids_to_fcsv(predictions, args.fcsv_path)
 
 
