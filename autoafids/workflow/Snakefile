@@ -4,9 +4,11 @@ from appdirs import AppDirs
 
 configfile: 'config/snakebids.yml'
 
+selected_pybids_input = {config['modality']: config['pybids_inputs'][config['modality']]}
+
 inputs = generate_inputs(
     bids_dir=config['bids_dir'],
-    pybids_inputs=config['pybids_inputs'],
+    pybids_inputs=selected_pybids_input,
     pybids_config=["bids", "derivatives"],
     derivatives=config["derivatives"],
     participant_label=config["participant_label"],
@@ -73,13 +75,13 @@ templatet1w =  config['templatet1w']
 print(f'..... {config["profile"]} preprocessing configration .....')
 print(f' the folowing squence will be triggered {profile_settings}')
 
-if config['modality'] != "t1w":
+if config['modality'] != "T1w":
     rule synthsr:
         input: 
             im=bids(
                 root=str(Path(config["bids_dir"])),
                 datatype="anat",
-                suffix="T2w.nii.gz",
+                suffix=f"{config['modality']}.nii.gz",
                 **inputs[config['modality']].wildcards
             ),
         output:
@@ -102,7 +104,7 @@ if "n4_bias_correction" in profile_settings:
                 datatype="anat",
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
-            )if config['modality'] == "t1w" else
+            )if config['modality'] == "T1w" else
             bids(
                 root=work,
                 datatype="anat",
@@ -143,7 +145,7 @@ rule norm_im:
                 datatype="anat",
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
-            ) if config['modality'] == "t1w" else
+            ) if config['modality'] == "T1w" else
             bids(
                 root=work,
                 datatype="anat",
@@ -203,7 +205,7 @@ rule mni2sub:
             datatype="anat",
             suffix="T1w.nii.gz",
             **inputs[config['modality']].wildcards
-            ) if config['modality'] == "t1w" else
+            ) if config['modality'] == "T1w" else
             bids(
                 root=work,
                 datatype="anat",

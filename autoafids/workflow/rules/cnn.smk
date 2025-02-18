@@ -26,7 +26,7 @@ rule gen_fcsv:
             space="native",
             desc="MNI",
             suffix="afids.fcsv",
-            **inputs["t1w"].wildcards,
+            **inputs["T1w"].wildcards,
         ),
         model_dir = Path(download_dir) / "models"
     output:
@@ -35,13 +35,13 @@ rule gen_fcsv:
             datatype="afids-cnn",
             desc="afidscnn",
             suffix="afids.fcsv",
-            **inputs["t1w"].wildcards
+            **inputs["T1w"].wildcards
         ),
     log:
         bids(
             root="logs",
             suffix="landmark.log",
-            **inputs["t1w"].wildcards
+            **inputs["T1w"].wildcards
         ),
     shell:
         'auto_afids_cnn_apply {input.t1w} {input.model_dir} {output.fcsv} {input.prior}'

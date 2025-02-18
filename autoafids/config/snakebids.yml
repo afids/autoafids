@@ -15,7 +15,7 @@ targets_by_analysis_level:
 
 # from autoafids_prep
 pybids_inputs:
-  t1w:
+  T1w:
     filters:
       suffix: T1w
       extension: .nii.gz
@@ -27,9 +27,21 @@ pybids_inputs:
       - reconstruction
       - run
     
-  not_t1w:
+  T2w:
     filters:
       suffix: T2w
+      extension: .nii.gz
+      datatype: anat
+    wildcards:
+      - subject
+      - session
+      - acquisition
+      - reconstruction
+      - run
+  
+  FLAIR:
+    filters:
+      suffix: FLAIR
       extension: .nii.gz
       datatype: anat
     wildcards:
@@ -89,8 +101,12 @@ parse_args:
       default: '100'  # Default to 1 
     
   --modality: 
-      help: 'Specify the modality to use (e.g., T1w or alternative).'
-      default: 't1w'
+      help: 'Specify the modality to use (e.g., T1w, T2w, or FLAIR).'
+      default: 'T1w'
+      choices:
+        - T1w
+        - T2w
+        - FLAIR
 
   --derivatives:
       help: 'Path(s) to a derivatives dataset, for folder(s) that contains multiple
