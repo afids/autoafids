@@ -1,10 +1,20 @@
 import snakebids
 from snakebids import bids, generate_inputs, get_wildcard_constraints
 from appdirs import AppDirs
+import warnings 
 
 configfile: 'config/snakebids.yml'
 
+# select the pybids inputs of the chosen modality
 selected_pybids_input = {config['modality']: config['pybids_inputs'][config['modality']]}
+
+# show synthsr warning message if t2w or flair is chosen 
+warn_modalities = ['T2w', 'FLAIR']
+if config['modality'] in warn_modalities:
+    warnings.warn(
+        f"The AFIDS prediction on a {config['modality']} image is only as accurate as the SynthSR conversion of a {config['modality']} to a T1w image.",
+        UserWarning
+    )
 
 inputs = generate_inputs(
     bids_dir=config['bids_dir'],
@@ -87,7 +97,7 @@ if config['modality'] != "T1w":
         output:
             preprocessed_im=bids(
                 root=work,
-                datatype="anat",
+                datatype="non_t1w_preprocessed",
                 desc="non_t1w_preprocessed",
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
@@ -107,7 +117,7 @@ if "n4_bias_correction" in profile_settings:
             )if config['modality'] == "T1w" else
             bids(
                 root=work,
-                datatype="anat",
+                datatype="non_t1w_preprocessed",
                 desc="non_t1w_preprocessed",
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
@@ -148,7 +158,7 @@ rule norm_im:
             ) if config['modality'] == "T1w" else
             bids(
                 root=work,
-                datatype="anat",
+                datatype="non_t1w_preprocessed",
                 desc="non_t1w_preprocessed",
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
@@ -208,7 +218,7 @@ rule mni2sub:
             ) if config['modality'] == "T1w" else
             bids(
                 root=work,
-                datatype="anat",
+                datatype="non_t1w_preprocessed",
                 desc="non_t1w_preprocessed",
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
