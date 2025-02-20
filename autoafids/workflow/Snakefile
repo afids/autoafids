@@ -102,8 +102,17 @@ if config['modality'] != "T1w":
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
             ),
+        log:
+            bids(
+            root="logs",
+            suffix="synthsr_output.txt",
+            **inputs[config['modality']].wildcards
+        ),
         container: config['singularity']['synthsr']
-        shell: 'python /app/scripts/predict_command_line.py {input.im} {output.preprocessed_im} --cpu'
+        shell: 
+            """
+                python /app/scripts/predict_command_line.py {input.im} {output.preprocessed_im} --cpu > {log} 2>&1
+            """
 
 if "n4_bias_correction" in profile_settings:
 
