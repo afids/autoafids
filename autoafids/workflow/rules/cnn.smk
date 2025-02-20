@@ -6,9 +6,9 @@ rule download_cnn_model:
     output:
         unzip_dir=directory(Path(download_dir) / "models")
     shell:
-        "wget https://{params.url} -O temp.zip && "
-        " unzip -d {output.unzip_dir} temp.zip && "
-        " rm temp.zip"
+        "wget https://{params.url} -O model.zip && "
+        " unzip -q -d {output.unzip_dir} model.zip && "
+        " rm model.zip"
     
 rule gen_fcsv:
     input:
