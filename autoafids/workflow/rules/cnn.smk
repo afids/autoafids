@@ -1,23 +1,15 @@
 # populate the AUTOAFIDS_CACHE_DIR folder as needed
 
-def get_model():
-    model_name = config["model"]
-
-    local_model = config["resource_urls"].get(model_name, None)
-    if local_model == None:
-        print(f"ERROR: {model_name} does not exist.")
-
-    return (Path(download_dir)/ "model" / Path(local_model).name).absolute()
-
 rule download_cnn_model:
     params:
         url=config["resource_urls"][config["model"]],
-        model_dir=Path(download_dir) / "model"
     output:
-        model=get_model()
+        unzip_dir=directory(Path(download_dir) / "models")
     shell:
-        "mkdir -p {params.model_dir} && wget https://{params.url} -O {output}"
-
+        "wget https://{params.url} -O model.zip && "
+        " unzip -q -d {output.unzip_dir} model.zip && "
+        " rm model.zip"
+    
 rule gen_fcsv:
     input:
         t1w = bids(
@@ -27,8 +19,7 @@ rule gen_fcsv:
                 res=config["res"],
                 suffix="T1w.nii.gz",
                 **inputs["t1w"].wildcards,
-                ), 
-        model = get_model(),
+                ),
         prior = bids(
             root=work,
             datatype="registration",
@@ -37,6 +28,7 @@ rule gen_fcsv:
             suffix="afids.fcsv",
             **inputs["t1w"].wildcards,
         ),
+        model_dir = Path(download_dir) / "models"
     output:
         fcsv = bids(
             root=root,
@@ -52,4 +44,4 @@ rule gen_fcsv:
             **inputs["t1w"].wildcards
         ),
     shell:
-        'auto_afids_cnn_apply {input.t1w} {input.model} {output.fcsv} {input.prior}'
+        'auto_afids_cnn_apply {input.t1w} {input.model_dir} {output.fcsv} {input.prior}'

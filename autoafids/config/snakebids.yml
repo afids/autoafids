@@ -123,8 +123,7 @@ singularity:
 
 # It will be downloaded to ~/.cache/autoafids
 resource_urls:
-  default: 'zenodo.org/records/14284289/files/model-combined.afidsmodel'
-  synthSR: 'zenodo.org/records/14284290/files/model-combined.afidsmodel' # dummy file which doesn't exist
+  default: 'files.osf.io/v1/resources/9fptg/providers/osfstorage/?zip='
 
 plugins.validator.skip: False
 root: results
