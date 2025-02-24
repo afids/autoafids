@@ -51,7 +51,7 @@ processing_steps = {
     "superfast": ["norm_im", "resample_im"]
 }
 
-profile_settings = processing_steps[config["profile"]]
+profile_settings = processing_steps[config["procprofile"]]
 
 # Normalization scheme 
 norm_methods = {
@@ -76,7 +76,7 @@ templates = {
 
 chosen_template =  templates[config['template']]
 
-print(f'..... {config["profile"]} preprocessing configration .....')
+print(f'..... {config["procprofile"]} preprocessing configration .....')
 print(f' the folowing squence will be triggered {profile_settings}')
 
 if "n4_bias_correction" in profile_settings:
