@@ -124,35 +124,38 @@
 <!-- T1w -->
 <g id="node10" class="node">
 <title>T1w</title>
-<text text-anchor="middle" x="70" y="-400.98" font-family="sans" font-size="12.00">T1w</text>
+<path fill="none" stroke="black" stroke-width="2" d="M85,-424C85,-424 55,-424 55,-424 49,-424 43,-418 43,-412 43,-412 43,-400 43,-400 43,-394 49,-388 55,-388 55,-388 85,-388 85,-388 91,-388 97,-394 97,-400 97,-400 97,-412 97,-412 97,-418 91,-424 85,-424"/>
+<text text-anchor="middle" x="70" y="-402.12" font-family="sans" font-size="10.00">T1w</text>
 </g>
 <!-- T1w&#45;&gt;4 -->
 <g id="edge9" class="edge">
 <title>T1w&#45;&gt;4</title>
-<path fill="none" stroke="grey" stroke-width="2" stroke-dasharray="5,2" d="M78.71,-388.05C82.41,-380.88 86.81,-372.31 91,-364.17"/>
-<polygon fill="grey" stroke="grey" stroke-width="2" points="94.02,-365.95 95.48,-355.46 87.79,-362.75 94.02,-365.95"/>
+<path fill="none" stroke="grey" stroke-width="2" stroke-dasharray="5,2" d="M79.08,-387.34C82.68,-380.34 86.91,-372.12 90.94,-364.28"/>
+<polygon fill="grey" stroke="grey" stroke-width="2" points="93.95,-366.09 95.41,-355.59 87.72,-362.89 93.95,-366.09"/>
 </g>
 <!-- T2w -->
 <g id="node11" class="node">
 <title>T2w</title>
-<text text-anchor="middle" x="106" y="-472.98" font-family="sans" font-size="12.00">T2w</text>
+<path fill="none" stroke="black" stroke-width="2" d="M121,-496C121,-496 91,-496 91,-496 85,-496 79,-490 79,-484 79,-484 79,-472 79,-472 79,-466 85,-460 91,-460 91,-460 121,-460 121,-460 127,-460 133,-466 133,-472 133,-472 133,-484 133,-484 133,-490 127,-496 121,-496"/>
+<text text-anchor="middle" x="106" y="-474.12" font-family="sans" font-size="10.00">T2w</text>
 </g>
 <!-- T2w&#45;&gt;synthsr -->
 <g id="edge10" class="edge">
 <title>T2w&#45;&gt;synthsr</title>
-<path fill="none" stroke="grey" stroke-width="2" stroke-dasharray="5,2" d="M114.71,-460.05C118.41,-452.88 122.81,-444.31 127,-436.17"/>
-<polygon fill="grey" stroke="grey" stroke-width="2" points="130.02,-437.95 131.48,-427.46 123.79,-434.75 130.02,-437.95"/>
+<path fill="none" stroke="grey" stroke-width="2" stroke-dasharray="5,2" d="M115.08,-459.34C118.68,-452.34 122.91,-444.12 126.94,-436.28"/>
+<polygon fill="grey" stroke="grey" stroke-width="2" points="129.95,-438.09 131.41,-427.59 123.72,-434.89 129.95,-438.09"/>
 </g>
 <!-- FLAIR -->
 <g id="node12" class="node">
 <title>FLAIR</title>
-<text text-anchor="middle" x="178" y="-472.98" font-family="sans" font-size="12.00">FLAIR</text>
+<path fill="none" stroke="black" stroke-width="2" d="M193,-496C193,-496 163,-496 163,-496 157,-496 151,-490 151,-484 151,-484 151,-472 151,-472 151,-466 157,-460 163,-460 163,-460 193,-460 193,-460 199,-460 205,-466 205,-472 205,-472 205,-484 205,-484 205,-490 199,-496 193,-496"/>
+<text text-anchor="middle" x="178" y="-474.12" font-family="sans" font-size="10.00">FLAIR</text>
 </g>
 <!-- FLAIR&#45;&gt;synthsr -->
 <g id="edge11" class="edge">
 <title>FLAIR&#45;&gt;synthsr</title>
-<path fill="none" stroke="grey" stroke-width="2" stroke-dasharray="5,2" d="M169.29,-460.05C165.59,-452.88 161.19,-444.31 157,-436.17"/>
-<polygon fill="grey" stroke="grey" stroke-width="2" points="160.21,-434.75 152.52,-427.46 153.98,-437.95 160.21,-434.75"/>
+<path fill="none" stroke="grey" stroke-width="2" stroke-dasharray="5,2" d="M168.92,-459.34C165.32,-452.34 161.09,-444.12 157.06,-436.28"/>
+<polygon fill="grey" stroke="grey" stroke-width="2" points="160.28,-434.89 152.59,-427.59 154.05,-438.09 160.28,-434.89"/>
 </g>
 </g>
 </svg>
