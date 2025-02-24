@@ -108,6 +108,9 @@ if config['modality'] != "T1w":
             suffix="synthsr_output.txt",
             **inputs[config['modality']].wildcards
         ),
+        resources:
+            mem_mb=32000
+        threads: 4
         container: config['singularity']['synthsr']
         shell: 
             """
