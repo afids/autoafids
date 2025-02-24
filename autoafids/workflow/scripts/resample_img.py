@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 from nilearn.image import resample_img
 import numpy as np
 import nibabel as nib

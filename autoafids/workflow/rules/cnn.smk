@@ -43,5 +43,5 @@ rule gen_fcsv:
             suffix="landmark.log",
             **inputs["t1w"].wildcards
         ),
-    shell:
-        'auto_afids_cnn_apply {input.t1w} {input.model_dir} {output.fcsv} {input.prior}'
+    script:
+        '../scripts/apply.py'

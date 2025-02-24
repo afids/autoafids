@@ -1,7 +1,3 @@
-#!/usr/bin/env python3
-
-from __future__ import annotations
-
 # Forces TensorFlow to use CPU only 
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "" #only use CPU, makes generealization to any machine easier.
@@ -15,14 +11,14 @@ import tempfile
 from argparse import ArgumentParser
 from os import PathLike
 from pathlib import Path
-from typing import IO
+from typing import IO, Dict
 import nibabel as nib
 import numpy as np
 import pandas as pd
 import skimage.measure
 from numpy.typing import NDArray
 import tensorflow as tf
-from .utils import afids_to_fcsv
+from utils import afids_to_fcsv
 
 
 def load_fcsv(fcsv_path: PathLike[str] | str) -> pd.DataFrame:
@@ -161,7 +157,7 @@ def slice_img(img: NDArray, centre: NDArray, radius: int) -> NDArray:
 
 def predict_distances(
     radius: int,
-    model: tf.keras.model,
+    model: tf.keras.Model,
     mni_fid: NDArray,
     img: NDArray,
 ) -> NDArray:
@@ -251,7 +247,7 @@ def process_distances(
 def apply_model(
     img: nib.nifti1.Nifti1Image | nib.nifti1.Nifti1Pair,
     fid_label: int,
-    model: tf.keras.model,
+    model: tf.keras.Model,
     radius: int,
     prior: PathLike[str] | str,
 ) -> NDArray:
@@ -266,7 +262,7 @@ def apply_model(
         fid_label :: int
             fiducial label of interest as defined by the protocol 
 
-        model :: tf.keras.model
+        model :: tf.keras.Model
             ML model for predicting within patch 
 
         radius :: int
@@ -380,45 +376,8 @@ class ArchiveMissingDataError(Exception):
         )
 
 
-def gen_parser() -> ArgumentParser:
-    """
-    Gen parser (elaborate)
 
-    Parameters
-    ----------
-        None
-    
-    Returns
-    -------
-        parser :: ArgumentParser
-            parser to help navigate paths and configure functions
-    """
-    parser = ArgumentParser()
-    parser.add_argument("img", help="The image for which to produce an FCSV.")
-    parser.add_argument("model_dir", help="The dir containing afids-CNN models to apply.")
-    parser.add_argument("fcsv_path", help="The path to write the output FCSV.")
-    parser.add_argument("sub_prior", help="The coordinates to define model prediction space")
-    return parser
+img = nib.nifti1.load(snakemake.input.t1w)
 
-
-def main():
-    """
-    Main
-
-    Parameters
-    ----------
-        None
-
-    Returns
-    -------
-        None
-    """
-    args = gen_parser().parse_args()
-    img = nib.nifti1.load(args.img)
-
-    predictions = apply_all(args.model_dir, img,args.sub_prior)
-    afids_to_fcsv(predictions, args.fcsv_path)
-
-
-if __name__ == "__main__":
-    main()
+predictions = apply_all(snakemake.input.model_dir, img,snakemake.input.prior)
+afids_to_fcsv(predictions, snakemake.output.fcsv)

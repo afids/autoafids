@@ -1,4 +1,3 @@
-# scripts/n4_bias_correction_snakemake.py
 import ants
 
 

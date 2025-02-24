@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 import ants
 import csv
 import numpy as np
