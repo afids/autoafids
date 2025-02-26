@@ -2,6 +2,10 @@ import snakebids
 from snakebids import bids, generate_inputs, get_wildcard_constraints
 from appdirs import AppDirs
 import warnings 
+import psutil
+
+# Get available memory in MB
+available_mem_mb = psutil.virtual_memory().available // 1024 // 1024
 
 configfile: 'config/snakebids.yml'
 
@@ -109,12 +113,12 @@ if config['modality'] != "T1w":
             **inputs[config['modality']].wildcards
         ),
         resources:
-            mem_mb=32000
-        threads: 4
+            mem_mb=10000
+        threads: max(1, workflow.cores // (available_mem_mb // 10000))
         container: config['singularity']['synthsr']
         shell: 
             """
-                python /app/scripts/predict_command_line.py {input.im} {output.preprocessed_im} --cpu > {log} 2>&1
+                python /app/scripts/predict_command_line.py {input.im} {output.preprocessed_im} --cpu --threads {threads} > {log} 2>&1
             """
 
 if "n4_bias_correction" in profile_settings:
