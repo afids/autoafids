@@ -114,11 +114,11 @@ if config['modality'] != "T1w":
         ),
         resources:
             mem_mb=10000
-        threads: max(1, workflow.cores // (available_mem_mb // 10000))
+        threads: max(1, workflow.cores // max(1, available_mem_mb // 10000))
         container: config['singularity']['synthsr']
         shell: 
             """
-                python /app/scripts/predict_command_line.py {input.im} {output.preprocessed_im} --cpu --threads {threads} > {log} 2>&1
+                python /app/scripts/predict_command_line.py {input.im} {output.preprocessed_im} --cpu > {log} 2>&1
             """
 
 if "n4_bias_correction" in profile_settings:
