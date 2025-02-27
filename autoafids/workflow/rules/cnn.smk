@@ -18,15 +18,15 @@ rule gen_fcsv:
                 desc=chosen_norm_method,
                 res=config["res"],
                 suffix="T1w.nii.gz",
-                **inputs["t1w"].wildcards,
-                ),
+                **inputs[config['modality']].wildcards,
+                ), 
         prior = bids(
             root=work,
             datatype="registration",
             space="native",
             desc="MNI",
             suffix="afids.fcsv",
-            **inputs["t1w"].wildcards,
+            **inputs[config['modality']].wildcards,
         ),
         model_dir = Path(download_dir) / "models"
     output:
@@ -35,13 +35,13 @@ rule gen_fcsv:
             datatype="afids-cnn",
             desc="afidscnn",
             suffix="afids.fcsv",
-            **inputs["t1w"].wildcards
+            **inputs[config['modality']].wildcards
         ),
     log:
         bids(
             root="logs",
             suffix="landmark.log",
-            **inputs["t1w"].wildcards
+            **inputs[config['modality']].wildcards
         ),
     script:
         '../scripts/apply.py'
