@@ -308,14 +308,15 @@ rule all:
                 desc="afidscnn",
                 suffix="afids.fcsv",
                 **inputs[config['modality']].wildcards
+            )
         ),
-        afidspred = inputs["t1w"].expand(
+        afidspred = inputs[config['modality']].expand(
             bids(
                 root=root,
                 datatype= "stereotaxy",
                 desc=stereotaxy_target,
                 suffix="native.fcsv",
-                **inputs["t1w"].wildcards
+                **inputs[config['modality']].wildcards
             )   
 
         ) if config["stereotaxy"] else [],
