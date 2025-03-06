@@ -121,7 +121,7 @@ if config['modality'] != "T1w":
                 python /app/scripts/predict_command_line.py {input.im} {output.preprocessed_im} --cpu > {log} 2>&1
             """
 
-if "n4_bias_correction" in profile_settings:
+if "n4_bias_correction" in profile_settings and config['modality'] == "T1w":
 
     rule n4_bias_correction:
         input:
@@ -165,7 +165,7 @@ rule norm_im:
                 desc="n4corrected",
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
-            ) if "n4_bias_correction" in profile_settings else
+            ) if "n4_bias_correction" in profile_settings and config['modality'] == "T1w" else
             bids(
                 root=str(Path(config["bids_dir"])),
                 datatype="anat",
@@ -226,7 +226,7 @@ rule mni2sub:
                 desc="n4corrected",
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
-            ) if "n4_bias_correction" in profile_settings else
+            ) if "n4_bias_correction" in profile_settings and config['modality'] == "T1w" else
             bids(root=str(Path(config["bids_dir"])),
             datatype="anat",
             suffix="T1w.nii.gz",
