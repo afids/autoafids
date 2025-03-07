@@ -1,0 +1,12 @@
+import utils
+
+if __name__ == "__main__":
+    
+    utils.generate_interactive_mri_html(
+        nii_path= snakemake.input["im"],
+        fcsv_path= snakemake.input["afidfcsv"],
+        labels= [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
+        ref_nii_path= snakemake.params["refim"],
+        ref_fcsv_path= snakemake.params["refcoord"],
+        out_file_prefix=snakemake.output["html"]
+    )
