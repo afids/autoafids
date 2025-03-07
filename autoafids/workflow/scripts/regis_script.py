@@ -105,11 +105,11 @@ def registration(fixed_image, moving_image, out_im, xfm_ras, xfm_slicer):
             writer.writerow(row)
 
 
-if __name__ == "__main__":
-    registration(
-        fixed_image=snakemake.input["im_resamp"],
-        moving_image=snakemake.params["moving"],
-        out_im=snakemake.output["out_im"],
-        xfm_ras=snakemake.output["xfm_ras"],
-        xfm_slicer=snakemake.output ["xfm_slicer"]
-    )
+
+registration(
+    fixed_image=snakemake.input.im_resamp,
+    moving_image=snakemake.params.moving,
+    out_im=snakemake.output.out_im,
+    xfm_ras=snakemake.output.xfm_ras,
+    xfm_slicer=snakemake.output.xfm_slicer
+)

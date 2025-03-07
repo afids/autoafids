@@ -89,6 +89,13 @@ templatet1w =  config['templatet1w']
 print(f'..... {config["profile"]} preprocessing configration .....')
 print(f' the folowing squence will be triggered {profile_settings}')
 
+if config["stereotaxy"] in ['STN','cZI']:
+    stereotaxy_target = config["stereotaxy"]
+    print("stereotaxy feature enabled") 
+    include: "rules/stereotaxy.smk"
+else: 
+    stereotaxy = False
+
 if config['modality'] != "T1w":
     rule synthsr:
         input: 
@@ -301,6 +308,16 @@ rule all:
                 desc="afidscnn",
                 suffix="afids.fcsv",
                 **inputs[config['modality']].wildcards
+            )
         ),
-    ),
+        afidspred = inputs[config['modality']].expand(
+            bids(
+                root=root,
+                datatype= "stereotaxy",
+                desc=stereotaxy_target,
+                suffix="native.fcsv",
+                **inputs[config['modality']].wildcards
+            )   
+
+        ) if config["stereotaxy"] else [],
     default_target: True
