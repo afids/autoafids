@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "autoafids"
-version = "0.1.0"
+version = "1.1.0"
 description = "End-to-end SnakeBIDS workflow for landmark regression and derivative apps"
 readme = "README.md"
 license = "MIT"
