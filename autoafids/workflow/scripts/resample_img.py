@@ -43,9 +43,9 @@ def resample_to_isotropic_resolution(
     resampled_image.to_filename(output_img)
 
 
-if __name__ == "__main__":
-    resample_to_isotropic_resolution(
-        nifti_image_path=snakemake.input["im_normed"],
-        isotropic_resolution=snakemake.params["res"],
-        output_img=snakemake.output["resam_im"],
-    )
+
+resample_to_isotropic_resolution(
+    nifti_image_path=snakemake.input.im_normed,
+    isotropic_resolution=snakemake.params.res,
+    output_img=snakemake.output.resam_im,
+)
