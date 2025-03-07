@@ -87,11 +87,11 @@ resolution = float(config['res'])
 templatet1w =  config['templatet1w']
 
 print(f'..... {config["procprofile"]} preprocessing configration .....')
-print(f' the folowing squence will be triggered {profile_settings}')
+print(f'{profile_settings}')
 
 if config["stereotaxy"] in ['STN','cZI']:
     stereotaxy_target = config["stereotaxy"]
-    print("stereotaxy feature enabled") 
+    print(f'..... Stereotaxy Target Enabled .....') 
     include: "rules/stereotaxy.smk"
 else: 
     stereotaxy = False
