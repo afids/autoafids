@@ -86,7 +86,7 @@ parse_args:
       default: MP2RAGE
       nargs: "?"
 
-  --profile:
+  --procprofile:
       help: 'Specify the profile and configration for preprocessing. (default: %(default)s)'
       choices: ['slow','medium','fast','superfast']
       default: 'fast'
