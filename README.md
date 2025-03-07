@@ -39,7 +39,7 @@ poetry install -e
 ```
 
 ## Workflow
-Below is a simplified example of the workflow along with its Directed Acyclic Graph (DAG) for the `--profile` fast. Each rounded rectangle (vertex) in the DAG represents a rule, which encompasses some code or script that produces output file(s), and the arrows (edges) represent file inputs and outputs to these rules. 
+Below is a simplified example of the workflow along with its Directed Acyclic Graph (DAG) for the `--procprofile` fast. Each rounded rectangle (vertex) in the DAG represents a rule, which encompasses some code or script that produces output file(s), and the arrows (edges) represent file inputs and outputs to these rules. 
 
 <img src="docs/dag.svg" alt="Workflow DAG" width="600">
 

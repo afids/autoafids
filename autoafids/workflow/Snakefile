@@ -67,7 +67,7 @@ processing_steps = {
     "superfast": ["norm_im", "resample_im"]
 }
 
-profile_settings = processing_steps[config["profile"]]
+profile_settings = processing_steps[config["procprofile"]]
 
 # Normalization scheme 
 norm_methods = {
@@ -86,8 +86,8 @@ resolution = float(config['res'])
 
 templatet1w =  config['templatet1w']
 
-print(f'..... {config["profile"]} Preprocessing Configration .....')
-print(f'{profile_settings}')
+print(f'..... {config["procprofile"]} preprocessing configration .....')
+print(f' the folowing squence will be triggered {profile_settings}')
 
 if config["stereotaxy"] in ['STN','cZI']:
     stereotaxy_target = config["stereotaxy"]

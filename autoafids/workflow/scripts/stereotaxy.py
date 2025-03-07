@@ -129,13 +129,12 @@ def model_pred(
     # Save the native-space coordinates to the output file
     fids_to_fcsv(stncoords, template_fcsv, target_native)
 
-if __name__ == "__main__":
-    model_pred(
-        in_fcsv= snakemake.input["afidfcsv"],
-        model= snakemake.params["model"],
-        midpoint= snakemake.params["midpoint"],
-        slicer_tfm= snakemake.output["ACPC_txt"],
-        template_fcsv= snakemake.params["target_fcsv"],
-        target_mcp= snakemake.output["fcsv_mcp"],
-        target_native= snakemake.output["fcsv_native"]  
-    )
+model_pred(
+    in_fcsv= snakemake.input.afidfcsv,
+    model= snakemake.params.model,
+    midpoint= snakemake.params.midpoint,
+    slicer_tfm= snakemake.output.ACPC_txt,
+    template_fcsv= snakemake.params.target_fcsv,
+    target_mcp= snakemake.output.fcsv_mcp,
+    target_native= snakemake.output.fcsv_native
+)
