@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# coding: utf-8
-
 import os  
 import numpy as np  
 from argparse import ArgumentParser
@@ -15,7 +12,7 @@ from sklearn.linear_model import Ridge
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
-from .utils import transform_afids, fids_to_fcsv, mcp_origin, dftodfml, make_zero
+from utils import transform_afids, fids_to_fcsv, mcp_origin, dftodfml, make_zero
 
 #hardcoding right and left hemisphere afids for reflecting
 right_afids = ['x_6','x_8','x_12','x_15','x_17','x_21','x_23','x_25','x_27','x_29','x_31','y_6','y_8','y_12','y_15','y_17','y_21','y_23','y_25','y_27','y_29','y_31', 'z_6','z_8','z_12','z_15','z_17','z_21','z_23','z_25','z_27','z_29','z_31']
@@ -32,8 +29,8 @@ def model_pred(
     slicer_tfm: str,
     template_fcsv: str,
     target_mcp: str,
-    target_native: str
-) -> None:
+    target_native: str):
+
     """
     Generate model predictions for fiducial points and transform coordinates to native space.
 
@@ -128,58 +125,17 @@ def model_pred(
     stncoords = np.zeros((2, 3))
     stncoords[0, :] = stn_r_native[:3]
     stncoords[1, :] = stn_l_native[:3]
-
+    
     # Save the native-space coordinates to the output file
     fids_to_fcsv(stncoords, template_fcsv, target_native)
 
-
-
-def gen_parser() -> ArgumentParser:
-    """
-    Gen parser (elaborate)
-
-    Parameters
-    ----------
-        None
-    
-    Returns
-    -------
-        parser :: ArgumentParser
-            parser to help navigate paths and configure functions
-    """
-    parser = ArgumentParser()
-    parser.add_argument("afidfcsv")
-    parser.add_argument("model")
-    parser.add_argument("midpoint")
-    parser.add_argument("ACPC_txt")
-    parser.add_argument("target_fcsv")
-    parser.add_argument("fcsv_mcp")
-    parser.add_argument("fcsv_native")
-    return parser
-
-
-def main():
-    """
-    Main
-
-    Parameters
-    ----------
-        None
-
-    Returns
-    -------
-        None
-    """
-    args = gen_parser().parse_args()
-    model_pred(
-        in_fcsv= args.afidfcsv,
-        model= args.model,
-        midpoint= args.midpoint,
-        slicer_tfm= args.ACPC_txt,
-        template_fcsv= args.target_fcsv,
-        target_mcp= args.fcsv_mcp,
-        target_native= args.fcsv_native  
-    )
-
 if __name__ == "__main__":
-    main()
+    model_pred(
+        in_fcsv= snakemake.input["afidfcsv"],
+        model= snakemake.params["model"],
+        midpoint= snakemake.params["midpoint"],
+        slicer_tfm= snakemake.output["ACPC_txt"],
+        template_fcsv= snakemake.params["target_fcsv"],
+        target_mcp= snakemake.output["fcsv_mcp"],
+        target_native= snakemake.output["fcsv_native"]  
+    )
