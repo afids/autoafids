@@ -1,40 +1,47 @@
 # populate the AUTOAFIDS_CACHE_DIR folder as needed
 
-def get_model():
-    model_name = config["model"]
-
-    local_model = config["resource_urls"].get(model_name, None)
-    if local_model == None:
-        print(f"ERROR: {model_name} does not exist.")
-
-    return (Path(download_dir)/ "model" / Path(local_model).name).absolute()
-
 rule download_cnn_model:
     params:
         url=config["resource_urls"][config["model"]],
-        model_dir=Path(download_dir) / "model"
     output:
-        model=get_model()
+        unzip_dir=directory(Path(download_dir) / "models")
     shell:
-        "mkdir -p {params.model_dir} && wget https://{params.url} -O {output}"
-
+        "wget https://{params.url} -O model.zip && "
+        " unzip -q -d {output.unzip_dir} model.zip && "
+        " rm model.zip"
+    
 rule gen_fcsv:
     input:
-        t1w=rules.preprocessing_result.input.samp, 
-        model=get_model(),
-        prior=rules.preprocessing_result.input.mni,
+        t1w = bids(
+                root=work,
+                datatype="resample",
+                desc=chosen_norm_method,
+                res=config["res"],
+                suffix="T1w.nii.gz",
+                **inputs[config['modality']].wildcards,
+                ), 
+        prior = bids(
+            root=work,
+            datatype="registration",
+            space="native",
+            desc="MNI",
+            suffix="afids.fcsv",
+            **inputs[config['modality']].wildcards,
+        ),
+        model_dir = Path(download_dir) / "models"
     output:
-        fcsv=bids(
-            root=str(Path(config["output_dir"]) / "afids-cnn"),
+        fcsv = bids(
+            root=root,
+            datatype="afids-cnn",
             desc="afidscnn",
             suffix="afids.fcsv",
-            **inputs["t1w"].wildcards
+            **inputs[config['modality']].wildcards
         ),
     log:
         bids(
             root="logs",
             suffix="landmark.log",
-            **inputs["t1w"].wildcards
+            **inputs[config['modality']].wildcards
         ),
-    shell:
-        'auto_afids_cnn_apply {input.t1w} {input.model} {output.fcsv} {input.prior}'
+    script:
+        '../scripts/apply.py'

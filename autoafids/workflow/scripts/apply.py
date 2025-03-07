@@ -1,7 +1,3 @@
-#!/usr/bin/env python3
-
-from __future__ import annotations
-
 # Forces TensorFlow to use CPU only 
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "" #only use CPU, makes generealization to any machine easier.
@@ -15,14 +11,15 @@ import tempfile
 from argparse import ArgumentParser
 from os import PathLike
 from pathlib import Path
-from typing import IO
+from typing import IO, Dict
 import nibabel as nib
 import numpy as np
 import pandas as pd
 import skimage.measure
 from numpy.typing import NDArray
 import tensorflow as tf
-from .utils import afids_to_fcsv
+tf.autograph.set_verbosity(0) #turn off epoch progress
+from utils import afids_to_fcsv
 
 
 def load_fcsv(fcsv_path: PathLike[str] | str) -> pd.DataFrame:
@@ -161,7 +158,7 @@ def slice_img(img: NDArray, centre: NDArray, radius: int) -> NDArray:
 
 def predict_distances(
     radius: int,
-    model: tf.keras.model,
+    model: tf.keras.Model,
     mni_fid: NDArray,
     img: NDArray,
 ) -> NDArray:
@@ -251,7 +248,7 @@ def process_distances(
 def apply_model(
     img: nib.nifti1.Nifti1Image | nib.nifti1.Nifti1Pair,
     fid_label: int,
-    model: tf.keras.model,
+    model: tf.keras.Model,
     radius: int,
     prior: PathLike[str] | str,
 ) -> NDArray:
@@ -266,7 +263,7 @@ def apply_model(
         fid_label :: int
             fiducial label of interest as defined by the protocol 
 
-        model :: tf.keras.model
+        model :: tf.keras.Model
             ML model for predicting within patch 
 
         radius :: int
@@ -316,7 +313,7 @@ def apply_model(
     return fid_voxel2world(fid_resampled2, img.affine)
 
 def apply_all(
-    model_path: PathLike,
+    model_dir: PathLike,
     img: nib.nifti1.Nifti1Image,
     prior: PathLike,
 ) -> Dict[int, NDArray]:
@@ -325,8 +322,8 @@ def apply_all(
 
     Parameters
     ----------
-        model_path : PathLike
-            Path to tarfile containing model weights
+        model_dir : PathLike
+            Path to dir containing model weights
         
         img : nib.nifti1.Nifti1Image
             Input image to be predicted
@@ -339,106 +336,39 @@ def apply_all(
         afid_dict : dict
             Dictionary of all predicted landmarks
     """
-    with tarfile.open(model_path, "r:gz") as tar_file:
-        # Extract configuration
-        config_file = extract_config(tar_file)
-        radius = int(json.load(config_file)["radius"])
+    radius = 31
+
+    afid_label_1 = 1
+    model_architecture_path = model_dir + "/" + f"afid-{afid_label_1:02}.model"
+    
+    # Extract the shared model architecture
+    model = tf.keras.models.load_model(model_architecture_path)
+
+    # Create an empty dictionary for storing predictions
+    afid_dict: Dict[int, NDArray] = {}
+
+    # Iterate through labels
+    for afid_label in range(1, 33):
+        print(f"Processing AFID Label: {afid_label}")
+
+        # Locate the weight file for the current label directly in the tarfile
+        weight_file_name = model_dir + "/" + f"afid-{afid_label:02}.model"
         
-        # Extract the shared model architecture
-        with tempfile.TemporaryDirectory() as model_dir:
-            model_architecture_path = extract_afids_model(tar_file, model_dir, 1)
-            model = tf.keras.models.load_model(model_architecture_path)
+        
+        # Load weights into memory (avoid disk I/O)
+        # weight_file_data = BytesIO(tar_file.extractfile(weight_file_name).read())
+        model.load_weights(weight_file_name).expect_partial()
 
-        # Create an empty dictionary for storing predictions
-        afid_dict: Dict[int, NDArray] = {}
-
-        # Iterate through labels
-        for afid_label in range(1, 33):
-            print(f"Processing AFID Label: {afid_label}")
-
-            # Locate the weight file for the current label directly in the tarfile
-            weight_file_name = extract_afids_model(tar_file, model_dir, afid_label)
-            
-            
-            # Load weights into memory (avoid disk I/O)
-           # weight_file_data = BytesIO(tar_file.extractfile(weight_file_name).read())
-            model.load_weights(weight_file_name).expect_partial()
-
-            # Apply the model to make predictions
-            afid_dict[afid_label] = apply_model(
-                img,
-                afid_label,
-                model,
-                radius,
-                prior,
-            )
+        # Apply the model to make predictions
+        afid_dict[afid_label] = apply_model(
+            img,
+            afid_label,
+            model,
+            radius,
+            prior,
+        )
 
     return afid_dict
-
-
-def extract_config(tar_file: tarfile.TarFile) -> IO[bytes]:
-    """
-    Extract config (elaborate)
-
-    Parameters
-    ----------
-        tar_file :: arfile.TarFile
-            ML model .tar file genereated from train workflow 
-
-    Returns
-    -------
-        config_file :: IO[bytes]
-            ML model configration file 
-    """
-    try:
-        config_file = tar_file.extractfile("config.json")
-    except KeyError as err:
-        missing_data = "config file"
-        raise ArchiveMissingDataError(missing_data, tar_file) from err
-    if not config_file:
-        missing_data = "config file as file"
-        raise ArchiveMissingDataError(missing_data, tar_file)
-    return config_file
-
-
-def extract_afids_model(
-    tar_file: tarfile.TarFile,
-    out_path: PathLike[str] | str,
-    afid_label: int,
-) -> Path:
-    """
-    Extract afids model
-
-    Parameters
-    ----------
-        tar_file :: tarfile.TarFile
-            ML model .tar file genereated from train workflow 
-        
-        out_path :: str
-            Output path for predicted fiducails
-
-        afid_label :: int
-            fiducial label of interest as defined by the protocol 
-
-    Returns
-    -------
-        None
-    """
-    for member in tar_file.getmembers():
-        if member.isdir() and f"afid-{afid_label:02}" in member.name:
-            tar_file.extractall(
-                path=out_path,
-                members=[
-                    candidate
-                    for candidate in tar_file.getmembers()
-                    if candidate.name.startswith(f"{member.name}/")
-                ],
-            )
-
-            return Path(out_path) / member.name
-    msg = f"AFID {afid_label:02} model"
-    raise ArchiveMissingDataError(msg, tar_file)
-
 
 class ArchiveMissingDataError(Exception):
     def __init__(self, missing_data: str, tar_file: tarfile.TarFile) -> None:
@@ -447,45 +377,8 @@ class ArchiveMissingDataError(Exception):
         )
 
 
-def gen_parser() -> ArgumentParser:
-    """
-    Gen parser (elaborate)
 
-    Parameters
-    ----------
-        None
-    
-    Returns
-    -------
-        parser :: ArgumentParser
-            parser to help navigate paths and configure functions
-    """
-    parser = ArgumentParser()
-    parser.add_argument("img", help="The image for which to produce an FCSV.")
-    parser.add_argument("model", help="The afids-CNN model to apply.")
-    parser.add_argument("fcsv_path", help="The path to write the output FCSV.")
-    parser.add_argument("sub_prior", help="The coordinates to define model prediction space")
-    return parser
+img = nib.nifti1.load(snakemake.input.t1w)
 
-
-def main():
-    """
-    Main
-
-    Parameters
-    ----------
-        None
-
-    Returns
-    -------
-        None
-    """
-    args = gen_parser().parse_args()
-    img = nib.nifti1.load(args.img)
-
-    predictions = apply_all(args.model, img,args.sub_prior)
-    afids_to_fcsv(predictions, args.fcsv_path)
-
-
-if __name__ == "__main__":
-    main()
+predictions = apply_all(snakemake.input.model_dir, img,snakemake.input.prior)
+afids_to_fcsv(predictions, snakemake.output.fcsv)

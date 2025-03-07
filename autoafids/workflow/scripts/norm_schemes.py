@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 import nibabel as nib
 
 
@@ -40,9 +37,9 @@ def normalize(method, input_im, output_im):
     nib.save(nib.Nifti1Image(nii_data_normalized, affine=nii_affine), output_im)
 
 
-if __name__ == "__main__":
-    normalize(
-        method=snakemake.params["norm_method"],
-        input_im=snakemake.input["im_raw"],
-        output_im=snakemake.output["im_norm"],
-    )
+
+normalize(
+    method=snakemake.params.norm_method,
+    input_im=snakemake.input.im_raw,
+    output_im=snakemake.output.im_norm,
+)

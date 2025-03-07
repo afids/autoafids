@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
 import csv
 import numpy as np
 import pandas as pd
@@ -56,10 +54,9 @@ def xfm_fcsv(fcsv_source, xfm_txt, template, fcsv_new):
         writer.writerows(list_of_lists)
 
 
-if __name__ == "__main__":
-    xfm_fcsv(
-        fcsv_source=snakemake.params["fcsv_mni"],
-        xfm_txt=snakemake.input["xfm_new"],
-        template=snakemake.params["fcsv"],
-        fcsv_new=snakemake.output["fcsv_new"],
-    )
+xfm_fcsv(
+    fcsv_source=snakemake.params.fcsv_mni,
+    xfm_txt=snakemake.input.xfm_new,
+    template=snakemake.params.fcsv,
+    fcsv_new=snakemake.output.fcsv_new,
+)
