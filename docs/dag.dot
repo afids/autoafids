@@ -31,6 +31,7 @@ digraph snakemake_dag {
 
     4[label = "n4_bias_correction", color = "0.17 0.6 0.85", style="rounded"];
     4 -> 6
+    4 -> 3
 
     T1w -> 4[style=dashed];
     T2w -> synthsr[style=dashed];
