@@ -54,6 +54,8 @@ Currently, we support generating your own models (i.e., training) in a sperate w
 ## Apply
 Use the classic BIDS App syntax to genereate output AFID .fcsv files. For other derivative outputs, the following flags will be supported: 
 
+`--fidqc`: for quality control of landmark prediction in the form of (*html) format
+
 `--regqc`: for quality control of registration on a BIDS dataset and its derivatives (e.g., fMRIPrep or LeadDBS derivative outputs) 
 
 `--stereotaxy`: predicts a .fcsv file with stereotactic targets (e.g., subthalamaic nucelus) also providing AC-PC transform files in the process 
