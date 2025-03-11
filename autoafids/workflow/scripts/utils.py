@@ -405,7 +405,7 @@ def generate_html_with_keypress(subject_images, reference_images, output_html="m
 
         html_content += f"""
         <div class="container">
-            <h2>Landmark: {label}</h2>
+            <h2>Landmark: {afids_labels[label]}</h2>
             <img id="{label}_image" class="image" src="data:image/png;base64,{images[0]}" alt="MRI Slice">
             <input type="range" min="0" max="{num_slices - 1}" value="0" class="slider" id="{label}_slider">
         </div>
