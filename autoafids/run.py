@@ -15,8 +15,12 @@ app = bidsapp.app(
 
 
 def get_parser():
-    """Exposes parser for sphinx doc generation, cwd is the docs dir."""
-    return app.build_parser().parser
+    """Exposes parser for sphinx doc generation, cwd is the docs dir"""
+    app = bidsapp("../autoafids", skip_parse_args=True)
+    add_dynamic_args(
+        app.parser, app.config["parse_args"], app.config["pybids_inputs"]
+    )
+    return app.parser
 
 
 if __name__ == "__main__":
