@@ -108,7 +108,7 @@ if config['modality'] != "T1w":
         output:
             SynthSR=bids(
                 root=work,
-                datatype=f"{config['modality']}-SynthSR",
+                datatype="SynthSR",
                 desc=f"{config['modality']}-SynthSR",
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
@@ -140,7 +140,7 @@ if "n4_bias_correction" in profile_settings and config['modality'] == "T1w":
             )if config['modality'] == "T1w" else
             bids(
                 root=work,
-                datatype=f"{config['modality']}-SynthSR",
+                datatype="SynthSR",
                 desc=f"{config['modality']}-SynthSR",
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
@@ -181,7 +181,7 @@ rule norm_im:
             ) if config['modality'] == "T1w" else
             bids(
                 root=work,
-                datatype=f"{config['modality']}-SynthSR",
+                datatype="SynthSR",
                 desc=f"{config['modality']}-SynthSR",
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
@@ -241,7 +241,7 @@ rule mni2sub:
             ) if config['modality'] == "T1w" else
             bids(
                 root=work,
-                datatype=f"{config['modality']}-SynthSR",
+                datatype="SynthSR",
                 desc=f"{config['modality']}-SynthSR",
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
