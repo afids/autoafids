@@ -119,7 +119,7 @@ parse_args:
         - T1w
         - T2w
         - FLAIR
-        - CT
+        - ct
 
   --derivatives:
       help: 'Path(s) to a derivatives dataset, for folder(s) that contains multiple
