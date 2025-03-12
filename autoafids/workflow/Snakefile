@@ -16,7 +16,7 @@ selected_pybids_input = {config['modality']: config['pybids_inputs'][config['mod
 warn_modalities = ['T2w', 'FLAIR']
 if config['modality'] in warn_modalities:
     warnings.warn(
-        f"The AFIDS prediction on a {config['modality']} image is only as accurate as the SynthSR conversion of a {config['modality']} to a T1w image.",
+        f"The landmark prediction on a {config['modality']} image is only as accurate as the SynthSR conversion of a {config['modality']} to a T1w image.",
         UserWarning
     )
 
@@ -106,10 +106,10 @@ if config['modality'] != "T1w":
                 **inputs[config['modality']].wildcards
             ),
         output:
-            preprocessed_im=bids(
+            SynthSR=bids(
                 root=work,
-                datatype="non_t1w_preprocessed",
-                desc="non_t1w_preprocessed",
+                datatype=f"{config['modality']}-SynthSR",
+                desc=f"{config['modality']}-SynthSR",
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
             ),
@@ -125,7 +125,7 @@ if config['modality'] != "T1w":
         container: config['singularity']['synthsr']
         shell: 
             """
-                python /app/scripts/predict_command_line.py {input.im} {output.preprocessed_im} --cpu > {log} 2>&1
+                python /app/scripts/predict_command_line.py {input.im} {output.SynthSR} --cpu > {log} 2>&1
             """
 
 if "n4_bias_correction" in profile_settings and config['modality'] == "T1w":
@@ -140,8 +140,8 @@ if "n4_bias_correction" in profile_settings and config['modality'] == "T1w":
             )if config['modality'] == "T1w" else
             bids(
                 root=work,
-                datatype="non_t1w_preprocessed",
-                desc="non_t1w_preprocessed",
+                datatype=f"{config['modality']}-SynthSR",
+                desc=f"{config['modality']}-SynthSR",
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
             ),
@@ -181,8 +181,8 @@ rule norm_im:
             ) if config['modality'] == "T1w" else
             bids(
                 root=work,
-                datatype="non_t1w_preprocessed",
-                desc="non_t1w_preprocessed",
+                datatype=f"{config['modality']}-SynthSR",
+                desc=f"{config['modality']}-SynthSR",
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
             ),
@@ -241,8 +241,8 @@ rule mni2sub:
             ) if config['modality'] == "T1w" else
             bids(
                 root=work,
-                datatype="non_t1w_preprocessed",
-                desc="non_t1w_preprocessed",
+                datatype=f"{config['modality']}-SynthSR",
+                desc=f"{config['modality']}-SynthSR",
                 suffix="T1w.nii.gz",
                 **inputs[config['modality']].wildcards
             )
