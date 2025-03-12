@@ -1,5 +1,3 @@
-include: "cnn.smk"
-
 stereotaxy_target = config["stereotaxy"]
 
 rule afidspred:

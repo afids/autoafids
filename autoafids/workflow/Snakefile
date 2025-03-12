@@ -299,6 +299,12 @@ rule mni2subfids:
 
 include: "rules/cnn.smk"
 
+if config["fidqc"]:
+    print(f'..... AFID QC Reports Enabled .....')
+    include: "rules/fidqc.smk"
+
+
+
 rule all:
     input:
         models = inputs[config['modality']].expand(
@@ -308,8 +314,18 @@ rule all:
                 desc="afidscnn",
                 suffix="afids.fcsv",
                 **inputs[config['modality']].wildcards
-            )
         ),
+    ),
+        fidqc = inputs[config['modality']].expand(
+           bids(
+                root=root,
+                datatype="fidqc",
+                desc="fidqc",
+                suffix="afids.html",
+                **inputs[config['modality']].wildcards
+            )
+        ) if config["fidqc"] else [],
+
         afidspred = inputs[config['modality']].expand(
             bids(
                 root=root,
