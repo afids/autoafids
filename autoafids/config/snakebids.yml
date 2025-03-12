@@ -50,6 +50,18 @@ pybids_inputs:
       - acquisition
       - reconstruction
       - run
+  
+  CT:
+    filters:
+      suffix: ct
+      extension: .nii.gz
+      datatype: anat
+    wildcards:
+      - subject
+      - session
+      - acquisition
+      - reconstruction
+      - run
 
 parse_args:
 #---  core BIDS-app options ---
@@ -101,12 +113,13 @@ parse_args:
       default: '100'  # Default to 1 
     
   --modality: 
-      help: 'Specify the modality to use (e.g., T1w, T2w, or FLAIR).'
+      help: 'Specify the modality to use (e.g., T1w, T2w, FLAIR, or CT).'
       default: 'T1w'
       choices:
         - T1w
         - T2w
         - FLAIR
+        - ct
 
   --derivatives:
       help: 'Path(s) to a derivatives dataset, for folder(s) that contains multiple
