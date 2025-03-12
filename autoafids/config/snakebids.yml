@@ -53,7 +53,7 @@ pybids_inputs:
   
   CT:
     filters:
-      suffix: CT
+      suffix: ct
       extension: .nii.gz
       datatype: anat
     wildcards:
