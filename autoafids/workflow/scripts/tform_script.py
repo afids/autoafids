@@ -1,4 +1,5 @@
 import csv
+
 import numpy as np
 import pandas as pd
 
@@ -25,7 +26,7 @@ def xfm_fcsv(fcsv_source, xfm_txt, template, fcsv_new):
         None
 
     """
-    
+
     # Load transform and groundtruth fcsv
     sub2template = np.loadtxt(xfm_txt)
     fcsv_df = pd.read_table(fcsv_source, sep=",", header=2)
@@ -34,13 +35,13 @@ def xfm_fcsv(fcsv_source, xfm_txt, template, fcsv_new):
 
     # to plot in native space, need to transform coords
     tcoords = np.zeros(coords.shape)
-    
+
     for i in range(len(coords)):
         vec = np.hstack([coords[i, :], 1])
         tvec = sub2template @ vec.T
         tcoords[i, :] = tvec[:3]
 
-    with open(template, "r", encoding="utf-8") as file:
+    with open(template, encoding="utf-8") as file:
         list_of_lists = []
         reader = csv.reader(file)
         for i in range(3):

@@ -9,7 +9,8 @@ def normalize(method, input_im, output_im):
     Parameters
     ----------
         method:: str
-            Method to be incorporated for normalizing. There are 2 choices, either minmax or zscore.
+            Method to be incorporated for normalizing.
+            There are 2 choices, either minmax or zscore.
 
         input_im:: str
             Input image that needs to be normalized.
@@ -34,7 +35,11 @@ def normalize(method, input_im, output_im):
     elif method == "zscore":
         nii_data_normalized = (nii_data - nii_data.mean()) / (nii_data.std())
 
-    nib.save(nib.Nifti1Image(nii_data_normalized, affine=nii_affine), output_im)
+    nib.save(
+        nib.Nifti1Image(
+            nii_data_normalized,
+            affine=nii_affine), output_im
+            )
 
 
 

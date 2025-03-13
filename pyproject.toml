@@ -48,3 +48,46 @@ autoafids = "autoafids.run:app.run"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poe.tasks]
+setup = "pre-commit install"
+ruff-lint = "ruff check --fix autoafids"
+ruff-lint-check = "ruff check autoafids"
+snakefmt = "snakefmt autoafids"
+snakefmt-check = "snakefmt --check autoafids"
+quality = ["yamlfix", "ruff-lint", "snakefmt"]
+quality-check = ["yamlfix-check", "ruff-lint-check", "snakefmt-check"]
+test = [
+    "test_base"
+]
+
+[tool.poe.tasks.test_base]
+shell = """
+python ./autoafids/run.py ./tests/data/ ./tests/data/derivatives/ participant \
+     -np --force-output
+"""
+
+[tool.poe.tasks.yamlfix]
+shell = """
+find . -type f \\( \
+    -iname \\*.yaml -o -iname \\*.yml ! -iname snakemake* \
+    ! -iname snakebids* \
+\\) -exec yamlfix {} \\;
+"""
+
+[tool.poe.tasks.yamlfix-check]
+shell = """
+find . -type f \\( \
+    -iname \\*.yaml -o -iname \\*.yml ! -iname snakemake* \
+    ! -iname snakebids* \
+\\) -exec yamlfix --check {} \\;
+"""
+
+[tool.ruff]
+select = ["E", "W", "N", "RUF", "I", "UP"]
+line-length = 79
+builtins = ["snakemake"]
+
+[tool.snakefmt]
+line_length = 79
+include = '\.smk$|^Snakefile'
