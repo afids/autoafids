@@ -1,9 +1,3 @@
-# Forces TensorFlow to use CPU only 
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "" #only use CPU, makes generealization to any machine easier.
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Suppresses INFO, WARNING, and ERROR logs
-
-
 import json
 import logging
 import tarfile
@@ -11,15 +5,25 @@ import tempfile
 from argparse import ArgumentParser
 from os import PathLike
 from pathlib import Path
-from typing import IO, Dict
+from typing import IO
+
 import nibabel as nib
 import numpy as np
 import pandas as pd
 import skimage.measure
-from numpy.typing import NDArray
 import tensorflow as tf
-tf.autograph.set_verbosity(0) #turn off epoch progress
+from numpy.typing import NDArray
 from utils import afids_to_fcsv
+
+# Forces TensorFlow to use CPU only
+# Only use CPU for compatibility.
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
+# Suppresses INFO, WARNING, and ERROR logs.
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+
+# Set TensorFlow verbosity
+tf.autograph.set_verbosity(0)  # Turn off epoch progress.
 
 
 def load_fcsv(fcsv_path: PathLike[str] | str) -> pd.DataFrame:
@@ -65,24 +69,25 @@ def get_fid(fcsv_df: pd.DataFrame, fid_label: int) -> NDArray:
 def fid_voxel2world(fid_voxel: NDArray, nii_affine: NDArray) -> NDArray:
     """
     Transform fiducials in voxel coordinates to world coordinates.
-    
+
     Parameters
     ----------
         fid_voxel :: NDArray
-            Voxel coordiantes for selected fiducial 
+            Voxel coordiantes for selected fiducial
 
         nii_affine :: NDArray
-            Image affine matrix for mapping between voxel to world coords 
+            Image affine matrix for mapping between voxel to world coords
 
     Returns
     -------
         fid_world :: NDArray
-            Coordinates in world space 
+            Coordinates in world space
     """
     translation = nii_affine[:3, 3]
     rotation = nii_affine[:3, :3]
-    fid_world = rotation.dot(fid_voxel)+translation
+    fid_world = rotation.dot(fid_voxel) + translation
     return fid_world.astype(float)
+
 
 def fid_world2voxel(
     fid_world: NDArray,
@@ -90,21 +95,21 @@ def fid_world2voxel(
 ) -> NDArray:
     """
     Transform fiducials in world coordinates to voxel coordinates.
-    
+
     Parameters
     ----------
         fid_world :: NDArray
             World coordiantes for selected fiducial
 
         nii_affine :: NDArray
-            Image affine matrix for mapping between voxel to world coords 
-        
+            Image affine matrix for mapping between voxel to world coords
+
     Returns
     -------
         fid_voxel :: NDArray
-            Coordinates in voxel space 
+            Coordinates in voxel space
     """
-    inv_affine =  np.linalg.inv(nii_affine)
+    inv_affine = np.linalg.inv(nii_affine)
     translation = inv_affine[:3, 3]
     rotation = inv_affine[:3, :3]
     fid_voxel = rotation.dot(fid_world) + translation
@@ -112,7 +117,10 @@ def fid_world2voxel(
     return fid_voxel.astype(int)
 
 
-def gen_patch_slices(centre: NDArray, radius: int) -> tuple[slice, slice, slice]:
+def gen_patch_slices(
+        centre: NDArray,
+        radius: int
+        ) -> tuple[slice, slice, slice]:
     """
     Generate patch slices
 
@@ -128,7 +136,10 @@ def gen_patch_slices(centre: NDArray, radius: int) -> tuple[slice, slice, slice]
     -------
         Image patches around center coordinate
     """
-    return tuple(slice(coord - radius, coord + radius + 1) for coord in centre[:3])
+    return tuple(
+        slice(coord - radius, coord + radius + 1
+              ) for coord in centre[:3]
+        )
 
 
 def slice_img(img: NDArray, centre: NDArray, radius: int) -> NDArray:
@@ -139,7 +150,7 @@ def slice_img(img: NDArray, centre: NDArray, radius: int) -> NDArray:
     ----------
         img :: NDArray
             input image to be predicted
-        
+
         centre :: NDArray
             Center of patch
 
@@ -148,7 +159,7 @@ def slice_img(img: NDArray, centre: NDArray, radius: int) -> NDArray:
 
     Returns
     -------
-        NDArray 
+        NDArray
             (fill desciption)
 
     """
@@ -171,18 +182,18 @@ def predict_distances(
             patch radius
 
         model :: tf.keras.model
-            ML model for predicting within patch 
+            ML model for predicting within patch
 
         mni_fid :: NDArray
             MNI fid prior to limit scope of prediction
-        
+
         img :: NDArray
             full image
 
     Returns
     -------
-        NDArray 
-            predicted label map 
+        NDArray
+            predicted label map
     """
     dim = (2 * radius) + 1
     pred = np.reshape(slice_img(img, mni_fid, radius), (1, dim, dim, dim, 1))
@@ -210,7 +221,7 @@ def process_distances(
             MNI fid prior
 
         radius :: int
-            Radius of configured model 
+            Radius of configured model
 
     Returns
     -------
@@ -261,15 +272,15 @@ def apply_model(
             input image to be predicted
 
         fid_label :: int
-            fiducial label of interest as defined by the protocol 
+            fiducial label of interest as defined by the protocol
 
         model :: tf.keras.Model
-            ML model for predicting within patch 
+            ML model for predicting within patch
 
         radius :: int
             patch radius
 
-        prior :: str 
+        prior :: str
             MNI fid prior fiducal file
 
     Returns
@@ -296,7 +307,7 @@ def apply_model(
         mni_fid_resampled,
         radius,
     )
-    #do it again to improve prediction
+    # do it again to improve prediction
     fid_pred = np.rint(fid_resampled).astype(int)
     distances2 = predict_distances(
         radius,
@@ -312,19 +323,21 @@ def apply_model(
     )
     return fid_voxel2world(fid_resampled2, img.affine)
 
+
 def apply_all(
     model_dir: PathLike,
     img: nib.nifti1.Nifti1Image,
     prior: PathLike,
-) -> Dict[int, NDArray]:
+) -> dict[int, NDArray]:
     """
-    Apply all models using a single architecture with dynamically loaded weights.
+    Apply all models using a single architecture
+    with dynamically loaded weights.
 
     Parameters
     ----------
         model_dir : PathLike
             Path to dir containing model weights
-        
+
         img : nib.nifti1.Nifti1Image
             Input image to be predicted
 
@@ -340,12 +353,12 @@ def apply_all(
 
     afid_label_1 = 1
     model_architecture_path = model_dir + "/" + f"afid-{afid_label_1:02}.model"
-    
+
     # Extract the shared model architecture
     model = tf.keras.models.load_model(model_architecture_path)
 
     # Create an empty dictionary for storing predictions
-    afid_dict: Dict[int, NDArray] = {}
+    afid_dict: dict[int, NDArray] = {}
 
     # Iterate through labels
     for afid_label in range(1, 33):
@@ -353,10 +366,11 @@ def apply_all(
 
         # Locate the weight file for the current label directly in the tarfile
         weight_file_name = model_dir + "/" + f"afid-{afid_label:02}.model"
-        
-        
+
         # Load weights into memory (avoid disk I/O)
-        # weight_file_data = BytesIO(tar_file.extractfile(weight_file_name).read())
+        # weight_file_data = BytesIO(
+        # tar_file.extractfile(weight_file_name).read()
+        # )
         model.load_weights(weight_file_name).expect_partial()
 
         # Apply the model to make predictions
@@ -370,6 +384,7 @@ def apply_all(
 
     return afid_dict
 
+
 class ArchiveMissingDataError(Exception):
     def __init__(self, missing_data: str, tar_file: tarfile.TarFile) -> None:
         super().__init__(
@@ -377,8 +392,7 @@ class ArchiveMissingDataError(Exception):
         )
 
 
-
 img = nib.nifti1.load(snakemake.input.t1w)
 
-predictions = apply_all(snakemake.input.model_dir, img,snakemake.input.prior)
+predictions = apply_all(snakemake.input.model_dir, img, snakemake.input.prior)
 afids_to_fcsv(predictions, snakemake.output.fcsv)

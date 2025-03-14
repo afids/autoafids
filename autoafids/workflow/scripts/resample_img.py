@@ -1,6 +1,6 @@
-from nilearn.image import resample_img
-import numpy as np
 import nibabel as nib
+import numpy as np
+from nilearn.image import resample_img
 
 
 def resample_to_isotropic_resolution(
@@ -41,7 +41,6 @@ def resample_to_isotropic_resolution(
     )
 
     resampled_image.to_filename(output_img)
-
 
 
 resample_to_isotropic_resolution(
