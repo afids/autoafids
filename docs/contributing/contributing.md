@@ -60,7 +60,7 @@ the command._
 ## Dry-run / testing your workflow
 
 Using Snakemake\'s dry-run option (`--dry-run`/`-n`) is an easy way to verify
-any changes made to the workflow are working direcctly. The `test/data` folder 
+any changes made to the workflow are working direcctly. The `tests/data` folder 
 contains a _fake_ BIDS dataset (i.e. dataset with zero-sized files) that is 
 useful for verifying different aspects of the workflow. These dry-run tests are 
 part of the automated Github actions that are run for every commit.
@@ -69,7 +69,7 @@ You can invoke the pre-configured task via
 [poethepoet](https://github.com/nat-n/poethepoet) to perform a dry-run:
 
 ```
-poetry run poe test
+poetry run poe test_base
 ```
 
 This performs a number of tests, involving different scenarios in which a user
