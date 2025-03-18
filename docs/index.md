@@ -33,7 +33,7 @@ workflow/workflow
 ```
 
 ```{toctree}
-:caption: Outputs of SCATTR
+:caption: Outputs of Autoafids
 :name: outputs
 :hidden:
 :maxdepth: 2

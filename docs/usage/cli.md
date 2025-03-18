@@ -11,7 +11,7 @@ cases, only the required arguments are needed.
 ---
 filename: ../autoafids/run.py
 func: get_parser
-prog: scattr
+prog: autoafids
 ---
 ```
 
