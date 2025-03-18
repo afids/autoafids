@@ -1,7 +1,6 @@
-import tarfile
 import os
+import tarfile
 from os import PathLike
-
 
 import nibabel as nib
 import numpy as np
