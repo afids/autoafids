@@ -3,6 +3,9 @@ from pathlib import Path
 
 from snakebids import bidsapp, plugins
 
+if "__file__" not in globals():
+    __file__ = "../autoafids/run.py"
+
 app = bidsapp.app(
     [
         plugins.SnakemakeBidsApp(Path(__file__).resolve().parent),
@@ -12,9 +15,6 @@ app = bidsapp.app(
         plugins.ComponentEdit("pybids_inputs"),
     ]
 )
-
-if "__file__" not in globals():
-    __file__ = "../autoafids/run.py"
 
 
 def get_parser():
