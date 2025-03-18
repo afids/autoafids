@@ -13,6 +13,9 @@ app = bidsapp.app(
     ]
 )
 
+if "__file__" not in globals():
+    __file__ = "../hippunfold/run.py"
+
 
 def get_parser():
     """Exposes parser for sphinx doc generation, cwd is the docs dir"""
