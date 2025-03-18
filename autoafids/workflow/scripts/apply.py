@@ -1,11 +1,7 @@
-import json
-import logging
 import tarfile
-import tempfile
-from argparse import ArgumentParser
+import os
 from os import PathLike
-from pathlib import Path
-from typing import IO
+
 
 import nibabel as nib
 import numpy as np
