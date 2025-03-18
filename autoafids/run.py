@@ -14,7 +14,7 @@ app = bidsapp.app(
 )
 
 if "__file__" not in globals():
-    __file__ = "../hippunfold/run.py"
+    __file__ = "../autoafids/run.py"
 
 
 def get_parser():
