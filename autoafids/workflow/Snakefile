@@ -146,8 +146,8 @@ if config["modality"] != "T1w":
             mem_mb=10000,
         threads: max(1, workflow.cores // max(1, available_mem_mb // 10000))
         params:
-            modality = config["modality"],
-            download_dir = download_dir
+            modality=config["modality"],
+            download_dir=download_dir,
         script:
             "scripts/run_synthsr.py"
 
