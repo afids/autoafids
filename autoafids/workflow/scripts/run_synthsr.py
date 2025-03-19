@@ -5,7 +5,7 @@ import logging
 # clone SynthSR repo
 def clone_repo(download_dir, log_file):
     repo = "https://github.com/mackenziesnyder/SynthSR"
-    branch = "main"
+    branch = "mackenzie/scaled-down-repo"
 
     repo_dir = os.path.join(download_dir, "SynthSR")
     if os.path.exists(repo_dir):
