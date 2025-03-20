@@ -17,7 +17,7 @@ FROM builder as app
 
 RUN apt-get update \
     && apt-get install -y \
-    gcc g++ wget \
+    gcc g++ wget unzip git \
     && apt-get clean \
     && rm -rf /var/lib/apt/list/*
 
