@@ -102,9 +102,6 @@ resolution = float(config["res"])
 
 templatet1w = config["templatet1w"]
 
-print(f'..... {config["procprofile"]} preprocessing configration .....')
-print(f"{profile_settings}")
-
 if config["stereotaxy"] in ["STN", "cZI"]:
     stereotaxy_target = config["stereotaxy"]
     print("..... Stereotaxy Target Enabled .....")
@@ -145,14 +142,11 @@ if config["modality"] != "T1w":
         resources:
             mem_mb=10000,
         threads: max(1, workflow.cores // max(1, available_mem_mb // 10000))
-        container:
-            config["singularity"]["synthsr"]
         params:
-            "--ct" if config["modality"] == "ct" else "",
-        shell:
-            """
-                python /app/scripts/predict_command_line.py {input.im} {output.SynthSR} --cpu > {log} 2>&1
-            """
+            modality=config["modality"],
+            download_dir=download_dir,
+        script:
+            "scripts/run_synthsr.py"
 
 
 if "n4_bias_correction" in profile_settings and config["modality"] == "T1w":

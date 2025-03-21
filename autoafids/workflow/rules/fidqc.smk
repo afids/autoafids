@@ -10,16 +10,8 @@ rule fidqc:
         im=bids(
             root=str(Path(config["bids_dir"])),
             datatype="anat",
-            suffix="T1w.nii.gz",
-            **inputs[config["modality"]].wildcards
-        )
-        if config["modality"] == "T1w"
-        else bids(
-            root=work,
-            datatype="non_t1w_preprocessed",
-            desc="non_t1w_preprocessed",
-            suffix="T1w.nii.gz",
-            **inputs[config["modality"]].wildcards
+            suffix=f"{config['modality']}.nii.gz",
+            **inputs[config["modality"]].wildcards,
         ),
     output:
         html=bids(
