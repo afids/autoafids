@@ -2,7 +2,7 @@
 import os
 
 # Forces TensorFlow to use CPU only
-# Only use CPU for compatibility.# ruff: noqa
+# Only use CPU for compatibility.
 os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 # Suppresses INFO, WARNING, and ERROR logs.
