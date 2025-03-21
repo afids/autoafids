@@ -1,27 +1,51 @@
+
 ```{include} ../README.md
-
 ```
 
 ```{toctree}
-:maxdepth: 1
-:caption: "Contents:"
-```
-
-```{toctree}
-:caption: Getting started
+:caption: Getting Started
 :name: getting_started
 :hidden:
-:maxdepth: 1
+:maxdepth: 2
 
 getting_started/installation
+getting_started/docker
+getting_started/singularity
 ```
 
 ```{toctree}
-:caption: Usage
+:caption: Usage Notes
 :name: usage
 :hidden:
-:maxdepth: 1
+:maxdepth: 2
 
-usage/app_cli
-usage/snakemake_cli
+usage/cli
+usage/useful_options
+```
+
+```{toctree}
+:caption: Workflow Details
+:name: workflow_details
+:hidden:
+:maxdepth: 2
+
+workflow/workflow
+```
+
+```{toctree}
+:caption: Outputs of Autoafids
+:name: outputs
+:hidden:
+:maxdepth: 2
+
+outputs/output_files
+```
+
+```{toctree}
+:caption: Contributing
+:name: contributing
+:hidden:
+:maxdepth: 2
+
+contributing/contributing
 ```
