@@ -26,7 +26,7 @@ jobs:
     needs: [quality]
     strategy:
       matrix:
-        python-version: ['3.9','3.10']
+        python-version: ['3.9', '3.10']
     steps:
       - name: Setup python environments
         uses: khanlab/actions/.github/actions/action-setup_task-installPyProject@v0.3.6
@@ -35,5 +35,3 @@ jobs:
           install-library: true
       - name: Test minimum input
         run: poetry run poe test_base
-
-  

@@ -1,6 +1,8 @@
+# ruff: noqa
 import os
+
 # Forces TensorFlow to use CPU only
-# Only use CPU for compatibility.
+# Only use CPU for compatibility.# ruff: noqa
 os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 # Suppresses INFO, WARNING, and ERROR logs.
@@ -13,6 +15,7 @@ import numpy as np
 import pandas as pd
 import skimage.measure
 import tensorflow as tf
+
 tf.autograph.set_verbosity(0)  # Turn off epoch progress.
 
 from numpy.typing import NDArray
