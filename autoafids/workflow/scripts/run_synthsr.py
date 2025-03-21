@@ -108,24 +108,21 @@ def run_program(
             logging.error(f"Error running SynthSR: {e}")
             raise
 
-# main function
-def main():
-    log_file=snakemake.log[0]
-    download_dir=snakemake.params["download_dir"]
-    repo_dir = clone_repo(download_dir, log_file)
-    venv_dir = make_virtual_env(repo_dir, log_file)
-    venv_python = install_dependencies(venv_dir, log_file)
 
-    run_program(
-        venv_python=venv_python,
-        repo_dir=repo_dir,
-        input_img=snakemake.input["im"],
-        output_img=snakemake.output["SynthSR"],
-        modality=snakemake.params["modality"],
-        log_file=log_file
-    )
+log_file=snakemake.log[0]
+download_dir=snakemake.params["download_dir"]
+repo_dir = clone_repo(download_dir, log_file)
+venv_dir = make_virtual_env(repo_dir, log_file)
+venv_python = install_dependencies(venv_dir, log_file)
 
-if __name__ == "__main__":
-    main()
+run_program(
+    venv_python=venv_python,
+    repo_dir=repo_dir,
+    input_img=snakemake.input["im"],
+    output_img=snakemake.output["SynthSR"],
+    modality=snakemake.params["modality"],
+    log_file=log_file
+)
+
 
 
