@@ -1,14 +1,5 @@
+# ruff: noqa
 import os
-import tarfile
-from os import PathLike
-
-import nibabel as nib
-import numpy as np
-import pandas as pd
-import skimage.measure
-import tensorflow as tf
-from numpy.typing import NDArray
-from utils import afids_to_fcsv
 
 # Forces TensorFlow to use CPU only
 # Only use CPU for compatibility.
@@ -17,8 +8,19 @@ os.environ["CUDA_VISIBLE_DEVICES"] = ""
 # Suppresses INFO, WARNING, and ERROR logs.
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-# Set TensorFlow verbosity
+import tarfile
+from os import PathLike
+
+import nibabel as nib
+import numpy as np
+import pandas as pd
+import skimage.measure
+import tensorflow as tf
+
 tf.autograph.set_verbosity(0)  # Turn off epoch progress.
+
+from numpy.typing import NDArray
+from utils import afids_to_fcsv
 
 
 def load_fcsv(fcsv_path: PathLike[str] | str) -> pd.DataFrame:
