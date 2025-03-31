@@ -74,3 +74,6 @@ poetry run poe test_base
 
 This performs a number of tests, involving different scenarios in which a user
 may use autoafids.
+
+## Questions, Issues, Suggestions, and Other Feedback
+Please reach out if you have any questions, suggestions, or other feedback related to this software—either through email (dbansal7@uwo.ca) or the discussions page. Larger issues or feature requests can be posted and tracked via the issues page. Finally, you can also reach out to Alaa Taha, the Science Lead.

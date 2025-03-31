@@ -27,11 +27,10 @@ A brief summary of the workflow can be found below along with its Directed Acycl
 ## Known Issues
 - Factorize apply workflow to run per landmark of interest
 
-## Roadmap
-
-- Model optimization
-
 ### **Full documentation:** [here](https://autoafids.readthedocs.io/en/)
+
+## Revalent Papers: 
+* Link relavent papers to autoafids here 
 
 ## Questions, Issues, Suggestions, and Other Feedback
 Please reach out if you have any questions, suggestions, or other feedback related to this software—either through email (dbansal7@uwo.ca) or the discussions page. Larger issues or feature requests can be posted and tracked via the issues page. Finally, you can also reach out to Alaa Taha, the Science Lead.
