@@ -30,6 +30,6 @@ args = parser.parse_args()
 mse = compute_mse(args.autoafids_fcsv, args.baseline_fcsv)
 print(f"mse: {mse:.4f}")
 
-if mse > 1.5:
+if mse > 1.2:
     raise ValueError("MSE is too large")
 
