@@ -59,7 +59,7 @@ quality = ["yamlfix", "ruff-lint", "snakefmt"]
 quality-check = ["yamlfix-check", "ruff-lint-check", "snakefmt-check"]
 test = [
     "dryrun_test",
-    "wetrun_test
+    "wetrun_test"
 ]
 
 [tool.poe.tasks.dryrun_test]
