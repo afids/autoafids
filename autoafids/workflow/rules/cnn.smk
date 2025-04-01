@@ -7,6 +7,7 @@ rule download_cnn_model:
     output:
         unzip_dir=directory(Path(download_dir) / "models"),
     shell:
+        "mkdir -p {output.unzip_dir} && "
         "wget https://{params.url} -O model.zip && "
         " unzip -q -d {output.unzip_dir} model.zip && "
         " rm model.zip"
