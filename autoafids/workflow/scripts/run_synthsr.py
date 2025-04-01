@@ -42,7 +42,7 @@ def run_program(
         "scripts",
         "predict_command_line.py"
     )
-    cmd = [predict_script, input_img, output_img, "--cpu"]
+    cmd = ["python", predict_script, input_img, output_img, "--cpu"]
 
     if modality == "ct":
         cmd.append["--ct"]
@@ -67,8 +67,6 @@ def run_program(
 log_file=snakemake.log[0]
 download_dir=snakemake.params["download_dir"]
 repo_dir = clone_repo(download_dir, log_file)
-# venv_dir = make_virtual_env(repo_dir, log_file)
-# venv_python = install_dependencies(venv_dir, log_file)
 
 run_program(
     repo_dir=repo_dir,
