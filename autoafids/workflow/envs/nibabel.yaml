@@ -1,7 +1,4 @@
+---
 name: nibabel
-channels:
-  - conda-forge
-  - defaults
-dependencies:
-  - python=3.9
-  - nibabel
+channels: [conda-forge, defaults]
+dependencies: [python=3.9, nibabel]

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-from pathlib import Path
-from autoafids.workflow.lib import utils as utils
 import os
+from pathlib import Path
 
 from snakebids import bidsapp, plugins
+
+from autoafids.workflow.lib import utils as utils
 
 app = bidsapp.app(
     [
