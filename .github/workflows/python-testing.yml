@@ -58,6 +58,23 @@ jobs:
         run: |
           echo "AUTOAFIDS_CACHE_DIR=`pwd`/test_data/autoafids_cache_dir" >> $GITHUB_ENV
 
-      - name: Test single T1w bids
+      - name: Test T1w modality
         run: |
           poetry run autoafids tests/data/ test_out participant -np
+
+      - name: Test T2w modality
+        run: |
+          poetry run autoafids tests/data/ test_out participant --modality T2w -np
+
+      - name: Test CT modality
+        run: |
+          poetry run autoafids tests/data/ test_out participant --modality ct -np
+
+      - name: Test stereotaxy feature
+        run: |
+          poetry run autoafids tests/data/ test_out participant --stereotaxy STN -np
+
+      - name: Test fidqc feature
+        run: |
+          poetry run autoafids tests/data/ test_out participant --fidqc -np
+
