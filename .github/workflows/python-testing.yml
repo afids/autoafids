@@ -60,21 +60,25 @@ jobs:
 
       - name: Test T1w modality
         run: |
-          poetry run autoafids tests/data/ test_out participant -np
+          poetry run autoafids tests/data/bids_T1w test_out participant -np
 
       - name: Test T2w modality
         run: |
-          poetry run autoafids tests/data/ test_out participant --modality T2w -np
+          poetry run autoafids tests/data/bids_T2w test_out participant --modality T2w -np
 
       - name: Test CT modality
         run: |
-          poetry run autoafids tests/data/ test_out participant --modality ct -np
+          poetry run autoafids tests/data/bids_ct test_out participant --modality ct -np
 
-      - name: Test stereotaxy feature
+      - name: Test stereotaxy feature with T1w modality
         run: |
-          poetry run autoafids tests/data/ test_out participant --stereotaxy STN -np
+          poetry run autoafids tests/data/bids_T1w test_out participant --stereotaxy STN -np
+
+      - name: Test stereotaxy feature with T2w modality
+        run: |
+          poetry run autoafids tests/data/bids_T2w test_out participant --stereotaxy STN --modality T2w -np
 
       - name: Test fidqc feature
         run: |
-          poetry run autoafids tests/data/ test_out participant --fidqc -np
+          poetry run autoafids tests/data/bids_T1w test_out participant --fidqc -np
 
