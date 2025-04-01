@@ -6,8 +6,13 @@ rule download_cnn_model:
         url=config["resource_urls"][config["model"]],
     output:
         unzip_dir=directory(Path(download_dir) / "models"),
+    log:
+        bids(
+            root="logs",
+            suffix="downlaod_model.log",
+        ),
     shell:
-        "wget https://{params.url} -O model.zip && "
+        "wget https://{params.url} -O model.zip &> {log} && "
         " unzip -q -d {output.unzip_dir} model.zip && "
         " rm model.zip"
 
