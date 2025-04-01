@@ -9,7 +9,7 @@ import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.linear_model import Ridge
 from sklearn.preprocessing import StandardScaler
-from utils import (
+from autoafids.workflow.lib.utils import (
     dftodfml,
     fids_to_fcsv,
     make_zero,

@@ -3,6 +3,7 @@ from snakebids import bids, generate_inputs, get_wildcard_constraints
 from appdirs import AppDirs
 import warnings
 import psutil
+from autoafids.workflow.lib import utils as utils
 
 # Get available memory in MB
 available_mem_mb = psutil.virtual_memory().available // 1024 // 1024
@@ -62,18 +63,7 @@ wildcard_constraints:
 root = os.path.expandvars(config["root"])
 work = os.path.expandvars(config["workdir"])
 
-
-def get_download_dir():
-    if "AUTOAFIDS_CACHE_DIR" in os.environ.keys():
-        download_dir = os.environ["AUTOAFIDS_CACHE_DIR"]
-    else:
-        # create local download dir if it doesn't exist
-        dirs = AppDirs("autoafids", "jclauneurolab")
-        download_dir = dirs.user_cache_dir
-    return download_dir
-
-
-download_dir = get_download_dir()
+download_dir = utils.get_download_dir()
 # ---- begin preproc profile pathways --------------------------------------------
 
 processing_steps = {

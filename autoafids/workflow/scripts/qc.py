@@ -1,4 +1,4 @@
-import utils
+from autoafids.workflow.lib import utils
 
 if __name__ == "__main__":
     utils.generate_interactive_mri_html(
