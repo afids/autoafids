@@ -60,4 +60,4 @@ jobs:
 
       - name: Test single T1w bids
         run: |
-          poetry run hippunfold tests/data/ test_out participant -np
+          poetry run autoafids tests/data/ test_out participant -np
