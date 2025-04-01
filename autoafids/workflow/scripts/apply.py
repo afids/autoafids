@@ -19,10 +19,11 @@ import tensorflow as tf
 tf.autograph.set_verbosity(0)  # Turn off epoch progress.
 
 from numpy.typing import NDArray
+from typing import Union
 from utils import afids_to_fcsv
 
 
-def load_fcsv(fcsv_path: PathLike[str] | str) -> pd.DataFrame:
+def load_fcsv(fcsv_path: Union[PathLike[str], str]) -> pd.DataFrame:
     """
     Loads fcsv.
 
