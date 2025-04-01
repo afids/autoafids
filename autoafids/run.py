@@ -4,7 +4,10 @@ from pathlib import Path
 
 from snakebids import bidsapp, plugins
 
-from autoafids.workflow.lib import utils as utils
+try:
+    from autoafids.workflow.lib import utils as utils # Works when run as a package
+except ImportError:
+    from workflow.lib import utils as utils
 
 app = bidsapp.app(
     [
