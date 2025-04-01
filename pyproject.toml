@@ -71,6 +71,7 @@ python ./autoafids/run.py ./tests/data/ ./tests/data/derivatives/ participant \
 [tool.poe.tasks.wetrun_test]
 env = { PYTHONUNBUFFERED = "1" }
 shell = """
+mkdir -p ~/.cache/autoafids/models && \
 python ./autoafids/run.py ./tests/data ./tests/data/derivatives/ participant \
      --modality T1w --participant-label 002 --cores all --force-output && \
 python ./tests/test_fcsv_output.py --autoafids_fcsv \
