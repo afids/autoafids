@@ -58,12 +58,12 @@ jobs:
         run: poetry run poe wetrun_test
 
       - name: Verify model is downloaded in correct location 
-        run: ls -alh ${HOME}/.cache/autoafids
+        run: ls -alh ${HOME}/.cache/autoafids/models
 
       - name: Cache autoafids models
         uses: actions/cache@v3
         with:
-          path: ${HOME}/.cache/autoafids/**
+          path: ${HOME}/.cache/autoafids/models
           key: autoafids-models-${{ runner.os }}-${{ github.sha }}
           restore-keys: |
             autoafids-models-${{ runner.os }}-
