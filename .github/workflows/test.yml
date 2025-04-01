@@ -47,16 +47,23 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           install-library: true
+
       - name: Create cache directory if not exists
         run: mkdir -p ${HOME}/.cache/autoafids
+
       - name: Set model cache dir
         run: echo "AUTOAFIDS_CACHE_DIR=${HOME}/.cache/autoafids" >> $GITHUB_ENV
+
       - name: Test MNI Template baseline with autoafids output
         run: poetry run poe wetrun_test
+
+      - name: Verify model is downloaded in correct location 
+        run: ls -alh ${HOME}/.cache/autoafids
+
       - name: Cache autoafids models
         uses: actions/cache@v3
         with:
-          path: ${HOME}/.cache/autoafids
-          key: autoafids-models-${{ runner.os }}-${{ hashFiles('config.yaml') }}
+          path: ${HOME}/.cache/autoafids/**
+          key: autoafids-models-${{ runner.os }}-${{ github.sha }}
           restore-keys: |
             autoafids-models-${{ runner.os }}-
