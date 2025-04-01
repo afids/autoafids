@@ -66,10 +66,12 @@ work = os.path.expandvars(config["workdir"])
 def get_download_dir():
     if "AUTOAFIDS_CACHE_DIR" in os.environ.keys():
         download_dir = os.environ["AUTOAFIDS_CACHE_DIR"]
+        print("has cache download_dir set here: ", download_dir)
     else:
         # create local download dir if it doesn't exist
         dirs = AppDirs("autoafids", "jclauneurolab")
         download_dir = dirs.user_cache_dir
+        print("program is setting download dir here: ", download_dir)
     return download_dir
 
 
