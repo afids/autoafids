@@ -13,9 +13,9 @@ import matplotlib.pyplot as plt
 import nibabel as nib
 import numpy as np
 import pandas as pd
+from appdirs import AppDirs
 from joblib import Parallel, delayed
 from numpy.typing import NDArray
-from appdirs import AppDirs
 
 # Dictionary for AFID labels
 afids_labels = {
