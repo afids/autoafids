@@ -7,6 +7,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 # Suppresses INFO, WARNING, and ERROR logs.
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+
 import tarfile
 from os import PathLike
 

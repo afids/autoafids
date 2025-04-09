@@ -113,5 +113,5 @@ jobs:
         run: |
           poetry run autoafids test_data/bids_wetrun_testing test_out participant --cores all --force-output \
           --stereotaxy STN --fidqc && \
-          python ./tests/test_fcsv_output.py --autoafids_fcsv ./test_data/test_out/sub-001/afids-cnn/*.fcsv \
+          python ./test_data/bids_wetrun_testing/test_fcsv_output.py --autoafids_fcsv ./test_data/test_out/sub-001/afids-cnn/*.fcsv \
           --baseline_fcsv ./test_data/bids_wetrun_testing/sub-001*.fcsv
