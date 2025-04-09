@@ -5,6 +5,8 @@ on:
 jobs:  
   wetrun_test:
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    needs: ["quality"]
     strategy:
       matrix:
         python-version: ["3.10"]
