@@ -51,7 +51,7 @@ pybids_inputs:
       - reconstruction
       - run
   
-  CT:
+  ct:
     filters:
       suffix: ct
       extension: .nii.gz

@@ -29,6 +29,7 @@ digraph snakemake_dag {
      8[label = "stereotaxy", color = "0.91 0.6 0.85", style="rounded"];
      9[label = "fidqc", color = "0.21 0.6 0.85", style="rounded"];
      4 -> 6
+     4 -> 3
      1 -> 0
      1 -> 8
      8 -> 0

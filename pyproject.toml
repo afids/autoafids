@@ -44,15 +44,7 @@ snakefmt = "snakefmt autoafids"
 snakefmt-check = "snakefmt --check autoafids"
 quality = ["yamlfix", "ruff-lint", "snakefmt"]
 quality-check = ["yamlfix-check", "ruff-lint-check", "snakefmt-check"]
-test = [
-    "test_base"
-]
 
-[tool.poe.tasks.test_base]
-shell = """
-python ./autoafids/run.py ./tests/data/ ./tests/data/derivatives/ participant \
-     -np --force-output
-"""
 
 [tool.poe.tasks.yamlfix]
 shell = """
