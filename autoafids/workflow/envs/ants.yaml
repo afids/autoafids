@@ -1,0 +1,4 @@
+---
+name: ants
+channels: [khanlab, conda-forge, defaults]
+dependencies: [python=3.9, antspyx=0.5.3]
