@@ -5,6 +5,7 @@
 name: Lint and test workflow
 on:
   push:
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -113,7 +114,7 @@ jobs:
       - name: Wetrun testing
         run: |
           poetry run autoafids test_data/bids_wetrun_testing test_out participant \
-            --cores all --force-output --stereotaxy STN --fidqc && 
+            --cores all --force-output --stereotaxy STN --fidqc && \
           poetry run python ./tests/test_fcsv_output.py \
             --autoafids_fcsv ./test_out/sub-001/afids-cnn/*.fcsv \
             --baseline_fcsv ./test_data/bids_wetrun_testing/sub-001/anat/sub-001*.fcsv
