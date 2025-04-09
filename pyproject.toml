@@ -58,7 +58,6 @@ snakefmt-check = "snakefmt --check autoafids"
 quality = ["yamlfix", "ruff-lint", "snakefmt"]
 quality-check = ["yamlfix-check", "ruff-lint-check", "snakefmt-check"]
 
-
 [tool.poe.tasks.yamlfix]
 shell = """
 find . -type f \\( \
