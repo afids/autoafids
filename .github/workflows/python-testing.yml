@@ -2,10 +2,9 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Lint and test workflow
+name: Lint and test workflow with dry runs
 on:
   push:
-  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -82,7 +81,12 @@ jobs:
       - name: Test fidqc feature
         run: |
           poetry run autoafids test_data/bids_T1w test_out participant --fidqc -np
-  
+
+name: test workflow with wet run 
+on:
+  pull_request:
+
+jobs:  
   wetrun_test:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
@@ -114,8 +118,11 @@ jobs:
       - name: Wetrun testing
         run: |
           poetry run autoafids test_data/bids_wetrun_testing test_out participant \
-            --cores all --force-output --stereotaxy STN --fidqc && \
+            --cores all --force-output --stereotaxy STN --fidqc | tee autoafids_output.log
+
+      - name: Model accuracy check 
+        run: |  
           poetry run python ./tests/test_fcsv_output.py \
             --autoafids_fcsv ./test_out/sub-001/afids-cnn/*.fcsv \
-            --baseline_fcsv ./test_data/bids_wetrun_testing/sub-001/anat/sub-001*.fcsv
+            --baseline_fcsv ./test_data/bids_wetrun_testing/sub-001/anat/sub-001*.fcsv | tee test_fcsv_output.log
 
