@@ -57,27 +57,6 @@ snakefmt = "snakefmt autoafids"
 snakefmt-check = "snakefmt --check autoafids"
 quality = ["yamlfix", "ruff-lint", "snakefmt"]
 quality-check = ["yamlfix-check", "ruff-lint-check", "snakefmt-check"]
-test = [
-    "dryrun_test",
-    "wetrun_test"
-]
-
-[tool.poe.tasks.dryrun_test]
-shell = """
-python ./autoafids/run.py ./tests/data/ ./tests/data/derivatives/ participant \
-     --participant-label 001 -np --force-output
-"""
-
-[tool.poe.tasks.wetrun_test]
-env = { PYTHONUNBUFFERED = "1" }
-shell = """
-python ./autoafids/run.py ./tests/data ./tests/data/derivatives/ participant \
-     --modality T1w --participant-label 002 --cores all \
-     --stereotaxy STN --fidqc --force-output && \
-python ./tests/test_fcsv_output.py --autoafids_fcsv \
-    ./tests/data/derivatives/sub-002/afids-cnn/*.fcsv \
-    --baseline_fcsv ./tests/sub-002*.fcsv
-"""
 
 [tool.poe.tasks.yamlfix]
 shell = """

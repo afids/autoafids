@@ -1,0 +1,117 @@
+---
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Lint and test workflow
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  quality:
+    name: Lint code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install non-python dependencies
+        run: |
+          sudo apt-get install -y graphviz-dev
+
+      - name: Setup Python environment
+        uses: khanlab/actions/.github/actions/action-setup_task-installPyProject@v0.3.6
+        with:
+          python-version: "3.10"
+
+      - name: yamlfix
+        run: poetry run poe yamlfix-check
+
+      - name: ruff
+        run: poetry run poe ruff-lint-check
+
+      - name: snakefmt
+        run: poetry run poe snakefmt-check
+
+  dryrun_test:
+    runs-on: ubuntu-latest
+    needs: ["quality"]
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10"]
+
+    steps:
+      - name: Install non-python dependencies
+        run: |
+          sudo apt-get install -y graphviz-dev
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: khanlab/actions/.github/actions/action-setup_task-installPyProject@v0.3.6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setup Python environments
+        uses: khanlab/actions/.github/actions/action-setup_task-installPyProject@v0.3.6
+        with:
+          python-version: ${{ matrix.python-version }}
+          install-library: true
+
+      - name: Setup env for autoafids
+        run: |
+          echo "AUTOAFIDS_CACHE_DIR=`pwd`/test_data/autoafids_cache_dir" >> $GITHUB_ENV
+
+      - name: Test T1w modality
+        run: |
+          poetry run autoafids test_data/bids_T1w test_out participant -np
+
+      - name: Test T2w modality
+        run: |
+          poetry run autoafids test_data/bids_T2w test_out participant --modality T2w -np
+
+      - name: Test CT modality
+        run: |
+          poetry run autoafids test_data/bids_ct test_out participant --modality ct -np
+
+      - name: Test stereotaxy feature with T1w modality
+        run: |
+          poetry run autoafids test_data/bids_T1w test_out participant --stereotaxy STN -np
+
+      - name: Test stereotaxy feature with T2w modality
+        run: |
+          poetry run autoafids test_data/bids_T2w test_out participant --stereotaxy STN --modality T2w -np
+
+      - name: Test fidqc feature
+        run: |
+          poetry run autoafids test_data/bids_T1w test_out participant --fidqc -np
+  
+  wetrun_test:
+    runs-on: ubuntu-latest
+    needs: ["quality"]
+    strategy:
+      matrix:
+        python-version: ["3.10"]
+
+    steps:
+      - name: Install non-python dependencies
+        run: |
+          sudo apt-get install -y graphviz-dev
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: khanlab/actions/.github/actions/action-setup_task-installPyProject@v0.3.6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setup Python environments
+        uses: khanlab/actions/.github/actions/action-setup_task-installPyProject@v0.3.6
+        with:
+          python-version: ${{ matrix.python-version }}
+          install-library: true
+
+      - name: Setup env for autoafids
+        run: |
+          echo "AUTOAFIDS_CACHE_DIR=`pwd`/test_data/autoafids_cache_dir" >> $GITHUB_ENV
+
+      - name: Wetrun testing
+        run: |
+          poetry run autoafids test_data/bids_wetrun_testing test_out participant --cores all --force-output \
+          --stereotaxy STN --fidqc && \
+          python ./tests/test_fcsv_output.py --autoafids_fcsv ./test_data/test_out/sub-001/afids-cnn/*.fcsv \
+          --baseline_fcsv ./test_data/bids_wetrun_testing/sub-001*.fcsv
