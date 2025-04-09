@@ -1,11 +1,9 @@
-import os
 import pickle
-import warnings
 import re
+import warnings
 
 import numpy as np
 import pandas as pd
-
 
 # Suppress specific warnings after all imports
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
@@ -279,7 +277,7 @@ def fcsvtodf(fcsv_path):
     # Extract the subject ID from the file path (naming is in bids-like)
     try:
         subject_id = re.search(r"(sub-\w+)", fcsv_path).group(1)
-    except:
+    except Exception as e:
        print("no subject id found")
 
     # Read in .fcsv file, skip header

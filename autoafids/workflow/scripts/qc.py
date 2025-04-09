@@ -1,11 +1,12 @@
-import nibabel as nib
+import base64
 import os
+from io import BytesIO
+
+import matplotlib.pyplot as plt
+import nibabel as nib
 import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
-import matplotlib.pyplot as plt
-from io import BytesIO
-import base64
 
 # Dictionary for AFID labels
 afids_labels = {
