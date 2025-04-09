@@ -5,7 +5,6 @@
 name: Lint and test workflow with dry runs
 on:
   push:
-  pull_request:
   workflow_dispatch:
 
 jobs:
