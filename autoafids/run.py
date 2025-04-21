@@ -26,10 +26,11 @@ app = bidsapp.app(
 )
 
 # Set the conda prefix directory
-conda_prefix = str(utils.get_download_dir()) +  "/" + "conda"
+conda_prefix = Path(utils.get_download_dir()) / "conda"
 
-# Set the environment variable SNAKEMAKE_CONDA_PREFIX
-os.environ["SNAKEMAKE_CONDA_PREFIX"] = str(conda_prefix)
+# Set the environment variable SNAKEMAKE_CONDA_PREFIX if not already set
+if not "SNAKEMAKE_CONDA_PREFIX" in os.environ:
+    os.environ["SNAKEMAKE_CONDA_PREFIX"] = str(Path(utils.get_download_dir()) / "conda")
 
 def get_parser():
     """Exposes parser for sphinx doc generation, cwd is the docs dir"""
