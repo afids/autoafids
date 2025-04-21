@@ -29,7 +29,7 @@ app = bidsapp.app(
 conda_prefix = Path(utils.get_download_dir()) / "conda"
 
 # Set the environment variable SNAKEMAKE_CONDA_PREFIX if not already set
-if not "SNAKEMAKE_CONDA_PREFIX" in os.environ:
+if "SNAKEMAKE_CONDA_PREFIX" not in os.environ:
     os.environ["SNAKEMAKE_CONDA_PREFIX"] = str(Path(utils.get_download_dir()) / "conda")
 
 def get_parser():
