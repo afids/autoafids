@@ -3,7 +3,13 @@ from snakebids import bids, generate_inputs, get_wildcard_constraints
 from appdirs import AppDirs
 import warnings
 import psutil
-from autoafids.workflow.lib import utils as utils
+
+try:
+    from autoafids.workflow.lib import (
+        utils as utils,  # Works when run as a package
+    )
+except ImportError:
+    from workflow.lib import utils as utils  # Works when run directly
 
 # Get available memory in MB
 available_mem_mb = psutil.virtual_memory().available // 1024 // 1024
