@@ -4,6 +4,13 @@ from appdirs import AppDirs
 import warnings
 import psutil
 
+try:
+    from autoafids.workflow.lib import (
+        utils as utils,  # Works when run as a package
+    )
+except ImportError:
+    from workflow.lib import utils as utils  # Works when run directly
+
 # Get available memory in MB
 available_mem_mb = psutil.virtual_memory().available // 1024 // 1024
 
@@ -62,18 +69,7 @@ wildcard_constraints:
 root = os.path.expandvars(config["root"])
 work = os.path.expandvars(config["workdir"])
 
-
-def get_download_dir():
-    if "AUTOAFIDS_CACHE_DIR" in os.environ.keys():
-        download_dir = os.environ["AUTOAFIDS_CACHE_DIR"]
-    else:
-        # create local download dir if it doesn't exist
-        dirs = AppDirs("autoafids", "jclauneurolab")
-        download_dir = dirs.user_cache_dir
-    return download_dir
-
-
-download_dir = get_download_dir()
+download_dir = utils.get_download_dir()
 # ---- begin preproc profile pathways --------------------------------------------
 
 processing_steps = {
@@ -145,6 +141,8 @@ if config["modality"] != "T1w":
         params:
             modality=config["modality"],
             download_dir=download_dir,
+        conda:
+            "envs/synthsr.yaml"
         script:
             "scripts/run_synthsr.py"
 
@@ -175,6 +173,8 @@ if "n4_bias_correction" in profile_settings and config["modality"] == "T1w":
                 suffix="T1w.nii.gz",
                 **inputs[config["modality"]].wildcards
             ),
+        conda:
+            "envs/ants.yaml"
         script:
             "scripts/n4_bias_corr.py"
 
@@ -222,6 +222,8 @@ rule norm_im:
         ),
     params:
         norm_method=chosen_norm_method,
+    conda:
+        "envs/nibabel.yaml"
     script:
         "scripts/norm_schemes.py"
 
@@ -248,6 +250,8 @@ if "resample_im" in profile_settings:
                 suffix="T1w.nii.gz",
                 **inputs[config["modality"]].wildcards,
             ),
+        conda:
+            "envs/resample.yaml"
         script:
             "scripts/resample_img.py"
 
@@ -301,6 +305,8 @@ rule mni2sub:
         ),
     params:
         moving=str(Path(workflow.basedir).parent / templatet1w),
+    conda:
+        "envs/ants.yaml"
     script:
         "scripts/regis_script.py"
 
@@ -326,6 +332,8 @@ rule mni2subfids:
             suffix="afids.fcsv",
             **inputs[config["modality"]].wildcards,
         ),
+    conda:
+        "envs/ants.yaml"
     script:
         "scripts/tform_script.py"
 
