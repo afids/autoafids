@@ -144,10 +144,11 @@ afids_labels = {
     32: "LOSF",
 }
 
-exclude_afids = ['CULx','PGx','GENUx', 'SPLEx', 'ALTHx', 'SAMTHx', 'IAMTHx', 'IGOx','VOHx','OSFx',
-                 'CULy','PGy','GENUy', 'SPLEy', 'ALTHy', 'SAMTHy', 'IAMTHy', 'IGOy','VOHy','OSFy',
-                 'CULz','PGz','GENUz', 'SPLEz', 'ALTHz', 'SAMTHz', 'IAMTHz', 'IGOz','VOHz','OSFz'
-                 ]
+exclude_afids = [
+    'CULx', 'PGx', 'GENUx', 'SPLEx', 'ALTHx', 'SAMTHx', 'IAMTHx', 'IGOx', 'VOHx', 'OSFx',
+    'CULy', 'PGy', 'GENUy', 'SPLEy', 'ALTHy', 'SAMTHy', 'IAMTHy', 'IGOy', 'VOHy', 'OSFy',
+    'CULz', 'PGz', 'GENUz', 'SPLEz', 'ALTHz', 'SAMTHz', 'IAMTHz', 'IGOz', 'VOHz', 'OSFz'
+]
 
 def dftodfml(fcsvdf):
     """
