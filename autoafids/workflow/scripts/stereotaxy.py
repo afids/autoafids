@@ -144,6 +144,10 @@ afids_labels = {
     32: "LOSF",
 }
 
+exclude_afids = ['CULx','PGx','GENUx', 'SPLEx', 'ALTHx', 'SAMTHx', 'IAMTHx', 'IGOx','VOHx','OSFx',
+                 'CULy','PGy','GENUy', 'SPLEy', 'ALTHy', 'SAMTHy', 'IAMTHy', 'IGOy','VOHy','OSFy',
+                 'CULz','PGz','GENUz', 'SPLEz', 'ALTHz', 'SAMTHz', 'IAMTHz', 'IGOz','VOHz','OSFz'
+                 ]
 
 def dftodfml(fcsvdf):
     """
@@ -589,6 +593,8 @@ def model_pred(
         .applymap(make_zero)
     )
 
+        # Drop excluded AFIDs
+    df_sub_mcp.drop(exclude_afids, axis=1, inplace=True)
 
     # Load the trained model components from the pickle file
     with open(model, "rb") as file:
