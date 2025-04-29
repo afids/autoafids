@@ -45,5 +45,7 @@ rule gen_fcsv:
             suffix="landmark.log",
             **inputs[config["modality"]].wildcards
         ),
+    conda:
+        "../envs/tensorflow.yaml"
     script:
         "../scripts/apply.py"

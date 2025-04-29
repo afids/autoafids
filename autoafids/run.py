@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
+import os
 from pathlib import Path
 
 from snakebids import bidsapp, plugins
 
+try:
+    from autoafids.workflow.lib import (
+        utils as utils,  # Works when run as a package
+    )
+except ImportError:
+    from workflow.lib import utils as utils  # Works when run directly
+
 if "__file__" not in globals():
     __file__ = "../autoafids/run.py"
+
 
 app = bidsapp.app(
     [
@@ -16,6 +25,12 @@ app = bidsapp.app(
     ]
 )
 
+# Set the conda prefix directory
+conda_prefix = Path(utils.get_download_dir()) / "conda"
+
+# Set the environment variable SNAKEMAKE_CONDA_PREFIX if not already set
+if "SNAKEMAKE_CONDA_PREFIX" not in os.environ:
+    os.environ["SNAKEMAKE_CONDA_PREFIX"] = str(conda_prefix)
 
 def get_parser():
     """Exposes parser for sphinx doc generation, cwd is the docs dir"""

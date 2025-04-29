@@ -1,0 +1,4 @@
+---
+name: resample
+channels: [conda-forge, defaults]
+dependencies: [python=3.9, nibabel, nilearn=0.10.4]

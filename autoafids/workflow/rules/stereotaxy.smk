@@ -38,5 +38,7 @@ rule afidspred:
         target_fcsv=str(
             Path(workflow.basedir).parent / config["template_fcsv"]
         ),
+    conda:
+        "../envs/skimage.yaml"
     script:
         "../scripts/stereotaxy.py"
