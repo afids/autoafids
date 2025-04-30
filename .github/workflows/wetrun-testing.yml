@@ -22,7 +22,15 @@ jobs:
 
       - name: Create environment with snakebids
         run: |
-          mamba create -n snakebids-env snakebids -c bioconda -y
+          mamba create -n snakebids-env snakebids scikit-learn pandas -c bioconda -c conda-forge -y
+
+      - name: Cache Snakemake Conda environments
+        uses: actions/cache@v4
+        with:
+          path: test_data/autoafids_cache_dir/conda
+          key: conda-env-${{ hashFiles('autoafids/workflow/envs/*.yml') }}
+          restore-keys: |
+            conda-env-
 
       - name: Set AUTOAFIDS_CACHE_DIR
         run: |
