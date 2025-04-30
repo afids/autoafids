@@ -31,12 +31,14 @@ jobs:
 
       - name: Wetrun testing
         run: |
+          set -eo pipefail
           poetry run autoafids test_data/bids_wetrun_testing test_out participant \
             --cores all --force-output --stereotaxy STN --fidqc --use-conda | tee autoafids_output.log
         continue-on-error: false
 
       - name: Model accuracy check 
         run: |  
+          set -eo pipefail
           poetry run python ./tests/test_fcsv_output.py \
             --autoafids_fcsv ./test_out/sub-001/afids-cnn/*.fcsv \
             --baseline_fcsv ./test_data/bids_wetrun_testing/sub-001/anat/sub-001*.fcsv | tee test_fcsv_output.log
