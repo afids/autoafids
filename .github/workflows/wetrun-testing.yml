@@ -32,7 +32,7 @@ jobs:
       - name: Wetrun testing
         run: |
           poetry run autoafids test_data/bids_wetrun_testing test_out participant \
-            --cores all --force-output --stereotaxy STN --fidqc | tee autoafids_output.log
+            --cores all --force-output --stereotaxy STN --fidqc --use-conda | tee autoafids_output.log
         continue-on-error: false
 
       - name: Model accuracy check 
