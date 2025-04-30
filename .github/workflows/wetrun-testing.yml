@@ -28,7 +28,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: test_data/autoafids_cache_dir/conda
-          key: conda-env-${{ hashFiles('autoafids/workflow/envs/*.yml') }}
+          key: conda-env-${{ hashFiles('autoafids/workflow/envs/*.yaml') }}
           restore-keys: |
             conda-env-
 
