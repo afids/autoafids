@@ -5,41 +5,41 @@ on:
 jobs:  
   wetrun_test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10"]
 
     steps:
-      - name: Install non-python dependencies
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Miniforge and mamba
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-variant: Miniforge3
+          miniforge-version: latest
+          mamba-version: "*"
+          use-mamba: true
+          conda-solver: libmamba
+          auto-activate-base: true
+
+      - name: Create environment with snakebids
         run: |
-          sudo apt-get install -y graphviz-dev
+          mamba create -n snakebids-env snakebids -c bioconda -y
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: khanlab/actions/.github/actions/action-setup_task-installPyProject@v0.3.6
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Setup Python environments
-        uses: khanlab/actions/.github/actions/action-setup_task-installPyProject@v0.3.6
-        with:
-          python-version: ${{ matrix.python-version }}
-          install-library: true
-
-      - name: Setup env for autoafids
+      - name: Set AUTOAFIDS_CACHE_DIR
         run: |
           echo "AUTOAFIDS_CACHE_DIR=`pwd`/test_data/autoafids_cache_dir" >> $GITHUB_ENV
 
-      - name: Wetrun testing
+      - name: Run wet-run test
+        shell: bash -l {0}
         run: |
-          set -eo pipefail
-          poetry run autoafids test_data/bids_wetrun_testing test_out participant \
-            --cores all --force-output --stereotaxy STN --fidqc --use-conda --conda-frontend conda | tee autoafids_output.log
-        continue-on-error: false
+          conda activate snakebids-env
+          ./autoafids/run.py test_data/bids_wetrun_testing test_out participant \
+            --cores all --force-output --stereotaxy STN --fidqc --use-conda --conda-frontend mamba | tee autoafids_output.log
 
       - name: Model accuracy check 
-        run: |  
-          set -eo pipefail
-          poetry run python ./tests/test_fcsv_output.py \
+        shell: bash -l {0}
+        run: |
+          conda activate snakebids-env
+          python ./tests/test_fcsv_output.py \
             --autoafids_fcsv ./test_out/sub-001/afids-cnn/*.fcsv \
             --baseline_fcsv ./test_data/bids_wetrun_testing/sub-001/anat/sub-001*.fcsv | tee test_fcsv_output.log
 
