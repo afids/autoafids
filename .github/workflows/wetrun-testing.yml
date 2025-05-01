@@ -32,6 +32,12 @@ jobs:
           restore-keys: |
             conda-env-
 
+      - name: Restore cached CNN model
+        uses: actions/cache@v4
+        with:
+          path: test_data/autoafids_cache_dir/models
+          key: static-model-cache-v1
+
       - name: Set AUTOAFIDS_CACHE_DIR
         run: |
           echo "AUTOAFIDS_CACHE_DIR=`pwd`/test_data/autoafids_cache_dir" >> $GITHUB_ENV
