@@ -60,11 +60,11 @@ jobs:
 
       - name: Test T1w modality
         run: |
-          poetry run autoafids test_data/bids_T1w test_out participant -np
+          poetry run autoafids test_data/bids_T1w test_out participant --participant-label 001 -np
 
       - name: Test T2w modality
         run: |
-          poetry run autoafids test_data/bids_T2w test_out participant --modality T2w -np
+          poetry run autoafids test_data/bids_T2w test_out participant --modality T2w -np -c1
 
       - name: Test CT modality
         run: |
@@ -72,7 +72,7 @@ jobs:
 
       - name: Test stereotaxy feature with T1w modality
         run: |
-          poetry run autoafids test_data/bids_T1w test_out participant --stereotaxy STN -np
+          poetry run autoafids test_data/bids_T1w test_out participant --participant-label 001 --stereotaxy STN -np
 
       - name: Test stereotaxy feature with T2w modality
         run: |
