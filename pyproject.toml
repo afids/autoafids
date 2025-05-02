@@ -27,6 +27,8 @@ poethepoet = "^0.21.1"
 ruff = "^0.0.282"
 snakefmt = "^0.8.4"
 yamlfix = "^1.11.0"
+pygraphviz = "1.7"
+Jinja2 = "^3.0.3"
 
 [tool.poetry.scripts]
 autoafids = "autoafids.run:app.run"
@@ -44,7 +46,6 @@ snakefmt = "snakefmt autoafids"
 snakefmt-check = "snakefmt --check autoafids"
 quality = ["yamlfix", "ruff-lint", "snakefmt"]
 quality-check = ["yamlfix-check", "ruff-lint-check", "snakefmt-check"]
-
 
 [tool.poe.tasks.yamlfix]
 shell = """

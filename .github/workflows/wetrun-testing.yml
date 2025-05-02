@@ -1,0 +1,59 @@
+name: test workflow with wet run 
+on:
+  pull_request:
+
+jobs:  
+  wetrun_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Miniforge and mamba
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-variant: Miniforge3
+          miniforge-version: latest
+          mamba-version: "*"
+          use-mamba: true
+          conda-solver: libmamba
+          auto-activate-base: true
+
+      - name: Create environment with snakebids
+        run: |
+          mamba create -n snakebids-env snakebids scikit-learn pandas -c bioconda -c conda-forge -y
+
+      - name: Cache Snakemake Conda environments
+        uses: actions/cache@v4
+        with:
+          path: test_data/autoafids_cache_dir/conda
+          key: conda-env-${{ hashFiles('autoafids/workflow/envs/*.yaml') }}
+          restore-keys: |
+            conda-env-
+
+      - name: Restore cached CNN model
+        uses: actions/cache@v4
+        with:
+          path: test_data/autoafids_cache_dir/models
+          key: static-model-cache-v1
+
+      - name: Set AUTOAFIDS_CACHE_DIR
+        run: |
+          echo "AUTOAFIDS_CACHE_DIR=`pwd`/test_data/autoafids_cache_dir" >> $GITHUB_ENV
+
+      - name: Run wet-run test
+        shell: bash -l {0}
+        run: |
+          conda activate snakebids-env
+          ./autoafids/run.py test_data/bids_wetrun_testing test_out participant \
+            --cores all --force-output --stereotaxy STN --fidqc --use-conda --conda-frontend mamba | tee autoafids_output.log
+
+      - name: Model accuracy check 
+        shell: bash -l {0}
+        run: |
+          conda activate snakebids-env
+          python ./tests/test_fcsv_output.py \
+            --autoafids_fcsv ./test_out/sub-001/afids-cnn/*.fcsv \
+            --baseline_fcsv ./test_data/bids_wetrun_testing/sub-001/anat/sub-001*.fcsv | tee test_fcsv_output.log
+
