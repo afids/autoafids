@@ -137,7 +137,7 @@ If you encounter issues while setting up AutoAFIDs via Conda:
   ```bash
   conda update -n base -c defaults conda
   ```
-- Double-check that your environment is activated (`conda activate autoafids-env` or `autoafids-dev`)
+- Double-check that your environment is activated (`mamba activate autoafids-env` or `autoafids-dev`)
 - Try creating a fresh environment if problems persist
 - Search for similar issues or open a new one in the [GitHub issues](https://github.com/afids/autoafids/issues) page
 
