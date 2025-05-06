@@ -11,6 +11,7 @@
 getting_started/installation
 getting_started/docker
 getting_started/singularity
+gettting_started/conda
 ```
 
 ```{toctree}
