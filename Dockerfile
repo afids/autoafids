@@ -24,7 +24,7 @@ RUN set -e && \
     ./autoafids/run.py test_data/bids_T1w test_out participant --participant-label 001 --fidqc --use-conda --conda-create-envs-only --cores all --conda-prefix /src/conda-envs && \
     conda clean --all -y && \
     rm -rf /opt/conda/pkgs /root/.cache && \
-    cp /src/entrypoint_quick.sh /usr/local/bin/hippunfold-quick 
+    cp /src/entrypoint_quick.sh
 
 # Set snakemake profile
 ENV SNAKEMAKE_PROFILE=/src/profiles/docker-conda
