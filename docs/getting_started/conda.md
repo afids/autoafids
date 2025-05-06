@@ -20,6 +20,7 @@ Follow the instructions at the official Conda documentation:
 ### 2. Create and activate a new Conda environment
 
 ```bash
+conda install mamba -c conda-forge
 conda create --name autoafids-env -c khanlab -c conda-forge -c bioconda autoafids
 conda activate autoafids-env
 ```
