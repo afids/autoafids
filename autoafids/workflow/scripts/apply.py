@@ -52,7 +52,7 @@ FCSV_TEMPLATE = (
 
 def afids_to_fcsv(
     afid_coords: dict[int, NDArray],
-    fcsv_output: os.PathLike[str] | str,
+    fcsv_output: Union[PathLike, str],
 ) -> None:
     """
     AFIDS to Slicer-compatible .fcsv file.
@@ -327,11 +327,11 @@ def process_distances(
 
 
 def apply_model(
-    img: nib.nifti1.Nifti1Image | nib.nifti1.Nifti1Pair,
+    img: Union[nib.nifti1.Nifti1Image, nib.nifti1.Nifti1Pair],
     fid_label: int,
     model: tf.keras.Model,
     radius: int,
-    prior: PathLike[str] | str,
+    prior: Union[PathLike, str],
 ) -> NDArray:
     """
     Apply model
