@@ -21,8 +21,8 @@ Follow the instructions at the official Conda documentation:
 
 ```bash
 conda install mamba -c conda-forge
-conda create --name autoafids-env -c khanlab -c conda-forge -c bioconda autoafids
-conda activate autoafids-env
+mamba create --name autoafids-env -c khanlab -c conda-forge -c bioconda autoafids
+mamba activate autoafids-env
 ```
 
 ---
