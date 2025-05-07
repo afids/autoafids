@@ -1,0 +1,52 @@
+{% set name = "autoafids" %}
+{% set version = "1.1.0" %}
+{% set ref = "241e4b3ddecc82f1e245ad3c881b516a44ee33cd" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://github.com/afids/autoafids/archive/{{ ref }}.tar.gz
+  sha256: cffa7619612fc2d43b1363ccc76744d04d2c6ff8f3cb549f22a75caf2ff6d8ae
+
+build:
+  entry_points: 
+    - autoafids = autoafids.run:app.run
+  noarch: python
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  number: 0
+
+requirements:
+  host:
+    - python
+    - poetry-core
+    - pip
+  run:
+    - python >=3.9,<4.0
+    - snakebids >=0.14.0
+    - appdirs >=1.4.4,<2.0.0
+    - pulp <2.8.0  # [py<311]
+    - pyvista >=0.44.2,<0.45.0
+
+test:
+  imports:
+    - autoafids
+  commands:
+    - autoafids --help
+
+
+about:
+  home: https://github.com/khanlab/hippunfold
+  summary: |
+    End-to-end BIDS app for automated anatomical fiducial landmark regression.
+  description: |
+    AutoAFIDs is a BIDS-compliant application that automates the placement 
+    and evaluation of anatomical fiducial landmarks (AFIDs).
+  license: MIT
+  license_file: LICENSE
+
+
+extra:
+  recipe-maintainers:
+    - Dhananjhay
