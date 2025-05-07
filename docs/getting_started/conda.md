@@ -70,7 +70,7 @@ ds002168/
 Running AutoAFIDs:
 
 ```bash
-autoafids ds002168 ds002168_autoafids participant --cores all --use-conda
+autoafids ds002168 ds002168_autoafids participant --cores all
 ```
 
 This should run the full pipeline and place results in a new `ds002168_autoafids/` folder.
