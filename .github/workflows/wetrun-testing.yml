@@ -62,5 +62,5 @@ jobs:
         run: |
           conda activate snakebids-env
           ./autoafids/run.py test_data/bids_wetrun_testing/bids_T2w test_out participant \
-            --modality T2w --cores all --force-output --stereotaxy STN --fidqc --use-conda --conda-frontend mamba --show-failed-logs
+            --modality T2w --cores all --force-output --use-conda --conda-frontend mamba --show-failed-logs
 
