@@ -42,12 +42,12 @@ jobs:
         run: |
           echo "AUTOAFIDS_CACHE_DIR=`pwd`/test_data/autoafids_cache_dir" >> $GITHUB_ENV
 
-      - name: Run wet-run test
+      - name: Run wet-run test for T1w modality
         shell: bash -l {0}
         run: |
           conda activate snakebids-env
-          ./autoafids/run.py test_data/bids_wetrun_testing test_out participant \
-            --cores all --force-output --stereotaxy STN --fidqc --conda-frontend mamba | tee autoafids_output.log
+          ./autoafids/run.py test_data/bids_wetrun_testing/bids_T1w test_out participant \
+            --cores all --force-output --stereotaxy STN --fidqc --use-conda --conda-frontend mamba | tee autoafids_output.log
 
       - name: Model accuracy check 
         shell: bash -l {0}
