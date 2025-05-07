@@ -3,7 +3,6 @@ import os
 import subprocess
 
 
-
 # clone SynthSR repo
 def clone_repo(download_dir, log_file):
     repo = "https://github.com/mackenziesnyder/SynthSR"
