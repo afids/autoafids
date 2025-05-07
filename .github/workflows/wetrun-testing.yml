@@ -47,7 +47,7 @@ jobs:
         run: |
           conda activate snakebids-env
           ./autoafids/run.py test_data/bids_wetrun_testing/bids_T1w test_out participant \
-            --cores all --force-output --stereotaxy STN --fidqc --use-conda --conda-frontend mamba | tee autoafids_output.log
+            --cores all --force-output --stereotaxy STN --fidqc --conda-frontend mamba | tee autoafids_output.log
 
       - name: Model accuracy check 
         shell: bash -l {0}
@@ -62,4 +62,4 @@ jobs:
         run: |
           conda activate snakebids-env
           ./autoafids/run.py test_data/bids_wetrun_testing/bids_T2w test_out participant \
-            --modality T2w --cores all --force-output --use-conda --conda-frontend mamba
+            --modality T2w --cores all --force-output --conda-frontend mamba
