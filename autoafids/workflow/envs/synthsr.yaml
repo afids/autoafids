@@ -7,3 +7,4 @@ dependencies:
   - keras=2.3.1
   - nibabel
   - matplotlib
+  - numpy<1.20
