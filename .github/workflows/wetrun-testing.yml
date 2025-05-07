@@ -1,9 +1,5 @@
 name: test workflow with wet run 
 on:
-  workflow_run:
-    workflows: ["Lint and test workflow"]
-    types:
-      - completed
   pull_request:
 
 jobs:
