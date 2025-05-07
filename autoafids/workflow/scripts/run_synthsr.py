@@ -5,8 +5,7 @@ import subprocess
 
 # clone SynthSR repo
 def clone_repo(download_dir, log_file):
-    repo = "https://github.com/mackenziesnyder/SynthSR"
-    branch = "mackenzie/scaled-down-repo"
+    repo = "https://github.com/BBillot/SynthSR.git"
 
     repo_dir = os.path.join(download_dir, "SynthSR")
     if os.path.exists(repo_dir):
@@ -18,7 +17,7 @@ def clone_repo(download_dir, log_file):
     with open(log_file, "a") as log:
         try:
             subprocess.run(
-                ["git", "clone", "--branch", branch, repo, repo_dir],
+                ["git", "clone", repo, repo_dir],
                 check=True,
                 stdout=log,
                 stderr=log
