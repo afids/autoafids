@@ -15,7 +15,7 @@ This Python package is a standard 3D [U-Net](https://arxiv.org/abs/1505.04597) (
 
 A brief summary of the workflow can be found below along with its Directed Acyclic Graph (DAG) (see documentation for a detailed summary):
 
-<img src="docs/images/dag.png" alt="Workflow DAG" width="600">
+![Pipeline Overview](https://raw.githubusercontent.com//afids/autoafids/master/docs/images/dag.png)
 
 1. Preprocess input NIfTI files based on image modality
 2. Download and apply the fiducial model 
