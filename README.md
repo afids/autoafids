@@ -1,11 +1,11 @@
 # Automatic Anatomical Fiducials (AutoAFIDs)
-[![Documentation Status](https://readthedocs.org/projects/autoafids/badge/?version=stable)](https://autoafids.readthedocs.io/en/stable/?badge=stable)
+[![Documentation Status](https://readthedocs.org/projects/autoafids/badge/?version=latest)](https://autoafids.readthedocs.io/en/stable/?badge=stable)
 ![Version](https://img.shields.io/github/v/tag/afids/autoafids?label=version)
-![Python3](https://img.shields.io/badge/python-_3.10_|_3.11-blue.svg)
-[![Tests](https://github.com/khanlab/scattr/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/khanlab/scattr/actions/workflows/test.yml?query=branch%3Amain)
-![Docker Pulls](https://img.shields.io/docker/pulls/mackenzieasnyder/autoafids)
+![Python3](https://img.shields.io/badge/python-_3.9_|_3.10_|_3.11_|_3.12-blue.svg)
+[![Tests](https://github.com/afids/autoafids/actions/workflows/lint-and-dryrun-testing.yml/badge.svg?branch=main)](https://github.com/afids/autoafids/actions/workflows/lint-and-dryrun-testing.yml?query=branch%3Amain)
+![Docker Pulls](https://img.shields.io/docker/pulls/dhananjhay/autoafids)
 
-AIMS Lab Research Team at the Robarts Research Institute - 2023-2024
+AIMS Lab Research Team at the Robarts Research Institute - 2023-2025
 
 *This package is under active development. It should be stable and reproducible, but please let any of the active contributing members know if there are any bugs or unusual behaviour.*
 
@@ -15,7 +15,7 @@ This Python package is a standard 3D [U-Net](https://arxiv.org/abs/1505.04597) (
 
 A brief summary of the workflow can be found below along with its Directed Acyclic Graph (DAG) (see documentation for a detailed summary):
 
-<img src="docs/workflow/dag.svg" alt="Workflow DAG" width="600">
+![Pipeline Overview](https://raw.githubusercontent.com//afids/autoafids/master/docs/images/dag.png)
 
 1. Preprocess input NIfTI files based on image modality
 2. Download and apply the fiducial model 

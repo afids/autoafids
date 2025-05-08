@@ -12,7 +12,7 @@ Below is an image exhibiting the workflow DAG. Each rounded rectangle underneath
 the DAG represents a rule (i.e. some code or script that produces an output), 
 with arrows representing the connections (i.e. inputs / outputs) to these rules.
 
-<img src="https://raw.githubusercontent.com/afids/autoafids/refs/heads/main/docs/dag.svg" width="800px">
+![workflow](../images/dag.png)
 
 ### Processing landmark data (AFIDs)
 1. Extract fiducial points from the landmark files (.fcsv is supported)
