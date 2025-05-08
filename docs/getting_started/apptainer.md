@@ -8,7 +8,7 @@
  3. Sufficient disk-space 
       - in your `/tmp` folder (>15GB) to build the container
       - in your working folder to store the container (~15GB)
-      - for HippUnfold outputs (~1GB per subject) 
+      - for AutoAFIDs outputs (~1GB per subject) 
  4. Sufficient CPU and memory - the more you have, the faster it will run, but we recommend at least 4 CPU cores and 16GB memory.
 
 
