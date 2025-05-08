@@ -10,7 +10,7 @@
 
 getting_started/installation
 getting_started/docker
-getting_started/singularity
+getting_started/apptainer
 getting_started/conda
 ```
 
