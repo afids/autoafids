@@ -26,7 +26,7 @@ RUN set -e && \
     rm -rf /opt/conda/pkgs /root/.caches
 
 # Set snakemake profile
-ENV SNAKEMAKE_PROFILE=/src/profiles/docker-conda
+ENV SNAKEMAKE_PROFILE=/src/autoafids/profiles/docker-conda
 
 # Set entrypoint
 ENTRYPOINT ["/src/entrypoint.sh"]
