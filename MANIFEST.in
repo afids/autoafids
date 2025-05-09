@@ -1,0 +1,3 @@
+recursive-include autoafids/resources *
+recursive-include autoafids/config *
+recursive-include autoafids/workflow *
