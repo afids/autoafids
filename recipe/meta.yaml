@@ -1,6 +1,6 @@
 {% set name = "autoafids" %}
 {% set version = "1.1.0" %}
-{% set ref = "241e4b3ddecc82f1e245ad3c881b516a44ee33cd" %}
+{% set ref = "51e7caafada94bea0fb4346e7437aecb3dd5e4aa" %}
 
 package:
   name: {{ name|lower }}
@@ -8,7 +8,7 @@ package:
 
 source:
   url: https://github.com/afids/autoafids/archive/{{ ref }}.tar.gz
-  sha256: cffa7619612fc2d43b1363ccc76744d04d2c6ff8f3cb549f22a75caf2ff6d8ae
+  sha256: 168ae1728af578ba2dc178f80402be6e6e4ad26959ebbce9f4d1f3cf57ceabf9
 
 build:
   entry_points: 
