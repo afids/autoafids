@@ -22,6 +22,7 @@ Follow the instructions at the official Conda documentation:
 ```bash
 conda install mamba -c conda-forge
 mamba create --name autoafids-env -c khanlab -c conda-forge -c bioconda autoafids
+eval "$(mamba shell hook --shell zsh)"
 mamba activate autoafids-env
 ```
 
@@ -67,13 +68,20 @@ ds002168/
 
 ### Run the full AutoAFIDs BIDS pipeline
 
-Running AutoAFIDs:
+By default (Linux or Intel-based macOS), you can run:
 
 ```bash
 autoafids ds002168 ds002168_autoafids participant --cores all
 ```
 
 This should run the full pipeline and place results in a new `ds002168_autoafids/` folder.
+
+If you’re on an M-chip mac, prefix with CONDA_SUBDIR=osx-64 to ensure compatibility:
+
+```bash
+CONDA_SUBDIR=osx-64 autoafids ds002168 ds002168_autoafids participant --cores all
+```
+Note: AutoAFIDs on M-chip mac currently only supports the T1w modality. Other modalities (e.g., T2w, FLAIR) are not yet processed by this pipeline.
 
 
 ## Cache Directory
