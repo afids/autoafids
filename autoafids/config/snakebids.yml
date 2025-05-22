@@ -153,6 +153,17 @@ parse_args:
     action: "store_true"  # Automatically sets to True when flag is used
     default: false        # Default to False when not used
 
+  --LEAD-DBS-DIR:
+    help: 'Path to a LEAD-DBS derivatives dataset, for folder(s) that contains multiple derivatives datasets (default: %(default)s) '
+    default: false
+    required: false
+    type: str
+
+  --FMRIPREP-DIR:
+    help: 'Path to a fMRIPrep derivatives dataset, for folder(s) that contains multiple derivatives datasets (default: %(default)s) '
+    default: false
+    required: false
+    type: str
 
   --workdir:
     help: |
