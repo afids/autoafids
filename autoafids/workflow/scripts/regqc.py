@@ -316,7 +316,7 @@ def generate_afid_qc_dashboard(gt_fcsv_path, pred_fcsv_path, output_html_path):
 
 if __name__ == "__main__":
     generate_afid_qc_dashboard(
-        gt_fcsv_path = snakemake.input["afidfcsv"]
+        gt_fcsv_path = snakemake.input["afidfcsv"],
         pred_fcsv_path = snakemake.params["refcoord"],
         output_html_path=snakemake.output["html"]
     )
