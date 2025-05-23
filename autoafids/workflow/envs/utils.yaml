@@ -1,4 +1,4 @@
 ---
 name: utils
 channels: [conda-forge, defaults]
-dependencies: [python=3.9, nibabel, pandas, matplotlib, joblib]
+dependencies: [python=3.9, nibabel, pandas, matplotlib, joblib, jinja2, plotly]
