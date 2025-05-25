@@ -118,7 +118,7 @@ cd autoafids
 ### 2. Create and activate a new Conda environment
 
 ```bash
-mamba env create -f autoafids/autoafids-dev.yml
+mamba env create -f autoafids-dev.yml
 mamba activate autoafids-dev
 ```
 
