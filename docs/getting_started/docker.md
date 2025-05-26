@@ -27,7 +27,7 @@ AutoAFIDs, and can be listed with `--help-snakemake`:
 
 ## Running an example
 
-Download and extract a single-subject BIDS dataset for this test from [ds003653.tar](https://www.dropbox.com/scl/fi/phmmofiy4q6o1k01rs6c4/ds003653.tar?rlkey=bpa8fxfl0lyrdc38fs6aowta7&st=zvhpqsga&dl=1" -O ds003653.tar). Here we will also assume you chose to save and extract to the directory `c:\Users\dhananjhay\Downloads\`.
+Download and extract a single-subject BIDS dataset for this test from [ds003653.tar](https://www.dropbox.com/scl/fi/phmmofiy4q6o1k01rs6c4/ds003653.tar?rlkey=bpa8fxfl0lyrdc38fs6aowta7&st=zvhpqsga&dl=1"). Here we will also assume you chose to save and extract to the directory `c:\Users\dhananjhay\Downloads\`.
 
 This contains a `ds003653/` directory with a single subject, that has a both T1w and T2w images. 
 
