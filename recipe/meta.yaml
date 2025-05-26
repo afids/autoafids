@@ -37,7 +37,7 @@ test:
 
 
 about:
-  home: https://github.com/khanlab/hippunfold
+  home: https://github.com/afids/autoafids
   summary: |
     End-to-end BIDS app for automated anatomical fiducial landmark regression.
   description: |
