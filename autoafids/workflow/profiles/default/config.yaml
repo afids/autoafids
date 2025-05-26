@@ -1,1 +1,2 @@
 use-conda: True
+conda-frontend: conda
