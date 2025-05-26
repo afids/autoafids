@@ -43,33 +43,36 @@ by setting environment variables, however, using a network file system for the f
 
 Download and extract a single-subject BIDS dataset for this test:
 
-    wget https://www.dropbox.com/s/mdbmpmmq6fi8sk0/hippunfold_test_data.tar 
-    tar -xvf hippunfold_test_data.tar
+    wget "https://www.dropbox.com/scl/fi/phmmofiy4q6o1k01rs6c4/ds003653.tar?rlkey=bpa8fxfl0lyrdc38fs6aowta7&st=zvhpqsga&dl=1" -O ds003653.tar
+    tar -xvf ds003653.tar
 
-This will create a `ds002168/` folder with a single subject, that has a 
+This will create a `ds003653/` folder with a single subject, that has a 
 both T1w and T2w images:
 
 ```
-ds002168/
+ds003653/
 ├── dataset_description.json
-├── README.md
-└── sub-1425
-    └── anat
-        ├── sub-1425_T1w.json
-        ├── sub-1425_T1w.nii.gz
-        ├── sub-1425_T2w.json
-        └── sub-1425_T2w.nii.gz
+├── README
+└── sub-718211
+    └── ses-01
+        ├── anat
+        │   ├── sub-718211_ses-01_T1w.json
+        │   ├── sub-718211_ses-01_T1w.nii.gz
+        │   ├── sub-718211_ses-01_T2w.json
+        │   └── sub-718211_ses-01_T2w.nii.gz
+        ├── sub-718211_ses-01_scans.json
+        └── sub-718211_ses-01_scans.tsv
 
-2 directories, 6 files
+3 directories, 8 files
 ```
 
 Now let's run AutoAFIDs. 
 
-    apptainer run -e jclauneurolab_autoafids_1.1.0.sif ds002168 ds002168_autoafids participant -n --modality T1
+    apptainer run -e jclauneurolab_autoafids_1.1.0.sif ds003653 ds003653_autoafids participant -n --modality T1
 Explanation:
 
 Everything prior to the container (`jclauneurolab_autoafids_1.1.0.sif`) are arguments to apptainer, and after are to AutoAFIDs itself. The first three arguments to AutoAFIDs (as with any BIDS App) are the input
-folder (`ds002168`), the output folder (`ds002168_autoafids`), and then the analysis level (`participant`). The `participant` analysis 
+folder (`ds003653`), the output folder (`ds003653_autoafids`), and then the analysis level (`participant`). The `participant` analysis 
 level is used in AutoAFIDs for performing any
 participant-level processing. Here 
 we used the T1w image. We also used the `--dry-run/-n`  option to 
@@ -80,7 +83,7 @@ When you run the above command, a long listing will print out, describing all th
 will be run. This is a long listing, and you can better appreciate it with the `less` tool. We can
 also have the shell command used for each rule printed to screen using the `-p` Snakemake option:
 
-    apptainer run -e jclauneurolab_autoafids_1.1.0.sif ds002168 ds002168_autoafids participant -np | less
+    apptainer run -e jclauneurolab_autoafids_1.1.0.sif ds003653 ds003653_autoafids participant -np | less
 
 
 Now, to actually run the workflow, we need to specify how many cores to use and leave out
@@ -93,7 +96,7 @@ Running the following command (autoafids on a single subject) may take ~6 minute
 cores, but could be much longer (several hours) if you only have a single core.
 
 
-    apptainer run -e jclauneurolab_autoafids_1.1.0.sif ds002168 ds002168_autoafids participant -p --cores all
+    apptainer run -e jclauneurolab_autoafids_1.1.0.sif ds003653 ds003653_autoafids participant -p --cores all
 
 
 Note that you may need to adjust your [Singularity options](https://sylabs.io/guides/3.1/user-guide/cli/apptainer_run.html) to ensure the container can read and write to yout input and output directories, respectively. You can bind paths easily by setting an 
@@ -103,14 +106,14 @@ environment variable, e.g. if you have a `/project` folder that contains your da
 
 
 
-After this completes, you should have a `ds002168_autoafids` folder with outputs for the one subject.
+After this completes, you should have a `ds003653_autoafids` folder with outputs for the one subject.
 
 ## Exploring different options
 
 If you alternatively want to run AutoAFIDs using a different modality, e.g. the high-resolution T2w image
 in the BIDS test dataset, you can use the `--modality T2w` option. The T2w image would be then first pre-processesed into T1w using SynthSR and then used as an input image for predicting AFIDs.
 
-    apptainer run -e jclauneurolab_autoafids_1.1.0.sif ds002168 ds002168_autoafids_t2w participant --modality T2w -p --cores all
+    apptainer run -e jclauneurolab_autoafids_1.1.0.sif ds003653 ds003653_autoafids_t2w participant --modality T2w -p --cores all
 
 Note that if you run with a different modality, you should use a separate output folder, since some of the files 
 would be overwritten if not.
