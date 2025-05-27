@@ -46,24 +46,27 @@ You can try AutoAFIDs on a sample dataset to make sure everything works as expec
 First, download and extract a single-subject BIDS dataset for this test:
 
 ```bash
-wget https://www.dropbox.com/s/mdbmpmmq6fi8sk0/hippunfold_test_data.tar 
-tar -xvf hippunfold_test_data.tar
+wget "https://www.dropbox.com/scl/fi/phmmofiy4q6o1k01rs6c4/ds003653.tar?rlkey=bpa8fxfl0lyrdc38fs6aowta7&st=zvhpqsga&dl=1" -O ds003653.tar
+tar -xvf ds003653.tar
 ```
 
-This will create a `ds002168/` folder with a single subject that has both T1w and T2w images:
+This will create a `ds003653/` folder with a single subject that has both T1w and T2w images:
 
 ```
-ds002168/
+ds003653/
 ├── dataset_description.json
-├── README.md
-└── sub-1425
-    └── anat
-        ├── sub-1425_T1w.json
-        ├── sub-1425_T1w.nii.gz
-        ├── sub-1425_T2w.json
-        └── sub-1425_T2w.nii.gz
+├── README
+└── sub-718211
+    └── ses-01
+        ├── anat
+        │   ├── sub-718211_ses-01_T1w.json
+        │   ├── sub-718211_ses-01_T1w.nii.gz
+        │   ├── sub-718211_ses-01_T2w.json
+        │   └── sub-718211_ses-01_T2w.nii.gz
+        ├── sub-718211_ses-01_scans.json
+        └── sub-718211_ses-01_scans.tsv
 
-2 directories, 6 files
+3 directories, 8 files
 ```
 
 ### Run the full AutoAFIDs BIDS pipeline
@@ -71,15 +74,15 @@ ds002168/
 By default (Linux or Intel-based macOS), you can run:
 
 ```bash
-autoafids ds002168 ds002168_autoafids participant --cores all
+autoafids ds003653 ds003653_autoafids participant --cores all
 ```
 
-This should run the full pipeline and place results in a new `ds002168_autoafids/` folder.
+This should run the full pipeline and place results in a new `ds003653_autoafids/` folder.
 
 If you’re on an M-chip mac, prefix with CONDA_SUBDIR=osx-64 to ensure compatibility:
 
 ```bash
-CONDA_SUBDIR=osx-64 autoafids ds002168 ds002168_autoafids participant --cores all
+CONDA_SUBDIR=osx-64 autoafids ds003653 ds003653_autoafids participant --cores all
 ```
 Note: AutoAFIDs on M-chip mac currently only supports the T1w modality. Other modalities (e.g., T2w, FLAIR) are not yet processed by this pipeline.
 
@@ -119,6 +122,7 @@ cd autoafids
 
 ```bash
 mamba env create -f autoafids-dev.yml
+eval "$(mamba shell hook --shell zsh)"
 mamba activate autoafids-dev
 ```
 
@@ -134,6 +138,12 @@ You can run AutoAFIDs directly from the source directory using:
 
 This should print out the available command-line arguments for the tool.  
 You’re now set up for development and contribution!
+
+If you’re on an M-chip mac, prefix with CONDA_SUBDIR=osx-64 to ensure compatibility:
+
+```bash
+CONDA_SUBDIR=osx-64 ./autoafids/run.py -h
+```
 
 ---
 
