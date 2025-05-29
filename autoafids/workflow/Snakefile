@@ -228,7 +228,7 @@ rule norm_im:
         "scripts/norm_schemes.py"
 
 
-if "resample_im" in profile_settings:
+if "resample_im" in profile_settings and config["modality"] == "T1w":
 
     rule resample_im:
         input:
