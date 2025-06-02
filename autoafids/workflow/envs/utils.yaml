@@ -1,4 +1,12 @@
 ---
 name: utils
 channels: [conda-forge, defaults]
-dependencies: [python=3.9, nibabel, pandas, matplotlib, joblib, plotly, simpleitk, scipy]
+dependencies:
+  - python=3.9
+  - nibabel
+  - pandas
+  - matplotlib
+  - joblib
+  - plotly
+  - simpleitk
+  - scipy
