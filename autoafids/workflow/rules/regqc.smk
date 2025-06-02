@@ -4,6 +4,7 @@ import glob
 lead_dbs_dir = config.get("LEAD_DBS_DIR", False)
 fmriprep_dir = config.get("FMRIPREP_DIR", False)
 
+
 def get_warp_path(subject):
     if lead_dbs_dir:
         trans_dir = (
@@ -19,11 +20,7 @@ def get_warp_path(subject):
         return None
 
     elif fmriprep_dir:
-        trans_dir = (
-            Path(fmriprep_dir)
-            / f"sub-{subject}"
-            / "anat"
-        )
+        trans_dir = Path(fmriprep_dir) / f"sub-{subject}" / "anat"
         pattern = f"sub-{subject}*from-T1w_to-MNI*_mode-image_xfm.h5"
         matches = list(trans_dir.glob(pattern))
         if matches:
@@ -31,7 +28,10 @@ def get_warp_path(subject):
         return None
 
     else:
-        raise ValueError("No LEAD-DBS or fMRIPrep directory provided for warp.")
+        raise ValueError(
+            "No LEAD-DBS or fMRIPrep directory provided for warp."
+        )
+
 
 def get_optional_matrix_path(subject):
     trans_dir = (
@@ -46,6 +46,7 @@ def get_optional_matrix_path(subject):
         return str(matches[0])
     return []
 
+
 def get_resampled_im(subject):
     if lead_dbs_dir:
         pattern = str(
@@ -59,7 +60,9 @@ def get_resampled_im(subject):
         if matches:
             return matches[0]
         else:
-            raise FileNotFoundError(f"No resampled image found for subject {subject} in LEAD-DBS")
+            raise FileNotFoundError(
+                f"No resampled image found for subject {subject} in LEAD-DBS"
+            )
 
     elif fmriprep_dir:
         pattern = str(
@@ -72,19 +75,29 @@ def get_resampled_im(subject):
         if matches:
             return matches[0]
         else:
-            raise FileNotFoundError(f"No resampled image found for subject {subject} in fMRIPrep")
+            raise FileNotFoundError(
+                f"No resampled image found for subject {subject} in fMRIPrep"
+            )
 
     else:
-        raise ValueError("No LEAD-DBS or fMRIPrep directory provided for resampled image.")
+        raise ValueError(
+            "No LEAD-DBS or fMRIPrep directory provided for resampled image."
+        )
+
 
 def get_ref_paths():
     if lead_dbs_dir:
-        refimage = str(Path(workflow.basedir).parent / config["templatet1w_lead"])
-        refcoordinate = str(Path(workflow.basedir).parent / config["fcsv_mni_lead"])
+        refimage = str(
+            Path(workflow.basedir).parent / config["templatet1w_lead"]
+        )
+        refcoordinate = str(
+            Path(workflow.basedir).parent / config["fcsv_mni_lead"]
+        )
     else:
         refimage = str(Path(workflow.basedir).parent / config["templatet1w"])
         refcoordinate = str(Path(workflow.basedir).parent / config["fcsv_mni"])
     return refimage, refcoordinate
+
 
 rule regqc:
     input:
@@ -97,7 +110,9 @@ rule regqc:
         ),
         im=lambda wildcards: get_resampled_im(wildcards.subject),
         warp=lambda wildcards: get_warp_path(wildcards.subject),
-        optional_matrix=lambda wildcards: get_optional_matrix_path(wildcards.subject),
+        optional_matrix=lambda wildcards: get_optional_matrix_path(
+            wildcards.subject
+        ),
     output:
         html=bids(
             root=root,
