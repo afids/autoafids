@@ -6,18 +6,7 @@ on:
   pull_request_target:
     types: [opened, ready_for_review]
 
-permissions:
-  pull-requests: write
-
 jobs:
-  assign-reviewers:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Assign reviewers
-        uses: hmarr/auto-assign-action@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          reviewers: |
-            mackenziesnyder
-            Dhananjhay
-            ataha24
+  assign-reviewer:
+    uses: khanlab/actions/.github/workflows/workflow-pr_task-assignReviewer.yml@v0.3.4
+
