@@ -1,6 +1,7 @@
 import logging
 import os
-import subprocess 
+import subprocess
+
 
 # clone SynthSR repo
 def clone_repo(download_dir, log_file):

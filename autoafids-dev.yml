@@ -1,8 +1,6 @@
+---
 name: autoafids-dev
-channels:
-  - conda-forge
-  - bioconda
-  - defaults
+channels: [conda-forge, bioconda, defaults]
 dependencies:
   - python=3.10
   - snakebids=0.14.0
