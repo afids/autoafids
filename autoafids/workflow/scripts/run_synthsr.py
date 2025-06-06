@@ -11,7 +11,14 @@ def run_program(
         log_file
     ):
 
-    cmd = ["python", "-m", "SynthSR.scripts.predict_command_line", input_img, output_img, "--cpu"]
+    cmd = [
+        "python",
+        "-m",
+        "SynthSR.scripts.predict_command_line",
+        input_img,
+        output_img,
+        "--cpu"
+    ]
 
     if modality == "ct":
         cmd.append["--ct"]
