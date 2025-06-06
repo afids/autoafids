@@ -377,21 +377,7 @@ def apply_model(
         mni_fid_resampled,
         radius,
     )
-    # do it again to improve prediction
-    fid_pred = np.rint(fid_resampled).astype(int)
-    distances2 = predict_distances(
-        radius,
-        model,
-        fid_pred,
-        img_data,
-    )
-    fid_resampled2 = process_distances(
-        distances2,
-        img_data,
-        fid_pred,
-        radius,
-    )
-    return fid_voxel2world(fid_resampled2, img.affine)
+    return fid_voxel2world(fid_resampled, img.affine)
 
 
 def apply_all(
