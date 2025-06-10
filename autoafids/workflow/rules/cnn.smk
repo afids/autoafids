@@ -19,13 +19,23 @@ rule download_cnn_model:
 
 rule gen_fcsv:
     input:
-        t1w=bids(
-            root=work,
-            datatype="resample",
-            desc=chosen_norm_method,
-            res=config["res"],
-            suffix="T1w.nii.gz",
-            **inputs[config["modality"]].wildcards,
+        t1w=lambda wildcards: (
+            bids(
+                root=work,
+                datatype="normalize",
+                desc=chosen_norm_method,
+                suffix="T1w.nii.gz",
+                **inputs[config["modality"]].wildcards
+            )
+            if config["modality"] != "T1w"  # SynthSR used → no resample
+            else bids(
+                root=work,
+                datatype="resample",
+                desc=chosen_norm_method,
+                res=config["res"],
+                suffix="T1w.nii.gz",
+                **inputs[config["modality"]].wildcards
+            )
         ),
         prior=bids(
             root=work,
