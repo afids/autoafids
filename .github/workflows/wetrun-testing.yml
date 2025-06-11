@@ -1,6 +1,7 @@
 name: test workflow with wet run 
 on:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   wetrun_test:
