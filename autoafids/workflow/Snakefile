@@ -2,7 +2,6 @@ import snakebids
 from snakebids import bids, generate_inputs, get_wildcard_constraints
 from appdirs import AppDirs
 import warnings
-import psutil
 
 try:
     from autoafids.workflow.lib import (
@@ -10,10 +9,6 @@ try:
     )
 except ImportError:
     from workflow.lib import utils as utils  # Works when run directly
-
-# Get available memory in MB
-available_mem_mb = psutil.virtual_memory().available // 1024 // 1024
-
 
 configfile: "config/snakebids.yml"
 
@@ -137,7 +132,7 @@ if config["modality"] != "T1w":
             ),
         resources:
             mem_mb=10000,
-        threads: max(1, workflow.cores // max(1, available_mem_mb // 10000))
+        threads: 4
         params:
             modality=config["modality"],
             download_dir=download_dir,
