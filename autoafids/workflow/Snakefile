@@ -10,6 +10,7 @@ try:
 except ImportError:
     from workflow.lib import utils as utils  # Works when run directly
 
+
 configfile: "config/snakebids.yml"
 
 
