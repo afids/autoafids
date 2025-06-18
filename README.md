@@ -15,15 +15,15 @@ Developed by the AIMS Lab at the Robarts Research Institute
 
 ## 📑 Table of Contents
 
-- [🧠 What is AutoAFIDs?](#-what-is-autoafids)
-- [⚙️ Workflow Overview](#️-workflow-overview)
-- [🔍 Known Issues](#-known-issues)
-- [📖 Full Documentation](#-full-documentation)
-- [💬 Questions, Issues, and Feedback](#-questions-issues-and-feedback)
-- [📚 Relevant Papers](#-relevant-papers)
+- [🧠 What is AutoAFIDs?](#what-is-autoafids)
+- [⚙️ Workflow Overview](#workflow-overview)
+- [🔍 Known Issues](#known-issues)
+- [📖 Full Documentation](#full-documentation)
+- [💬 Questions, Issues, and Feedback](#questions-issues-and-feedback)
+- [📚 Relevant Papers](#relevant-papers)
 
 ---
-## 🧠 What is AutoAFIDs?
+## What is AutoAFIDs?
 
 **AutoAFIDs** is an open-source Python package and BIDS App for fully automatic detection of anatomical fiducial points (AFIDs) from 3D brain MRI. These fiducials—standardized anatomical landmarks—are used in neuroimaging for tasks such as image registration, quality control, and neurosurgical targeting.
 
@@ -37,7 +37,7 @@ The software is modality-aware, and supports preprocessing for T1w and T2w MRI i
 
 ---
 
-## ⚙️ Workflow Overview
+## Workflow Overview
 
 Below is a high-level summary of the AutoAFIDs processing pipeline:
 
@@ -50,14 +50,14 @@ Below is a high-level summary of the AutoAFIDs processing pipeline:
 
 ---
 
-## 🔍 Known Issues
+## Known Issues
 
 - `cnn inferenace` workflow is currently sequential and may benefit from AFID-level parallelization
 - Multi-modal synthesis (e.g., SynthSR preprocessing) is available but requires millimetric validation
 
 ---
 
-## 📖 Full Documentation
+## Full Documentation
 
 👉 [autoafids.readthedocs.io](https://autoafids.readthedocs.io/en/)
 
@@ -65,7 +65,7 @@ Includes installation instructions, usage examples, and advanced configuration.
 
 ---
 
-## 💬 Questions, Issues, and Feedback
+## Questions, Issues, and Feedback
 
 - Open an issue on the [GitHub issues page](https://github.com/afids/autoafids/issues)
 - Start a conversation on the [Discussions board](https://github.com/afids/autoafids/discussions)
@@ -74,13 +74,13 @@ Includes installation instructions, usage examples, and advanced configuration.
 We welcome feedback, contributions, and collaboration!
 
 
-## 📚 Relevant Papers
+## Relevant Papers
 
 AutoAFIDs builds upon a series of foundational works that introduce, validate, and apply the anatomical fiducials (AFIDs) framework for neuroimaging quality control, registration evaluation, and surgical planning.
 
 ---
 
-### 🧠 Methodological Foundations
+### Methodological Foundations
 
 - **Lau et al., 2019**  
   *A framework for evaluating correspondence between brain images using anatomical fiducials.*  
@@ -89,7 +89,7 @@ AutoAFIDs builds upon a series of foundational works that introduce, validate, a
 
 ---
 
-### 🏥 Clinical Applications
+### Clinical Applications
 
 - **Abbass et al., 2022**  
   *Application of the anatomical fiducials framework to a clinical dataset of patients with Parkinson’s disease.*  
@@ -102,7 +102,7 @@ AutoAFIDs builds upon a series of foundational works that introduce, validate, a
 
 ---
 
-### 📊 Dataset & Resource Publication
+### Dataset & Resource Publication
 
 - **Taha et al., 2023**  
   *Magnetic resonance imaging datasets with anatomical fiducials for quality control and registration.*  
@@ -111,7 +111,7 @@ AutoAFIDs builds upon a series of foundational works that introduce, validate, a
 
 ---
 
-### 🧪 Registration and Localization Accuracy
+### Registration and Localization Accuracy
 
 - **Abbass et al., 2025**  
   *The impact of localization and registration accuracy on estimates of deep brain stimulation electrode position in stereotactic space.*  
