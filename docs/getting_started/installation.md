@@ -1,63 +1,82 @@
 # Installation
 
-## BIDS App for Automatic Anatomical Fiducials (AutoAFIDs)
+## AutoAFIDs: A BIDS App for Automatic Landmark Localization
 
-### Requirements
+***AutoAFIDs*** is a BIDS App that automatically detects anatomical landmarks in the human brain. It is trained to predict the coordinates of a standardized set of well-validated anatomical landmarks (e.g., the anterior and posterior commissures).
 
-AutoAFIDs can be run either with Conda, or with containers
--   Conda (Linux/Mac only, no containers needed)
--   **--OR--**  Docker (Intel Mac/Windows/Linux) or Apptainer (formerly known as Singularity) (Linux)
--   For those wishing to contribute or modify the code, see [Contributing to AutoAFIDs](https://autoafids.readthedocs.io/en/latest/contributing/contributing.html).
--   GPU not required
-- ⚠️ Warning: Local installation on Apple M1 is currently not supported. You can still run the pipeline by building a docker container, but it'll be an emulated amd64 container and fairly slow. 
+---
 
-### Notes
-- Inputs to AutoAFIDs should be a BIDS-formatted dataset.
-- The output includes fiducial markers that are automatically positioned at standardized anatomical landmarks.
+## 🧰 System Requirements
 
-## Comparison of methods for running AutoAFIDs
+we support three modes for installing ***AutoAFIDs***:
 
-There are several different ways of running AutoAFIDs:
+| Method                | OS Support                  | Container Needed | Editable | Cluster Profiles | Notes                                |
+|-----------------------|-----------------------------|------------------|----------|------------------|---------------------------------------|
+| **Conda**             | Linux, macOS (Intel & M2 only)   | ❌ No            | ✅ Yes   | ✅ Yes           | Recommended for most local setups     |
+| **Docker**            | Windows, macOS (Intel/Silicon) | ✅ Yes     | ❌ No    | ❌ No            | Works cross-platform (slow on M1)     |
+| **Singularity/Apptainer** | Linux only             | ✅ Yes           | ❌ No    | ❌ No            | Good for HPC or shared environments   |
 
-1. Conda Environment (Linux/macOS)
-2. Apptainer/Singularity Container on Linux
-3. Docker Container on Windows/Mac (Intel)/Linux
+> 💡 **Note:** GPU is *not* required.  
+> ⚠️ **Apple Silicon (M1):** Native Conda support is not available. You can use Docker with emulated `amd64`, but performance will be slow.
 
-## Conda
+If you're interested in contributing to development, see the [Contributing Guide](https://autoafids.readthedocs.io/en/latest/contributing/contributing.html).
 
-AutoAFIDs is available via [Conda](https://docs.conda.io/), offering a container-free way to run the tool on Linux and macOS systems.
+---
 
-### Pros:
-- No need for any containers
-- Easy to install via `conda`
-- Compatible with Snakemake execution profiles
-- Good option for users who prefer Python virtual environments
+## 📂 Inputs and Outputs
 
-### Cons:
-- Not compatible with Windows
-- Requires installation of Conda or Miniconda
+- **Input:** BIDS-formatted dataset containing structural MRI images (best on T1-weighted modalities).
+- **Output:** Automatically placed anatomical fiducials (AFIDs) saved as structured coordinate files and visualizations (if using `--fidqc` flag).
 
-## Docker on Windows/macOS/Linux
+---
 
-The AutoAFIDs BIDS App is available as a Docker container. Instructions can be found in the [Docker](https://autoafids.readthedocs.io/en/latest/getting_started/docker.html) documentation page.
+## 🚀 Installation Methods
 
-### Pros
-- Compatible with non-Linux systems, including Apple Silicon (M1, M2)
-- All dependencies are contained within a single container
+### 🔧 1. Conda Environment (Linux/macOS)
 
-### Cons
-- Typically not possible on shared machines
-- Cannot use Snakemake cluster execution profiles
-- Cannot edit code within the container
+AutoAFIDs can be installed via [Conda](https://docs.conda.io/) for container-free execution on Linux and Intel macOS systems.
 
-## Singularity Container
+📘 [Conda Installtion Instructions](https://autoafids.readthedocs.io/en/latest/getting_started/conda.html)
 
-The same Docker container can also be used with Singularity (now Apptainer). Instructions can be found in the [Singularity](https://autoafids.readthedocs.io/en/latest/getting_started/singularity.html) documentation page.
 
-### Pros
-- All dependencies are packaged within a single `.sif` file
-- Compatible with shared systems where Singularity is installed
+**✅ Pros:**
+- Easy to install and run
+- Fully editable code
+- Works with Snakemake profiles
 
-### Cons
-- Cannot use Snakemake cluster execution profiles
-- Cannot edit code within the container
+**⚠️ Cons:**
+- Not supported on Windows or Apple Silicon (M1) system
+- Requires Conda or Miniconda
+
+---
+
+### 🐳 2. Docker Container (Windows/Linux/macOS Intel)
+
+A pre-built Docker container is available with all dependencies bundled.
+
+📘 [Docker Setup Instructions](https://autoafids.readthedocs.io/en/latest/getting_started/docker.html)
+
+**✅ Pros:**
+- Cross-platform support, including limited M1 compatibility via emulation
+- All dependencies packaged in a single file
+
+**⚠️ Cons:**
+- Cannot edit code inside the container
+- Not compatible with Snakemake cluster execution
+- May not be usable on shared systems (e.g., university clusters)
+
+---
+
+### 🧪 3. Singularity / Apptainer (Linux)
+
+Use [Singularity](https://apptainer.org/) (now Apptainer) to convert the Docker image into a `.sif` file for HPC or institutional clusters.
+
+📘 [Singularity Setup Instructions](https://autoafids.readthedocs.io/en/latest/getting_started/singularity.html)
+
+**✅ Pros:**
+- Ideal for shared Linux systems
+- All dependencies packaged in a single file
+
+**⚠️ Cons:**
+- Cannot edit code inside the container
+- Not compatible with Snakemake cluster execution
