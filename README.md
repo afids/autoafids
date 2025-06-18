@@ -4,7 +4,7 @@
 ![Version](https://img.shields.io/github/v/tag/afids/autoafids?label=version)
 ![Python3](https://img.shields.io/badge/python-_3.9_|_3.10_|_3.11_|_3.12-blue.svg)
 [![Tests](https://github.com/afids/autoafids/actions/workflows/lint-and-dryrun-testing.yml/badge.svg?branch=main)](https://github.com/afids/autoafids/actions/workflows/lint-and-dryrun-testing.yml?query=branch%3Amain)
-![Docker Pulls](https://img.shields.io/docker/pulls/dhananjhay/autoafids)
+![Docker Pulls](https://img.shields.io/docker/pulls/jclauneurolab/autoafids)
 
 Developed by the AIMS Lab at the Robarts Research Institute  
 *2023–2025*
@@ -13,6 +13,16 @@ Developed by the AIMS Lab at the Robarts Research Institute
 
 ---
 
+## 📑 Table of Contents
+
+- [🧠 What is AutoAFIDs?](#-what-is-autoafids)
+- [⚙️ Workflow Overview](#️-workflow-overview)
+- [🔍 Known Issues](#-known-issues)
+- [📖 Full Documentation](#-full-documentation)
+- [💬 Questions, Issues, and Feedback](#-questions-issues-and-feedback)
+- [📚 Relevant Papers](#-relevant-papers)
+
+---
 ## 🧠 What is AutoAFIDs?
 
 **AutoAFIDs** is an open-source Python package and BIDS App for fully automatic detection of anatomical fiducial points (AFIDs) from 3D brain MRI. These fiducials—standardized anatomical landmarks—are used in neuroimaging for tasks such as image registration, quality control, and neurosurgical targeting.
@@ -59,7 +69,7 @@ Includes installation instructions, usage examples, and advanced configuration.
 
 - Open an issue on the [GitHub issues page](https://github.com/afids/autoafids/issues)
 - Start a conversation on the [Discussions board](https://github.com/afids/autoafids/discussions)
-- Contact: [dbansal7@uwo.ca](mailto:dbansal7@uwo.ca) or [ataha24@uwo.ca] (mailto:ataha24@uwo.ca)
+- Contact: [ataha24@uwo.ca](mailto:ataha24@uwo.ca) or [dbansal7@uwo.ca](mailto:dbansal7@uwo.ca)
 
 We welcome feedback, contributions, and collaboration!
 
