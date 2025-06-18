@@ -25,15 +25,15 @@ Developed by the AIMS Lab at the Robarts Research Institute
 ---
 ## What is AutoAFIDs?
 
-**AutoAFIDs** is an open-source Python package and BIDS App for fully automatic detection of anatomical fiducial points (AFIDs) from 3D brain MRI. These fiducials—standardized anatomical landmarks—are used in neuroimaging for tasks such as image registration, quality control, and neurosurgical targeting.
+**AutoAFIDs** is a BIDS App for automatic detection of anatomical fiducials (AFIDs) on MRI scans. We make use of these AFIDs in various neuroimaging applications such as image registration, quality control, and neurosurgical targeting.
 
 AutoAFIDs leverages:
 
 - A 3D [U-Net architecture](https://arxiv.org/abs/1505.04597) for landmark localization
-- The [Snakemake](https://snakemake.readthedocs.io/) and [SnakeBIDS](https://github.com/khanlab/snakebids) workflow frameworks for reproducible processing
-- The anatomical fiducial standard developed by the [AFIDs community](https://github.com/afids)
+- The [Snakemake](https://snakemake.readthedocs.io/) and [SnakeBIDS](https://snakebids.readthedocs.io/en/stable/) workflow frameworks for reproducible processing
+- The AFIDs protocol developed by the [AFIDs community](https://github.com/afids)
 
-The software is modality-aware, and supports preprocessing for T1w and T2w MRI images. It also includes fine-tuned QC visualizations for quality assurance.
+The software is modality-aware, but best supports T1-weighted MRI scans. It also includes QC visualizations for quality assurance.
 
 ---
 
@@ -46,14 +46,14 @@ Below is a high-level summary of the AutoAFIDs processing pipeline:
 1. Preprocess BIDS input files based on image modality (T1w, T2w)
 2. Load trained fiducial models (32 AFID points)
 3. Run patch-based U-Net inference per AFID
-4. Generate predictions and visual QC outputs
+4. Generate predictions
 
 ---
 
 ## Known Issues
 
-- `cnn inferenace` workflow is currently sequential and may benefit from AFID-level parallelization
-- Multi-modal synthesis (e.g., SynthSR preprocessing) is available but requires millimetric validation
+- `gen_fcsv` rule is currently sequential and may benefit from AFID-level parallelization
+- T1w-like scan synthesis is available (via SynthSR [Iglesias et al., 2023](https://www-science-org.proxy1.lib.uwo.ca/doi/10.1126/sciadv.add3607)) but requires millimetric validation and may not work for all operating systems
 
 ---
 
