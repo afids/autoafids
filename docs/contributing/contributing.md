@@ -11,7 +11,7 @@ AutoAFIDs is a Python-based BIDS App for automatic anatomical fiducial detection
 Ensure **Conda** is installed on your system. You can install Miniconda or Anaconda by following the official guide:  
 👉 [https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 
-Note: AutoAFIDs primarily supports T1-weighted images. For additional modalities (e.g., T2w), an external dependency (`SynthSR`) is required and must be installed separately.
+Note: AutoAFIDs primarily supports T1-weighted images. For additional modalities (e.g., T2w), `SynthSR` will be triggered, though compatibility varies by operating system.
 
 ---
 
