@@ -11,8 +11,11 @@ AutoAFIDs is a Python-based BIDS App for automatic anatomical fiducial detection
 Ensure **Conda** is installed on your system. You can install Miniconda or Anaconda by following the official guide:  
 👉 [https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 
+<<<<<<< Updated upstream
 Note: AutoAFIDs primarily supports T1-weighted images. For additional modalities (e.g., T2w), `SynthSR` will be triggered, though compatibility varies by operating system.
 
+=======
+>>>>>>> Stashed changes
 ---
 
 ## 🧪 Setting Up the Development Environment
@@ -27,30 +30,19 @@ cd autoafids
 2. Create and activate the development environment:
 
 ```bash
-conda create -n autoafids-dev python=3.10
-conda activate autoafids-dev
+mamba env create -f autoafids-dev.yml
+eval "$(mamba shell hook --shell zsh)"
+mamba activate autoafids-dev
 ```
 
-3. Install AutoAFIDs with development dependencies:
+3. Run AutoAFIDs with development dependencies:
 
 ```bash
-mamba install -c conda-forge -c bioconda -c khanlab autoafids
-pip install -r requirements-dev.txt
+./autoafids/run.py -h
 ```
 
 ---
 
-## ▶️ Running AutoAFIDs (Dev Mode)
-
-Once installed, you can run AutoAFIDs directly from the command line:
-
-```bash
-autoafids -h
-```
-
-To modify the CLI or core modules, edit files in the `autoafids/` directory and re-run commands in your active Conda environment.
-
----
 
 ## 🧹 Code Quality and Formatting
 
@@ -83,7 +75,7 @@ yamlfix config/
 To test the Snakemake workflow without running any jobs, use the built-in **dry-run** feature:
 
 ```bash
-autoafids tests/data tests/output participant -n
+./autoafids/run.py tests/data tests/output participant -n
 ```
 
 The `tests/data` directory contains a lightweight fake BIDS dataset (with zero-byte files) useful for testing the pipeline logic.

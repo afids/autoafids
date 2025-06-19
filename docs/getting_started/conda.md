@@ -96,9 +96,9 @@ CONDA_SUBDIR=osx-64 autoafids ds003653 ds003653_autoafids participant --cores al
 
 ## Cache Directory
 
-When running, AutoAFIDs automatically downloads and caches necessary SynthSR repo and CNN model to speed up subsequent runs.
+When running, AutoAFIDs automatically downloads and caches the necessary CNN model to speed up subsequent runs.
 
-By default, these are stored in the following directory:
+By default,  it's stored in the following directory:
 
 ```bash
 ~/.cache/autoafids/
