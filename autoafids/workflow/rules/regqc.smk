@@ -34,17 +34,20 @@ def get_warp_path(subject):
 
 
 def get_optional_matrix_path(subject):
-    trans_dir = (
-        Path(lead_dbs_dir)
-        / f"sub-{subject}"
-        / "coregistration"
-        / "transformations"
-    )
-    pattern = f"sub-{subject}_desc-precoreg_*T1w.mat"
-    matches = list(trans_dir.glob(pattern))
-    if matches:
-        return str(matches[0])
-    return []
+    if lead_dbs_dir:
+        trans_dir = (
+            Path(lead_dbs_dir)
+            / f"sub-{subject}"
+            / "coregistration"
+            / "transformations"
+        )
+        pattern = f"sub-{subject}_desc-precoreg_*T1w.mat"
+        matches = list(trans_dir.glob(pattern))
+        if matches:
+            return str(matches[0])
+        return []
+    if fmriprep_dir:
+        return []
 
 
 def get_resampled_im(subject):
