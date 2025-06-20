@@ -1,18 +1,19 @@
-# Running AutoAFIDS with Conda
+# Running AutoAFIDs with Conda
 
 AutoAFIDs can be installed and run using Conda on **Linux and macOS** systems.
 
-**Note:** Conda installation is **not supported on Windows** at this time. If you are on Windows, please refer to the [Docker instructions](docker.md) instead.
+> **Note:** Conda installation is **not supported on Windows and M1 chip** at this time.  
+> If you are on Windows or M1 chip on Mac, please refer to the [Docker instructions](docker.md) instead.
 
 ---
 
 ## For Users: Installing AutoAFIDs via Conda
 
-These steps are intended for **end users** who simply want to run AutoAFIDs and get their AFIDs.
+These steps are intended for **end users** who simply want to run AutoAFIDs and get their AFIDs (+ other derivative apps).
 
 ### 1. Install Conda (if not already installed)
 
-Follow the instructions at the official Conda documentation:
+Follow the instructions at the official Conda documentation:  
 [https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 
 ---
@@ -39,7 +40,9 @@ autoafids -h
 You should see a help message listing all available command-line options.  
 If this runs successfully, you’re ready to start processing data with AutoAFIDs!
 
-## Running an example
+---
+
+## Running an Example
 
 You can try AutoAFIDs on a sample dataset to make sure everything works as expected.
 
@@ -65,33 +68,37 @@ ds003653/
         │   └── sub-718211_ses-01_T2w.nii.gz
         ├── sub-718211_ses-01_scans.json
         └── sub-718211_ses-01_scans.tsv
-
-3 directories, 8 files
 ```
 
-### Run the full AutoAFIDs BIDS pipeline
+---
 
-By default (Linux or Intel-based macOS), you can run:
+### Run the Full AutoAFIDs BIDS Pipeline
+
+By default (Linux or Intel-based macOS), run:
 
 ```bash
 autoafids ds003653 ds003653_autoafids participant --cores all
 ```
 
-This should run the full pipeline and place results in a new `ds003653_autoafids/` folder.
+This will run the full pipeline and place results in a new `ds003653_autoafids/` folder.
 
-If you’re on an M-chip mac, prefix with CONDA_SUBDIR=osx-64 to ensure compatibility:
+#### For M2 (Apple Silicon) Macs
+
+Prefix with `CONDA_SUBDIR=osx-64` to force compatibility:
 
 ```bash
 CONDA_SUBDIR=osx-64 autoafids ds003653 ds003653_autoafids participant --cores all
 ```
-Note: AutoAFIDs on M-chip mac currently only supports the T1w modality. Other modalities (e.g., T2w, FLAIR) are not yet processed by this pipeline.
+
+> ⚠️ **Note:** AutoAFIDs on Apple Silicon currently only supports the T1w modality.  
+> Other modalities (e.g., T2w, FLAIR) are not yet supported on this platform.
 
 
 ## Cache Directory
 
-When running, AutoAFIDs automatically downloads and caches necessary SynthSR repo and CNN model to speed up subsequent runs.
+When running, AutoAFIDs automatically downloads and caches the necessary CNN model to speed up subsequent runs.
 
-By default, these are stored in the following directory:
+By default,  it's stored in the following directory:
 
 ```bash
 ~/.cache/autoafids/
@@ -161,4 +168,3 @@ If you encounter issues while setting up AutoAFIDs via Conda:
 
 ---
 
-Happy AFIDs placing!
