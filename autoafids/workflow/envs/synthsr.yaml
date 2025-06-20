@@ -1,6 +1,4 @@
 ---
 name: synthsr
 channels: [khanlab, anaconda, conda-forge, defaults]
-dependencies:
-  - python=3.8
-  - synthsr
+dependencies: [python=3.8, synthsr]
