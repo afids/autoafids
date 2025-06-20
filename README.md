@@ -54,6 +54,7 @@ Below is a high-level summary of the AutoAFIDs processing pipeline:
 
 - `gen_fcsv` rule is currently sequential and may benefit from AFID-level parallelization
 - T1w-like scan synthesis is available (via SynthSR [Iglesias et al., 2023](https://www-science-org.proxy1.lib.uwo.ca/doi/10.1126/sciadv.add3607)) but requires millimetric validation and may not work for all operating systems
+- AutoAFIDs does not currently filter for the `desc` entity in BIDS input files, since it outputs files with a fixed, custom `desc` value. Therefore, BIDS input filenames must not include a `desc` field, or the pipeline may fail to resolve inputs correctly.
 
 ---
 
