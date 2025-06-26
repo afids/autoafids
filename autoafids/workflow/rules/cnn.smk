@@ -17,7 +17,7 @@ rule download_cnn_model:
         " rm model.zip"
 
 
-rule gen_fcsv:
+rule applyfidmodel:
     input:
         t1w=bids(
             root=work,

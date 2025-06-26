@@ -252,7 +252,7 @@ if "resample_im" in profile_settings:
             "scripts/resample_img.py"
 
 
-rule mni2sub:
+rule regmni2sub:
     input:
         im_resamp=bids(
             root=work,
