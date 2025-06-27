@@ -62,9 +62,12 @@ jobs:
         shell: bash -l {0}
         run: |-
           conda activate base
+          
           anaconda login \
             --username ${{ secrets.ANACONDA_USERNAME }} \
-            --password ${{ secrets.ANACONDA_PASSWORD }}
+            --password ${{ secrets.ANACONDA_PASSWORD }} \
+            --hostname "$ANACONDA_HOSTNAME"
+            
           anaconda upload "$PACKAGE_PATH" \
             --label main \
             --force \

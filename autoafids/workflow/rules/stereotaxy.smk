@@ -1,7 +1,7 @@
 stereotaxy_target = config["stereotaxy"]
 
 
-rule afidspred:
+rule stereotaxy:
     input:
         afidfcsv=bids(
             root=root,

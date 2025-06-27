@@ -2,11 +2,17 @@
 name: test workflow with wet run
 on:
   pull_request:
+    types: [labeled]
   workflow_dispatch:
-
 
 jobs:
   wetrun_test:
+    if: >
+      (github.event_name == 'pull_request' &&
+        github.event.action == 'labeled' &&
+        github.event.label.name == 'ready-for-wet-run')
+      || 
+      (github.event.name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

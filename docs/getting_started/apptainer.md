@@ -1,53 +1,82 @@
 # Running AutoAFIDs with Apptainer (Singularity)
 
-## Pre-requisities:
- 1. Apptainer (or Singularity) is installed on your system. For more info, see the detailed [apptainer install instructions](https://apptainer.org/docs/admin/main/installation.html#install-from-pre-built-packages).
- 2. The following command-line tools are installed:
-      - wget
-      - tar
- 3. Sufficient disk-space 
-      - in your `/tmp` folder (>15GB) to build the container
-      - in your working folder to store the container (~15GB)
-      - for AutoAFIDs outputs (~1GB per subject) 
- 4. Sufficient CPU and memory - the more you have, the faster it will run, but we recommend at least 4 CPU cores and 16GB memory.
+## Prerequisites
+
+Before running AutoAFIDs with Apptainer (formerly Singularity), ensure the following requirements are met:
+
+1. **Apptainer is installed.**  
+   See the official [Apptainer installation guide](https://apptainer.org/docs/admin/main/installation.html#install-from-pre-built-packages) for instructions.
+
+2. **Required command-line tools are installed:**
+   - `wget`
+   - `tar`
+
+3. **Sufficient disk space is available:**
+   - At least **15 GB** free in `/tmp` to build the container
+   - At least **15 GB** in your working directory to store the `.sif` container
+   - Approximately **1 GB per subject** for AutoAFIDs output
+
+4. **Adequate CPU and memory:**
+   - Minimum: 4 CPU cores and 16 GB RAM
+   - More resources will improve performance
 
 
-## First time setup
+## First-Time Setup
 
-Pull the container:
+### 🔄 Pull the container
 
-    apptainer pull jclauneurolab_autoafids_1.1.0.sif docker://dhananjhay/autoafids:1.1.0
+```bash
+apptainer pull autoafids.sif docker://jclauneurolab/autoafids
+```
+
+### 🚀 Run AutoAFIDs
+
+Run without arguments to see a short help message:
+
+```bash
+apptainer run -e jclauneurolab_autoafids_1.1.0.sif
+```
+
+Get detailed help with the `-h` flag:
+
+```bash
+apptainer run -e jclauneurolab_autoafids_1.1.0.sif -h
+```
+
+List available Snakemake-specific options using:
+
+```bash
+apptainer run -e jclauneurolab_autoafids_1.1.0.sif --help-snakemake
+```
+
+---
+
+### ⚠️ Troubleshooting: Pull Errors
+
+If you encounter errors while pulling the container, it may be due to insufficient disk space in your Apptainer cache directories.
+
+You can redirect the cache location by setting the following environment variable:
+
+```bash
+export APPTAINER_CACHEDIR=/your/custom/path/.cache/apptainer
+```
+
+> 💡 **Tip:** Avoid using network file systems (e.g., NFS) for the cache directory, as this may lead to performance issues or errors during image creation.
 
 
-Run AutoAFIDs without any arguments to print the short help:
 
-    apptainer run -e jclauneurolab_autoafids_1.1.0.sif 
+## Running an Example
 
-Use the `-h` option to get a detailed help listing:
+### 📥 Download a Sample Dataset
 
-    apptainer run -e jclauneurolab_autoafids_1.1.0.sif -h
+Download and extract a single-subject BIDS dataset:
 
-Note that all the Snakemake command-line options are also available in
-AutoAFIDs, and can be listed with `--help-snakemake`:
+```bash
+wget "https://www.dropbox.com/scl/fi/phmmofiy4q6o1k01rs6c4/ds003653.tar?rlkey=bpa8fxfl0lyrdc38fs6aowta7&st=zvhpqsga&dl=1" -O ds003653.tar
+tar -xvf ds003653.tar
+```
 
-    apptainer run -e jclauneurolab_autoafids_1.1.0.sif --help-snakemake
-
-Note: If you encounter any errors pulling the container from dockerhub, it may be because you are running 
-out of disk space in your cache folders. Note, you can change these locations 
-by setting environment variables, however, using a network file system for the folders may result in poor performance and/or errors e.g.:
-    
-    export APPTAINER_CACHEDIR=/YOURDIR/.cache/apptainer
-
-
-## Running an example
-
-Download and extract a single-subject BIDS dataset for this test:
-
-    wget "https://www.dropbox.com/scl/fi/phmmofiy4q6o1k01rs6c4/ds003653.tar?rlkey=bpa8fxfl0lyrdc38fs6aowta7&st=zvhpqsga&dl=1" -O ds003653.tar
-    tar -xvf ds003653.tar
-
-This will create a `ds003653/` folder with a single subject, that has a 
-both T1w and T2w images:
+This will create a `ds003653/` folder containing a single subject with both T1w and T2w images:
 
 ```
 ds003653/
@@ -62,61 +91,74 @@ ds003653/
         │   └── sub-718211_ses-01_T2w.nii.gz
         ├── sub-718211_ses-01_scans.json
         └── sub-718211_ses-01_scans.tsv
-
-3 directories, 8 files
 ```
 
-Now let's run AutoAFIDs. 
+---
 
-    apptainer run -e jclauneurolab_autoafids_1.1.0.sif ds003653 ds003653_autoafids participant -n --modality T1
-Explanation:
+### 🚀 Run AutoAFIDs
 
-Everything prior to the container (`jclauneurolab_autoafids_1.1.0.sif`) are arguments to apptainer, and after are to AutoAFIDs itself. The first three arguments to AutoAFIDs (as with any BIDS App) are the input
-folder (`ds003653`), the output folder (`ds003653_autoafids`), and then the analysis level (`participant`). The `participant` analysis 
-level is used in AutoAFIDs for performing any
-participant-level processing. Here 
-we used the T1w image. We also used the `--dry-run/-n`  option to 
-just print out what would run, without actually running anything.
+Run the following command to perform a dry-run with the T1w image:
 
+```bash
+apptainer run -e jclauneurolab_autoafids_1.1.0.sif ds003653 ds003653_autoafids participant -n --modality T1
+```
 
-When you run the above command, a long listing will print out, describing all the rules that 
-will be run. This is a long listing, and you can better appreciate it with the `less` tool. We can
-also have the shell command used for each rule printed to screen using the `-p` Snakemake option:
+#### 🔍 Explanation
 
-    apptainer run -e jclauneurolab_autoafids_1.1.0.sif ds003653 ds003653_autoafids participant -np | less
+Everything **before** the container name is passed to Apptainer. Everything **after** is passed to AutoAFIDs:
 
+- `ds003653`: input folder
+- `ds003653_autoafids`: output folder
+- `participant`: analysis level
+- `--modality T1`: use T1w image
+- `-n`: dry-run mode (no processing, just show steps)
 
-Now, to actually run the workflow, we need to specify how many cores to use and leave out
-the dry-run option.  The Snakemake `--cores` option tells AutoAFIDs how many cores to use.
- Using `--cores 8` means that AutoAFIDs will only make use of 8 cores at most. Generally speaking 
-you should use `--cores all`,  so it can make maximal use of all the CPU cores it has access to on your system. This is especially 
-useful if you are running multiple subjects. 
+To inspect the rule graph more interactively:
 
-Running the following command (autoafids on a single subject) may take ~6 minutes if you have 8 cores, shorter if you have more 
-cores, but could be much longer (several hours) if you only have a single core.
+```bash
+apptainer run -e jclauneurolab_autoafids_1.1.0.sif ds003653 ds003653_autoafids participant -np | less
+```
 
+To actually run the pipeline, remove `-n` and specify the number of cores:
 
-    apptainer run -e jclauneurolab_autoafids_1.1.0.sif ds003653 ds003653_autoafids participant -p --cores all
+```bash
+apptainer run -e jclauneurolab_autoafids_1.1.0.sif ds003653 ds003653_autoafids participant -p --cores all
+```
 
+> 💡 We recommend `--cores all` to utilize all available CPU cores. This speeds up processing, especially for multi-subject datasets.
 
-Note that you may need to adjust your [Singularity options](https://sylabs.io/guides/3.1/user-guide/cli/apptainer_run.html) to ensure the container can read and write to yout input and output directories, respectively. You can bind paths easily by setting an 
-environment variable, e.g. if you have a `/project` folder that contains your data, you can add it to the `APPTAINER_BINDPATH` so it is available when you are running a container:
+---
 
-    export APPTAINER_BINDPATH=/data:/data
+### ⚙️ Apptainer Bind Paths
 
+Make sure input/output folders are accessible inside the container. You can bind host paths using:
 
+```bash
+export APPTAINER_BINDPATH=/data:/data
+```
 
-After this completes, you should have a `ds003653_autoafids` folder with outputs for the one subject.
+Adjust paths as needed for your system.
 
-## Exploring different options
+---
 
-If you alternatively want to run AutoAFIDs using a different modality, e.g. the high-resolution T2w image
-in the BIDS test dataset, you can use the `--modality T2w` option. The T2w image would be then first pre-processesed into T1w using SynthSR and then used as an input image for predicting AFIDs.
+### 📂 After Completion
 
-    apptainer run -e jclauneurolab_autoafids_1.1.0.sif ds003653 ds003653_autoafids_t2w participant --modality T2w -p --cores all
+Upon completion, the `ds003653_autoafids/` folder will contain output files for the processed subject.
 
-Note that if you run with a different modality, you should use a separate output folder, since some of the files 
-would be overwritten if not.
+---
+
+## Exploring Different Options
+
+To run AutoAFIDs using the T2w image (or CT and FLAIR) instead:
+
+```bash
+apptainer run -e jclauneurolab_autoafids_1.1.0.sif ds003653 ds003653_autoafids_t2w participant --modality T2w -p --cores all
+```
+
+> ⚠️ Use a **separate output folder** when running with a different modality, as outputs may be overwritten.
+
+When using `--modality T2w`, the T2w image will first be synthesized into a T1-like image using **SynthSR**, then used for fiducial prediction.
+
 
 
 

@@ -1,79 +1,90 @@
-# Contributing to Autoafids
+# Contributing to AutoAFIDs
 
-Autoafids python package uses Poetry pacakge manager to manage its dependencies. You’ll need it installed on your machine before contributing to the software. Installation instructions can be found on the 
-[Poetry website](https://python-poetry.org/docs/master/#installation).
+AutoAFIDs is a Python-based BIDS App for automatic anatomical fiducial detection. Development is managed using **Conda** for dependency and environment management.
 
-Autoafids primarily caters to T1w modality images, in which case it doesn't need to depend on pacakges outside of python but for other modalities it has a single dependency outside of python, i.e., `synthsr`. 
+> 🛠️ These instructions are intended for contributors making code changes to the AutoAFIDs codebase or using advanced features such as Snakemake cluster execution profiles.
 
-Note: These instructions are only recommended if you are making changes to the Autoafids codebase and committing these back to the repository or if you are using Snakemake’s cluster execution profiles.
+---
 
-## Setup the development environment
+## 📦 Prerequisites
 
-Once Poetry is available, clone this repository and install all dependencies (including `dev`):
+Ensure **Conda** is installed on your system. You can install Miniconda or Anaconda by following the official guide:  
+👉 [https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 
-```
+Note: AutoAFIDs primarily supports T1-weighted images. For additional modalities (e.g., T2w), SynthSR will be triggered, though compatibility varies by operating system.
+
+## 🧪 Setting Up the Development Environment
+
+1. Clone the repository:
+
+```bash
 git clone https://github.com/afids/autoafids.git
 cd autoafids
-poetry install --with dev 
 ```
 
-Poetry will automatically create a virtual environment. To customize where 
-these virtual environments are stored, see the poetry docs 
-[here](https://python-poetry.org/docs/configuration/).
+2. Create and activate the development environment:
 
-Then, you can run autoafids:
-
-```
-autoafids -h
+```bash
+mamba env create -f autoafids-dev.yml
+eval "$(mamba shell hook --shell zsh)"
+mamba activate autoafids-dev
 ```
 
-or you can activate a virtual environment shell and run autoafids directly:
+3. Run AutoAFIDs with development dependencies:
 
-```
-poetry shell
-autoafids
-```
-
-You can exit the poetry shell with `exit`
-
-## Running and fixing code format quality
-
-Autoafids uses [poethepoet](https://github.com/nat-n/poethepoet) as a task runner.
-You can see what commands are available by running:
-
-```
-poetry run poe 
+```bash
+./autoafids/run.py -h
 ```
 
-We use a few tools, including `ruff`, `snakefmt`, and `yamlfix` to ensure 
-formatting and style of our codebase is consistent. There are two task runners 
-you can use to check and fix your code, which can be invoked with:
+---
 
-```
-poetry run poe quality-check
-poetry run poe quality
-```
 
-_Note: If you are in a poetry shell, you do not need to prepend `poetry run` to
-the command._
+## 🧹 Code Quality and Formatting
 
-## Dry-run / testing your workflow
+AutoAFIDs uses several tools to ensure clean and consistent code:
 
-Using Snakemake\'s dry-run option (`--dry-run`/`-n`) is an easy way to verify
-any changes made to the workflow are working direcctly. The `tests/data` folder 
-contains a _fake_ BIDS dataset (i.e. dataset with zero-sized files) that is 
-useful for verifying different aspects of the workflow. These dry-run tests are 
-part of the automated Github actions that are run for every commit.
+- [`ruff`](https://github.com/charliermarsh/ruff) – for linting and formatting
+- [`snakefmt`](https://github.com/snakemake/snakefmt) – for formatting Snakemake files
+- [`yamlfix`](https://github.com/lyz-code/yamlfix) – for YAML cleanup
 
-You can invoke the pre-configured task via 
-[poethepoet](https://github.com/nat-n/poethepoet) to perform a dry-run:
+### Check formatting:
 
-```
-poetry run poe test_base
+```bash
+ruff check .
+snakefmt --check Snakefile
+yamlfix --check config/
 ```
 
-This performs a number of tests, involving different scenarios in which a user
-may use autoafids.
+### Auto-fix formatting:
 
-## Questions, Issues, Suggestions, and Other Feedback
-Please reach out if you have any questions, suggestions, or other feedback related to this software—either through email (dbansal7@uwo.ca) or the discussions page. Larger issues or feature requests can be posted and tracked via the issues page. Finally, you can also reach out to Alaa Taha, the Science Lead.
+```bash
+ruff check . --fix
+snakefmt Snakefile
+yamlfix config/
+```
+
+---
+
+## 🧪 Dry Run / Workflow Testing
+
+To test the Snakemake workflow without running any jobs, use the built-in **dry-run** feature:
+
+```bash
+./autoafids/run.py tests/data tests/output participant -n
+```
+
+The `tests/data` directory contains a lightweight fake BIDS dataset (with zero-byte files) useful for testing the pipeline logic.
+
+You can simulate more complex scenarios by modifying the `tests/` configuration and rerunning dry-runs with `--modality` and other options.
+
+---
+
+## 🙋 Questions, Issues, and Feedback
+
+We welcome all forms of feedback and contributions.
+
+- 💬 For questions or suggestions, use the [Discussions](https://github.com/afids/autoafids/discussions) page.
+- 🐛 For bugs or feature requests, open an issue on the [Issues](https://github.com/afids/autoafids/issues) page.
+- 📧 You may also contact [dbansal7@uwo.ca](mailto:dbansal7@uwo.ca) or reach out to **Alaa Taha**, the Science Lead.
+
+Thanks for helping improve AutoAFIDs!
