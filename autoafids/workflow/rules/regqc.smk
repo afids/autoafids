@@ -142,6 +142,6 @@ rule regqc:
         refim=lambda wildcards: get_ref_paths()[0],
         refcoord=lambda wildcards: get_ref_paths()[1],
     conda:
-        "../envs/utils.yaml"
+        "../envs/regqc.yaml"
     script:
         "../scripts/regqc.py"
