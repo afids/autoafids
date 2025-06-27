@@ -60,11 +60,9 @@ jobs:
           conda mambabuild . -c conda-forge -c bioconda
       - name: Upload package to Khanlab channel
         shell: bash -l {0}
+        env:
+          ANACONDA_AUTH_API_KEY: ${{ secrets.ANACONDA_AUTH_API_KEY }}
         run: |-
-          conda activate base
-          anaconda login \
-            --username ${{ secrets.ANACONDA_USERNAME }} \
-            --password ${{ secrets.ANACONDA_PASSWORD }}
           anaconda upload "$PACKAGE_PATH" \
             --label main \
             --force \
