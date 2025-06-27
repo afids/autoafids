@@ -63,6 +63,7 @@ jobs:
         env:
           ANACONDA_AUTH_API_KEY: ${{ secrets.ANACONDA_AUTH_API_KEY }}
         run: |-
+          conda activate base
           anaconda upload "$PACKAGE_PATH" \
             --label main \
             --force \
