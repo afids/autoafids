@@ -9,6 +9,7 @@ What types of changes does your code introduce? Put an `x` in the boxes that app
 - [ ] Bugfix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionalitiy)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Documentation (non-breaking change which adds content to documentation)
 - [ ] Other (if none of the other choices apply)
 
 ## Checklist
