@@ -6,7 +6,7 @@
 [![Tests](https://github.com/afids/autoafids/actions/workflows/lint-and-dryrun-testing.yml/badge.svg?branch=main)](https://github.com/afids/autoafids/actions/workflows/lint-and-dryrun-testing.yml?query=branch%3Amain)
 ![Docker Pulls](https://img.shields.io/docker/pulls/jclauneurolab/autoafids)
 
-Developed by the AIMS Lab at the Robarts Research Institute  
+Developed by the AIMS Lab at the Robarts Research Institute     
 *2023–2025*
 
 > ⚠️ This package is under active development. While stable and reproducible, users are encouraged to report any bugs or unexpected behavior to the development team.
