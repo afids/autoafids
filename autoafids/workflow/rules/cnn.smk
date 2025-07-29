@@ -27,7 +27,7 @@ rule applyfidmodel:
                 suffix="T1w.nii.gz",
                 **inputs[config["modality"]].wildcards
             )
-            if config["modality"] != "T1w"  # SynthSR used → no resample
+            if config["modality"] != "T1w" 
             else bids(
                 root=work,
                 datatype="resample",
