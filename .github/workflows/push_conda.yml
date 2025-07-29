@@ -64,7 +64,6 @@ jobs:
           ANACONDA_AUTH_API_KEY: ${{ secrets.ANACONDA_AUTH_API_KEY }}
         run: |-
           conda activate base
-          
           anaconda login \
             --username ${{ secrets.ANACONDA_USERNAME }} \
             --password ${{ secrets.ANACONDA_PASSWORD }} \
