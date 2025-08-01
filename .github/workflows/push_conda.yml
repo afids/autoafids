@@ -66,8 +66,5 @@ jobs:
           BINSTAR_TOKEN: ${{ secrets.ANACONDA_UPLOAD_TOKEN }}
         run: |-            
           conda activate base
-          printf 'y\n' | anaconda upload \
-          --user khanlab \ 
-          --label main \
-          --force \
-          "$PACKAGE_PATH"
+          printf 'y\n' | anaconda upload --user khanlab --label main --force "$PACKAGE_PATH"
+          echo "PACKAGE_PATH is: [$PACKAGE_PATH]"
