@@ -65,6 +65,7 @@ jobs:
         env:
           ANACONDA_UPLOAD_TOKEN: ${{ secrets.ANACONDA_UPLOAD_TOKEN }}
         run: |-            
+          conda activate base
           anaconda upload "$PACKAGE_PATH" \
             --label main \
             -y \
