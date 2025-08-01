@@ -68,6 +68,6 @@ jobs:
           conda activate base
           printf 'y\n' | anaconda upload \
           --label main \
-          --token "$ANACONDA_UPLOAD_TOKEN" \
+          -t "$ANACONDA_UPLOAD_TOKEN" \
           --force \
           "$PACKAGE_PATH"
