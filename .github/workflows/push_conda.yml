@@ -65,16 +65,16 @@ jobs:
         env:
           ANACONDA_AUTH_API_KEY: ${{ secrets.ANACONDA_AUTH_API_KEY }}
         run: |-
+          # delete any leftover token or netrc entry
+          rm -f ~/.anaconda/token ~/.netrc || true
+
           conda activate base
           anaconda login \
             --username ${{ secrets.ANACONDA_USERNAME }} \
             --password ${{ secrets.ANACONDA_PASSWORD }} \
             --hostname "$ANACONDA_HOSTNAME"
-
-          # delete any leftover token or netrc entry
-          rm -f ~/.anaconda/token ~/.netrc || true
             
           anaconda upload "$PACKAGE_PATH" \
             --label main \
-            --yes \
+            -y \
             --force \
