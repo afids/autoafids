@@ -63,10 +63,11 @@ jobs:
       - name: Upload package to Khanlab channel
         shell: bash -l {0}
         env:
-          BINSTAR_TOKEN: ${{ secrets.ANACONDA_UPLOAD_TOKEN }}
+          ANACONDA_UPLOAD_TOKEN: ${{ secrets.ANACONDA_UPLOAD_TOKEN }}
         run: |-            
           conda activate base
           printf 'y\n' | anaconda upload \
           --label main \
+          --token "$ANACONDA_UPLOAD_TOKEN" \
           --force \
           "$PACKAGE_PATH"
