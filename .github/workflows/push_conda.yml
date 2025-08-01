@@ -4,6 +4,8 @@ name: Build and Upload Conda Package
 on:
   push:
     branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 jobs:
   build-and-upload:
@@ -68,7 +70,11 @@ jobs:
             --username ${{ secrets.ANACONDA_USERNAME }} \
             --password ${{ secrets.ANACONDA_PASSWORD }} \
             --hostname "$ANACONDA_HOSTNAME"
+
+          # delete any leftover token or netrc entry
+          rm -f ~/.anaconda/token ~/.netrc || true
             
           anaconda upload "$PACKAGE_PATH" \
             --label main \
+            --yes \
             --force \
