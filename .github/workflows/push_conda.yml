@@ -68,10 +68,12 @@ jobs:
           set -euv
           conda activate base
 
-          # 1) Login with your token (drops it into ~/.anaconda/token)
-          anaconda login --token "$BINSTAR_TOKEN"
+          # 1) Drop your PAT into the client's token file
+          mkdir -p ~/.anaconda
+          printf "%s" "$BINSTAR_TOKEN" > ~/.anaconda/token
+          chmod 600 ~/.anaconda/token
 
-          # 2) Debug: confirm token file exists (optional)
+          # 2) Debug: list the token file (optional; will show as "***")
           ls -l ~/.anaconda/token
 
           # 3) Non-interactive upload (auto-"y" to overwrite)
