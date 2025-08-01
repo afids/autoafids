@@ -65,6 +65,18 @@ jobs:
         env:
           BINSTAR_TOKEN: ${{ secrets.ANACONDA_UPLOAD_TOKEN }}
         run: |-            
+          set -euv
           conda activate base
-          printf 'y\n' | anaconda upload --user khanlab --label main --force "$PACKAGE_PATH"
-          echo "PACKAGE_PATH is: [$PACKAGE_PATH]"
+
+          # 1) Login with your token (drops it into ~/.anaconda/token)
+          anaconda login --token "$BINSTAR_TOKEN"
+
+          # 2) Debug: confirm token file exists (optional)
+          ls -l ~/.anaconda/token
+
+          # 3) Non-interactive upload (auto-"y" to overwrite)
+          printf 'y\n' | anaconda upload \
+            --user khanlab \
+            --label main \
+            --force \
+            "$PACKAGE_PATH"
