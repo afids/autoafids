@@ -63,17 +63,8 @@ jobs:
       - name: Upload package to Khanlab channel
         shell: bash -l {0}
         env:
-          ANACONDA_AUTH_API_KEY: ${{ secrets.ANACONDA_AUTH_API_KEY }}
-        run: |-
-          # delete any leftover token or netrc entry
-          rm -f ~/.anaconda/token ~/.netrc || true
-
-          conda activate base
-          anaconda login \
-            --username ${{ secrets.ANACONDA_USERNAME }} \
-            --password ${{ secrets.ANACONDA_PASSWORD }} \
-            --hostname "$ANACONDA_HOSTNAME"
-            
+          ANACONDA_UPLOAD_TOKEN: ${{ secrets.ANACONDA_UPLOAD_TOKEN }}
+        run: |-            
           anaconda upload "$PACKAGE_PATH" \
             --label main \
             -y \
