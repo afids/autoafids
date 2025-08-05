@@ -4,8 +4,6 @@ name: Build and Upload Conda Package
 on:
   push:
     branches: [main]
-  pull_request:
-    types: [opened, synchronize, reopened]
   workflow_dispatch:
 jobs:
   build-and-upload:
@@ -63,15 +61,14 @@ jobs:
       - name: Upload package to Khanlab channel
         shell: bash -l {0}
         env:
-          BINSTAR_TOKEN: ${{ secrets.ANACONDA_UPLOAD_TOKEN }}
-        run: |-            
-          set -euv
+          ANACONDA_AUTH_API_KEY: ${{ secrets.ANACONDA_AUTH_API_KEY }}
+        run: |-
           conda activate base
-          
-          export ANACONDA_API_TOKEN=$BINSTAR_TOKEN
-
-          anaconda upload \
-            --user khanlab \
+          anaconda login \
+            --username ${{ secrets.ANACONDA_USERNAME }} \
+            --password ${{ secrets.ANACONDA_PASSWORD }} \
+            --hostname "$ANACONDA_HOSTNAME"
+            
+          anaconda upload "$PACKAGE_PATH" \
             --label main \
             --force \
-            "$PACKAGE_PATH"
