@@ -67,17 +67,10 @@ jobs:
         run: |-            
           set -euv
           conda activate base
+          
+          export ANACONDA_API_TOKEN=$BINSTAR_TOKEN
 
-          # 1) Drop your PAT into the client's token file
-          mkdir -p ~/.anaconda
-          printf "%s" "$BINSTAR_TOKEN" > ~/.anaconda/token
-          chmod 600 ~/.anaconda/token
-
-          # 2) Debug: list the token file (optional; will show as "***")
-          ls -l ~/.anaconda/token
-
-          # 3) Non-interactive upload (auto-"y" to overwrite)
-          printf 'y\n' | anaconda upload \
+          anaconda upload \
             --user khanlab \
             --label main \
             --force \
