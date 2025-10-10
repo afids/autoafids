@@ -6,3 +6,7 @@ dependencies:
   - plotly
   - simpleitk
   - scipy
+  - matplotlib
+  - pandas
+  - ants=2.5.4
+  - libitk=5.4.0
