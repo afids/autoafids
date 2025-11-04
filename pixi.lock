@@ -1227,7 +1227,7 @@ packages:
 - pypi: ./
   name: autoafids
   version: 1.1.0
-  sha256: e6f752c357511869733e472136a357a2f93acd62e7a2f1619413c5eac78e137c
+  sha256: c6686596be0572ea3d5808d421b055d484a039608dd2b87cc9f86753850458a7
   requires_python: '>=3.11'
   editable: true
 - conda: https://conda.anaconda.org/conda-forge/linux-64/bcrypt-5.0.0-py313h843e2db_0.conda
