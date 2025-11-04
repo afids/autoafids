@@ -1,32 +1,31 @@
-{% set name = "autoafids" %}
-{% set version = "1.1.0" %}
-{% set ref = "241e4b3ddecc82f1e245ad3c881b516a44ee33cd" %}
+context:
+  version: 1.1.0
 
 package:
-  name: {{ name|lower }}
-  version: {{ version }}
+  name: autoafids
+  version: ${{ version }}
 
 source:
-  url: https://github.com/afids/autoafids/archive/{{ ref }}.tar.gz
-  sha256: cffa7619612fc2d43b1363ccc76744d04d2c6ff8f3cb549f22a75caf2ff6d8ae
+  git: https://github.com/afids/autoafids.git
+  rev: 241e4b3ddecc82f1e245ad3c881b516a44ee33cd
 
 build:
-  entry_points: 
-    - autoafids = autoafids.run:app.run
+  script: ${{ PYTHON }} -m pip install
+  python:
+    entry_points: 
+      - autoafids = autoafids.run:app.run
   noarch: python
-  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
-  number: 0
 
 requirements:
   host:
-    - python
-    - poetry-core
+    - python >=3.11
+    - hatchling
+    - hatch-vcs
     - pip
   run:
-    - python >=3.9,<4.0
-    - snakebids >=0.14.0
+    - python >=3.11
+    - snakebids >=0.14.0,<0.15
     - appdirs >=1.4.4,<2.0.0
-    - pulp <2.8.0  # [py<311]
     - pyvista >=0.44.2,<0.45.0
 
 test:
