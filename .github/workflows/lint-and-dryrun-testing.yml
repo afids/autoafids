@@ -10,40 +10,42 @@ jobs:
     name: Lint code
     runs-on: ubuntu-latest
     steps:
+      - name: Clone repo
+        uses: actions/checkout@v4
+
       - name: Install non-python dependencies
         run: |
           sudo apt-get install -y graphviz-dev
+
       - name: Setup Python environment
-        uses: khanlab/actions/.github/actions/action-setup_task-installPyProject@v0.3.6
+        uses: prefix-dev/setup-pixi@v0.8.14
         with:
-          python-version: '3.10'
-      - name: yamlfix
-        run: poetry run poe yamlfix-check
-      - name: ruff
-        run: poetry run poe ruff-lint-check
+          environments: >-
+            dev-only
+          activate-environment: dev-only
+
+      - name: isort
+        run: isort autoafids/*.py -c
+
+      - name: black
+        run: black autoafids --check
+
       - name: snakefmt
-        run: poetry run poe snakefmt-check
+        run: snakefmt autoafids --check
+
   test:
     runs-on: ubuntu-latest
     needs: [quality]
-    defaults:
-      run:
-        shell: bash -l {0}
+
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
-      - name: Setup Miniforge and mamba
-        uses: conda-incubator/setup-miniconda@v3
+
+      - name: Setup Pixi environment
+        uses: prefix-dev/setup-pixi@v0.8.14
         with:
-          miniforge-variant: Miniforge3
-          miniforge-version: latest
-          mamba-version: '*'
-          use-mamba: true
-          conda-solver: libmamba
-          auto-activate-base: true
-      - name: Install snakebids
-        run: |
-          mamba install snakebids -c bioconda -c conda-forge -y
+          activate-environment: true
+
       - name: Setup env for autoafids
         run: |
           echo "AUTOAFIDS_CACHE_DIR=`pwd`/test_data/autoafids_cache_dir" >> $GITHUB_ENV
