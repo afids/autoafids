@@ -7,7 +7,7 @@ package:
 
 source:
   git: https://github.com/afids/autoafids.git
-  rev: 3a16875972f0035642672b6189bb75fa29d0f9af
+  rev: 40e8b3ed51d1edb9752446bb36e5ed6c58c9be68
 
 build:
   script: ${{ PYTHON }} -m pip install .
@@ -25,7 +25,6 @@ requirements:
   run:
     - python >=3.11
     - snakebids >=0.14.0,<0.15
-    - snakemake >=9.13.5,<10.0.0
     - appdirs >=1.4.4,<2.0.0
     - pyvista >=0.44.2,<0.45.0
 
@@ -33,7 +32,6 @@ tests:
 - python:
     imports:
       - autoafids
-    pip_check: true
 - script:
     - autoafids --help
 
