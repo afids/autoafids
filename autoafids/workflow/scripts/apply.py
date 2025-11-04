@@ -19,10 +19,11 @@ import tensorflow as tf
 
 tf.autograph.set_verbosity(0)  # Turn off epoch progress.
 
-from numpy.typing import NDArray
-from typing import Union
-from pathlib import Path
 import csv
+from pathlib import Path
+from typing import Union
+
+from numpy.typing import NDArray
 
 AFIDS_FIELDNAMES = [
     "id",
