@@ -28,7 +28,7 @@ jobs:
       - name: Build conda package
         uses: prefix-dev/rattler-build-action@v0.2.34
         with:
-          build-args: -c khanlab -c conda-forge
+          build-args: -c conda-forge -c bioconda
       - name: Upload package to Khanlab channel
         shell: bash
         env:
