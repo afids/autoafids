@@ -38,12 +38,8 @@ tests:
 
 
 about:
-  home: https://github.com/afids/autoafids
-  summary: |
-    End-to-end BIDS app for automated anatomical fiducial landmark regression.
-  description: |
-    AutoAFIDs is a BIDS-compliant application that automates the placement 
-    and evaluation of anatomical fiducial landmarks (AFIDs).
+  summary: End-to-end BIDS app for automated anatomical fiducial landmark regression.
+  description: AutoAFIDs is a BIDS-compliant application that automates the placement and evaluation of anatomical fiducial landmarks (AFIDs).
   license: MIT
   license_file: LICENSE
 
