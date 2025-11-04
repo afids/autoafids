@@ -5,9 +5,7 @@ from pathlib import Path
 from snakebids import bidsapp, plugins
 
 try:
-    from autoafids.workflow.lib import (
-        utils as utils,  # Works when run as a package
-    )
+    from autoafids.workflow.lib import utils as utils  # Works when run as a package
 except ImportError:
     from workflow.lib import utils as utils  # Works when run directly
 
@@ -34,6 +32,7 @@ os.environ['TEMPLATEFLOW_HOME'] = str(
 # Set the environment variable SNAKEMAKE_CONDA_PREFIX if not already set
 if "SNAKEMAKE_CONDA_PREFIX" not in os.environ:
     os.environ["SNAKEMAKE_CONDA_PREFIX"] = str(conda_prefix)
+
 
 def get_parser():
     """Exposes parser for sphinx doc generation, cwd is the docs dir"""

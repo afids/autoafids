@@ -85,15 +85,12 @@ def afids_to_fcsv(
         row["z"] = afid_coords[label][2]
 
     # Write output fcsv
-    with Path(fcsv_output).open(
-        "w", encoding="utf-8", newline=""
-        ) as out_fcsv_file:
+    with Path(fcsv_output).open("w", encoding="utf-8", newline="") as out_fcsv_file:
         for line in header:
             out_fcsv_file.write(line)
         writer = csv.DictWriter(out_fcsv_file, fieldnames=AFIDS_FIELDNAMES)
         for row in fcsv:
             writer.writerow(row)
-
 
 
 def load_fcsv(fcsv_path: Union[PathLike[str], str]) -> pd.DataFrame:
@@ -187,10 +184,7 @@ def fid_world2voxel(
     return fid_voxel.astype(int)
 
 
-def gen_patch_slices(
-        centre: NDArray,
-        radius: int
-        ) -> tuple[slice, slice, slice]:
+def gen_patch_slices(centre: NDArray, radius: int) -> tuple[slice, slice, slice]:
     """
     Generate patch slices
 
@@ -206,10 +200,7 @@ def gen_patch_slices(
     -------
         Image patches around center coordinate
     """
-    return tuple(
-        slice(coord - radius, coord + radius + 1
-              ) for coord in centre[:3]
-        )
+    return tuple(slice(coord - radius, coord + radius + 1) for coord in centre[:3])
 
 
 def slice_img(img: NDArray, centre: NDArray, radius: int) -> NDArray:

@@ -129,7 +129,7 @@ if config["modality"] != "T1w":
             bids(
                 root="logs",
                 suffix="synthsr_output.txt",
-                **inputs[config["modality"]].wildcards
+                **inputs[config["modality"]].wildcards,
             ),
         resources:
             mem_mb=10000,
@@ -147,19 +147,21 @@ if "n4_bias_correction" in profile_settings and config["modality"] == "T1w":
 
     rule n4_bias_correction:
         input:
-            im=bids(
-                root=str(Path(config["bids_dir"])),
-                datatype="anat",
-                suffix="T1w.nii.gz",
-                **inputs[config["modality"]].wildcards,
-            )
-            if config["modality"] == "T1w"
-            else bids(
-                root=work,
-                datatype="SynthSR",
-                desc=f"{config['modality']}-SynthSR",
-                suffix="T1w.nii.gz",
-                **inputs[config["modality"]].wildcards,
+            im=(
+                bids(
+                    root=str(Path(config["bids_dir"])),
+                    datatype="anat",
+                    suffix="T1w.nii.gz",
+                    **inputs[config["modality"]].wildcards,
+                )
+                if config["modality"] == "T1w"
+                else bids(
+                    root=work,
+                    datatype="SynthSR",
+                    desc=f"{config['modality']}-SynthSR",
+                    suffix="T1w.nii.gz",
+                    **inputs[config["modality"]].wildcards,
+                )
             ),
         output:
             corrected_im=bids(
@@ -167,7 +169,7 @@ if "n4_bias_correction" in profile_settings and config["modality"] == "T1w":
                 datatype="n4biascorr",
                 desc="n4corrected",
                 suffix="T1w.nii.gz",
-                **inputs[config["modality"]].wildcards
+                **inputs[config["modality"]].wildcards,
             ),
         conda:
             "envs/ants.yaml"
@@ -177,36 +179,42 @@ if "n4_bias_correction" in profile_settings and config["modality"] == "T1w":
 
 rule norm_im:
     input:
-        im_raw=lambda wildcards: bids(
-            root=work,
-            datatype="synthstrip",
-            desc="synthstrip",
-            suffix="T1w.nii.gz",
-            **inputs[config["modality"]].wildcards,
-        )
-        if "skull_strip" in profile_settings
-        else bids(
-            root=work,
-            datatype="n4biascorr",
-            desc="n4corrected",
-            suffix="T1w.nii.gz",
-            **inputs[config["modality"]].wildcards,
-        )
-        if "n4_bias_correction" in profile_settings
-        and config["modality"] == "T1w"
-        else bids(
-            root=str(Path(config["bids_dir"])),
-            datatype="anat",
-            suffix="T1w.nii.gz",
-            **inputs[config["modality"]].wildcards,
-        )
-        if config["modality"] == "T1w"
-        else bids(
-            root=work,
-            datatype="SynthSR",
-            desc=f"{config['modality']}-SynthSR",
-            suffix="T1w.nii.gz",
-            **inputs[config["modality"]].wildcards,
+        im_raw=lambda wildcards: (
+            bids(
+                root=work,
+                datatype="synthstrip",
+                desc="synthstrip",
+                suffix="T1w.nii.gz",
+                **inputs[config["modality"]].wildcards,
+            )
+            if "skull_strip" in profile_settings
+            else (
+                bids(
+                    root=work,
+                    datatype="n4biascorr",
+                    desc="n4corrected",
+                    suffix="T1w.nii.gz",
+                    **inputs[config["modality"]].wildcards,
+                )
+                if "n4_bias_correction" in profile_settings
+                and config["modality"] == "T1w"
+                else (
+                    bids(
+                        root=str(Path(config["bids_dir"])),
+                        datatype="anat",
+                        suffix="T1w.nii.gz",
+                        **inputs[config["modality"]].wildcards,
+                    )
+                    if config["modality"] == "T1w"
+                    else bids(
+                        root=work,
+                        datatype="SynthSR",
+                        desc=f"{config['modality']}-SynthSR",
+                        suffix="T1w.nii.gz",
+                        **inputs[config["modality"]].wildcards,
+                    )
+                )
+            )
         ),
     output:
         im_norm=bids(
@@ -254,28 +262,32 @@ if "resample_im" in profile_settings and config["modality"] == "T1w":
 
 rule regmni2sub:
     input:
-        im_resamp=bids(
-            root=work,
-            datatype="n4biascorr",
-            desc="n4corrected",
-            suffix="T1w.nii.gz",
-            **inputs[config["modality"]].wildcards,
-        )
-        if "n4_bias_correction" in profile_settings
-        and config["modality"] == "T1w"
-        else bids(
-            root=str(Path(config["bids_dir"])),
-            datatype="anat",
-            suffix="T1w.nii.gz",
-            **inputs[config["modality"]].wildcards,
-        )
-        if config["modality"] == "T1w"
-        else bids(
-            root=work,
-            datatype="SynthSR",
-            desc=f"{config['modality']}-SynthSR",
-            suffix="T1w.nii.gz",
-            **inputs[config["modality"]].wildcards,
+        im_resamp=(
+            bids(
+                root=work,
+                datatype="n4biascorr",
+                desc="n4corrected",
+                suffix="T1w.nii.gz",
+                **inputs[config["modality"]].wildcards,
+            )
+            if "n4_bias_correction" in profile_settings
+            and config["modality"] == "T1w"
+            else (
+                bids(
+                    root=str(Path(config["bids_dir"])),
+                    datatype="anat",
+                    suffix="T1w.nii.gz",
+                    **inputs[config["modality"]].wildcards,
+                )
+                if config["modality"] == "T1w"
+                else bids(
+                    root=work,
+                    datatype="SynthSR",
+                    desc=f"{config['modality']}-SynthSR",
+                    suffix="T1w.nii.gz",
+                    **inputs[config["modality"]].wildcards,
+                )
+            )
         ),
     output:
         xfm_slicer=bids(
@@ -357,7 +369,7 @@ rule all:
                 datatype="afids-cnn",
                 desc="afidscnn",
                 suffix="afids.fcsv",
-                **inputs[config["modality"]].wildcards
+                **inputs[config["modality"]].wildcards,
             ),
         ),
         fidqc=inputs[config["modality"]].expand(
