@@ -10,8 +10,8 @@ dependencies = []
 scripts = { autoafids = "autoafids.run:app.run" }
 
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
+requires = ["hatchling"]
 
 [tool.pixi.workspace]
 channels = ["conda-forge", "bioconda"]

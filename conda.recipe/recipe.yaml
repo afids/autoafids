@@ -7,10 +7,10 @@ package:
 
 source:
   git: https://github.com/afids/autoafids.git
-  rev: 8167bd51638100a25c127da6088c4fc34e98fc55
+  rev: 63c037c0a47fc760eab58a2ec35467c15b413807
 
 build:
-  script: ${{ PYTHON }} -m pip install . --no-build-isolation
+  script: ${{ PYTHON }} -m pip install .
   python:
     entry_points: 
       - autoafids = autoafids.run:app.run
