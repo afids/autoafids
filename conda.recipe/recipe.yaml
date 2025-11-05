@@ -10,7 +10,7 @@ source:
   rev: 40e8b3ed51d1edb9752446bb36e5ed6c58c9be68
 
 build:
-  script: ${{ PYTHON }} -m pip install .
+  script: ${{ PYTHON }} -m pip install . --no-build-isolation
   python:
     entry_points: 
       - autoafids = autoafids.run:app.run
