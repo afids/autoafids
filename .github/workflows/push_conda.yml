@@ -13,18 +13,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Get latest commit SHA from master
-        id: get_sha
-        run: |
-          echo "Fetching latest commit on master branch..."
-          COMMIT_SHA=$(git ls-remote origin refs/heads/master | cut -f1)
-          echo "COMMIT_SHA=$COMMIT_SHA" >> $GITHUB_ENV
-      - name: Update recipe.yaml with latest rev
-        run: |
-          echo "Updating recipe.yaml with commit: $COMMIT_SHA"
+      # - name: Get latest commit SHA from master
+      #   id: get_sha
+      #   run: |
+      #     echo "Fetching latest commit on master branch..."
+      #     COMMIT_SHA=$(git ls-remote origin refs/heads/master | cut -f1)
+      #     echo "COMMIT_SHA=$COMMIT_SHA" >> $GITHUB_ENV
+      # - name: Update recipe.yaml with latest rev
+      #   run: |
+      #     echo "Updating recipe.yaml with commit: $COMMIT_SHA"
 
-          # Replace the literal 'rev:' line under source:
-          sed -i "s|^\(\s*rev:\s*\).*|\1$COMMIT_SHA|" ./conda.recipe/recipe.yaml
+      #     # Replace the literal 'rev:' line under source:
+      #     sed -i "s|^\(\s*rev:\s*\).*|\1$COMMIT_SHA|" ./conda.recipe/recipe.yaml
       - name: Build conda package
         uses: prefix-dev/rattler-build-action@v0.2.34
         with:
