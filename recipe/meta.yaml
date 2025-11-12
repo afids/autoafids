@@ -8,7 +8,7 @@ package:
 
 source:
   url: https://github.com/afids/autoafids/archive/{{ ref }}.tar.gz
-  sha256: cffa7619612fc2d43b1363ccc76744d04d2c6ff8f3cb549f22a75caf2ff6d8ae
+  sha256: 1c749b2c7d38f288e6590ee682998e8d27c99979e0b02ae5830f0bd5a11ad0a6
 
 build:
   entry_points: 
