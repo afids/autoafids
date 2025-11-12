@@ -1,6 +1,6 @@
 {% set name = "autoafids" %}
 {% set version = "1.1.0" %}
-{% set ref = "241e4b3ddecc82f1e245ad3c881b516a44ee33cd" %}
+{% set ref = "0495778fac62a789ba0970804fa007a73e18a6c9" %}
 
 package:
   name: {{ name|lower }}
