@@ -308,7 +308,10 @@ def process_distances(
     thresholded = transformed
     thresholded[thresholded < thresh] = 0
     thresholded = (thresholded * 1000000).astype(int)
-    new = skimage.measure.regionprops(thresholded)
+    try:
+        new = skimage.measure.regionprops(thresholded)
+    except MemoryError:
+        new=None
     if not new:
         print("No centroid found for this afid. Results may be suspect.")
         return np.array(

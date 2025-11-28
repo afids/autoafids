@@ -1,6 +1,6 @@
 ---
 name: regqc
-channels: [conda-forge, defaults]
+channels: [khanlab,conda-forge, defaults]
 dependencies:
   - python=3.9 
   - plotly
@@ -8,5 +8,4 @@ dependencies:
   - scipy
   - matplotlib
   - pandas
-  - ants=2.5.4
-  - libitk=5.4.0
+  - antspyx=0.5.3

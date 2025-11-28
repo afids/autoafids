@@ -4,6 +4,7 @@ import csv
 from io import BytesIO
 from pathlib import Path
 
+import ants
 import matplotlib.pyplot as plt
 import nibabel as nib
 import numpy as np
@@ -108,7 +109,7 @@ def apply_affine_transform(mat_path, coords):
     return transformed_homogeneous[:, :3]
 
 # --- APPLY WARP (HARMONIZED) ---
-def apply_warp_deformation(transform_path, coords, flip_ras_lps=True):
+def apply_warp_deformation(transform_path, coords, flip_ras_lps=True, leaddbs=True):
     """
     Applies a non-linear warp deformation to coordinates
     using a SimpleITK displacement field.
@@ -124,15 +125,22 @@ def apply_warp_deformation(transform_path, coords, flip_ras_lps=True):
     if flip_ras_lps:
         coords = coords * np.array([-1, -1, 1])
 
-    transform_image = SimpleITK.ReadImage(transform_path)
-    transform_image = SimpleITK.Cast(
-        transform_image, SimpleITK.sitkVectorFloat64
-    )
-    transform = SimpleITK.Transform(transform_image)
+    if leaddbs:
 
-    transformed_coords = np.array([
-        transform.TransformPoint(point.tolist()) for point in coords
-    ])
+        transform_image = SimpleITK.ReadImage(transform_path)
+        transform_image = SimpleITK.Cast(
+            transform_image, SimpleITK.sitkVectorFloat64
+        )
+        transform = SimpleITK.Transform(transform_image)
+
+        transformed_coords = np.array([
+            transform.TransformPoint(point.tolist()) for point in coords
+        ])
+    
+    else:
+        d = pd.DataFrame(data=coords, columns=['x','y','z'])
+        transformed_coords_dataframe = ants.apply_transforms_to_points( 3, d, transform_path)
+        transformed_coords = transformed_coords_dataframe.to_numpy()
 
     if flip_ras_lps:
         transformed_coords = transformed_coords * np.array([-1, -1, 1])
@@ -690,7 +698,7 @@ def generate_afid_qc_dashboard(
         gt_coords_a= apply_affine_transform(matfile_path,native_coords)
         gt_coords= apply_warp_deformation(warpfile_path,gt_coords_a)
     else:
-        gt_coords= apply_warp_deformation(warpfile_path,native_coords)
+        gt_coords= apply_warp_deformation(warpfile_path,native_coords, leaddbs=False)
     pred_coords, _ = load_fcsv(pred_fcsv_path)
     afids_to_fcsv(gt_coords, output_fcsv_path)
     dx, dy, dz, ed = compute_error_components(gt_coords, pred_coords)
