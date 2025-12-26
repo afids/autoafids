@@ -21,7 +21,7 @@ def get_warp_path(subject):
 
     elif fmriprep_dir:
         trans_dir = Path(fmriprep_dir) / f"sub-{subject}" / "anat"
-        pattern = f"sub-{subject}*from-T1w_to-MNI*_mode-image_xfm.h5"
+        pattern = f"sub-{subject}*from-MNI*_to-T1w_mode-image_xfm.h5"
         matches = list(trans_dir.glob(pattern))
         if matches:
             return str(matches[0])
