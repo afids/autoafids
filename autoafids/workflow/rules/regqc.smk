@@ -4,6 +4,25 @@ import glob
 lead_dbs_dir = config.get("LEAD_DBS_DIR", False)
 fmriprep_dir = config.get("FMRIPREP_DIR", False)
 
+template_name = config.get("template_flow", '')
+
+template_dict = {
+    "Agile12v2016" : 'resources/regqc/tpl-Agile12v2016_desc-groundtruth_afids.fcsv',
+    "MNI152Lin" : 'resources/regqc/tpl-MNI152Lin_res-01_desc-groundtruth_afids.fcsv',
+    "MNI152NLin2009cAsym" : 'resources/regqc/tpl-MNI152NLin2009cAsym_res-01_desc-groundtruth_afids.fcsv',
+    "MNI152NLin6Sym" : 'resources/regqc/tpl-MNI152NLin6Asym_res-01_desc-groundtruth_afids.fcsv',
+    "OASIS30ANTs" : 'resources/regqc/tpl-OASIS30ANTs_res-01_desc-groundtruth_afids.fcsv',
+    "BigBrainSym" : 'resources/regqc/BigBrain_space-ICBM2009sym_desc-groundtruth_afids.fcsv',
+    "MNI152NLin2009bAsym" : 'resources/regqc/tpl-MNI152NLin2009bAsym_res-1_desc-groundtruth_afids.fcsv',
+    "MNI152NLin2009cSym" : 'resources/regqc/tpl-MNI152NLin2009cSym_res-1_desc-groundtruth_afids.fcsv',
+    "MNI305" : 'resources/regqc/tpl-MNI305_desc-groundtruth_afids.fcsv',
+    "PD25" : 'resources/regqc/tpl-PD25-res-01_desc-groundtruth_afids.fcsv',
+    "fsaverage" : 'resources/regqc/tpl-fsaverage_res-01_den-41k_desc-groundtruth_afids.fcsv',
+    "MNI152NLin2009bSym" : 'resources/regqc/tpl-MNI152NLin2009bSym_res-1_desc-groundtruth_afids.fcsv',
+    "MNI152NLin6Asym" : 'resources/regqc/tpl-MNI152NLin6Asym_res-01_desc-groundtruth_afids.fcsv',
+    "MNIColin27" : 'resources/regqc/tpl-MNIColin27_desc-groundtruth_afids.fcsv',
+}
+
 
 def get_warp_path(subject):
     if lead_dbs_dir:
@@ -89,18 +108,36 @@ def get_resampled_im(subject):
 
 
 def get_ref_paths():
-    if lead_dbs_dir:
-        refimage = str(
-            Path(workflow.basedir).parent / config["templatet1w_lead"]
-        )
-        refcoordinate = str(
-            Path(workflow.basedir).parent / config["fcsv_mni_lead"]
-        )
+    if template_name:
+        refimage=directory(Path(download_dir) / "templateflow" / template_name)
+        refcoordinate=template_dict[template_name]
     else:
-        refimage = str(Path(workflow.basedir).parent / config["templatet1w"])
-        refcoordinate = str(Path(workflow.basedir).parent / config["fcsv_mni"])
+        if lead_dbs_dir:
+            refimage = str(
+                Path(workflow.basedir).parent / config["templatet1w_lead"]
+            )
+            refcoordinate = str(
+                Path(workflow.basedir).parent / config["fcsv_mni_lead"]
+            )
+        else:
+            refimage = str(Path(workflow.basedir).parent / config["templatet1w"])
+            refcoordinate = str(Path(workflow.basedir).parent / config["fcsv_mni"])
     return refimage, refcoordinate
 
+rule download_template:
+    params:
+        template=template_name,
+    output:
+        template_dir=directory(Path(download_dir) / "templateflow"),
+    log:
+        bids(
+            root="logs",
+            suffix="downlaod_template.log",
+        ),
+    conda:
+        "../envs/templateflow.yaml"
+    script:
+        "../scripts/templateflow.py"
 
 rule regqc:
     input:
