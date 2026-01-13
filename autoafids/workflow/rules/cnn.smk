@@ -12,8 +12,8 @@ rule download_cnn_model:
             suffix="downlaod_model.log",
         ),
     shell:
-        "wget -q https://{params.url} -O model.zip && "
-        " unzip -q -d {output.unzip_dir} model.zip && "
+        "wget https://{params.url} -O model.zip && "
+        " unzip -q -d {output.unzip_dir} model.zip || true && "
         " rm model.zip"
 
 

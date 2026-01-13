@@ -109,8 +109,11 @@ def get_resampled_im(subject):
 
 def get_ref_paths():
     if template_name:
-        refimage=directory(Path(download_dir) / "templateflow" / template_name)
-        refcoordinate=template_dict[template_name]
+        refimage=directory(Path(download_dir) / "templateflow")
+
+        refcoordinate=str(
+            Path(workflow.basedir).parent / template_dict[template_name]
+        )
     else:
         if lead_dbs_dir:
             refimage = str(
@@ -128,16 +131,11 @@ rule download_template:
     params:
         template=template_name,
     output:
-        template_dir=directory(Path(download_dir) / "templateflow"),
-    log:
-        bids(
-            root="logs",
-            suffix="downlaod_template.log",
-        ),
+        template_path=directory(Path(download_dir) / "templateflow")
     conda:
         "../envs/templateflow.yaml"
     script:
-        "../scripts/templateflow.py"
+        "../scripts/template_flow.py"
 
 rule regqc:
     input:
@@ -153,6 +151,8 @@ rule regqc:
         optional_matrix=lambda wildcards: get_optional_matrix_path(
             wildcards.subject
         ),
+        refim_dir=lambda wildcards: get_ref_paths()[0],
+        refcoord=lambda wildcards: get_ref_paths()[1],
     output:
         html=bids(
             root=root,
@@ -176,8 +176,7 @@ rule regqc:
             **inputs[config["modality"]].wildcards
         ),
     params:
-        refim=lambda wildcards: get_ref_paths()[0],
-        refcoord=lambda wildcards: get_ref_paths()[1],
+        template=template_name,
     conda:
         "../envs/regqc.yaml"
     script:

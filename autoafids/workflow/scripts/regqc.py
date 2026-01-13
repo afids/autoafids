@@ -684,12 +684,13 @@ def render_dashboard_html(
 
 # --- MAIN WRAPPER ---
 def generate_afid_qc_dashboard(
+        template_name,
         gt_fcsv_path,
         pred_fcsv_path,
         output_html_path,
         output_fcsv_path,
         output_csv_path,subject_nii,
-        template_nii,
+        template_dir,
         matfile_path,
         warpfile_path
     ):
@@ -711,6 +712,8 @@ def generate_afid_qc_dashboard(
         "dz (mm)": dz,
         "ED (mm)": ed
     })
+
+    template_nii = str(Path(template_dir) / f'tpl-{template_name}' / f'tpl-{template_name}_res-01_T1w.nii.gz')
     error_df.to_csv(output_csv_path, index=False)
     heatmap_html = make_toggleable_heatmap([dx, dy, dz, ed], afid_ids)
     scatter_html = make_3d_plot(gt_coords, pred_coords, afid_ids)
@@ -722,13 +725,14 @@ def generate_afid_qc_dashboard(
 
 if __name__ == "__main__":
     generate_afid_qc_dashboard(
+        template_name=snakemake.params['template'],
         gt_fcsv_path=snakemake.input["afidfcsv"],
-        pred_fcsv_path=snakemake.params["refcoord"],
+        pred_fcsv_path=snakemake.input["refcoord"],
         output_html_path=snakemake.output["html"],
         output_fcsv_path=snakemake.output["fcsv"],
         output_csv_path=snakemake.output["csv"],
         subject_nii=snakemake.input["im"],
-        template_nii=snakemake.params["refim"],
+        template_dir=snakemake.input["refim_dir"],
         matfile_path=snakemake.input["optional_matrix"],
         warpfile_path=snakemake.input["warp"]
     )
