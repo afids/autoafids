@@ -149,7 +149,7 @@ parse_args:
 
   --template-flow:
     help: 'Downloads a template from templateflow and uses it to assess the quality of registration.'
-    choices: ['Agile12v2016', 'MNI152Lin ', 'MNI152NLin2009cAsym', 'MNI152NLin6Sym', 'OASIS30ANTs', 'BigBrainSym' , 'MNI152NLin2009bAsym', 'MNI152NLin2009cSym', 'MNI305', 'PD25', 'fsaverage', 'MNI152NLin2009bSym',  'MNI152NLin6Asym','MNIColin27']
+    choices: ['Agile12v2016', 'MNI152Lin', 'MNI152NLin2009cAsym', 'MNI152NLin6Sym', 'OASIS30ANTs', 'BigBrainSym' , 'MNI152NLin2009bAsym', 'MNI152NLin2009cSym', 'MNI305', 'PD25', 'fsaverage', 'MNI152NLin2009bSym',  'MNI152NLin6Asym','MNIColin27']
     default: false
     required: false
     type: str

@@ -713,7 +713,12 @@ def generate_afid_qc_dashboard(
         "ED (mm)": ed
     })
 
-    template_nii = str(Path(template_dir) / f'tpl-{template_name}' / f'tpl-{template_name}_res-01_T1w.nii.gz')
+    if template_name in ['MNI152NLin2009bAsym','MNI152NLin2009bSym']:
+        template_nii = str(Path(template_dir) / f'tpl-{template_name}' / f'tpl-{template_name}_res-1_T1w.nii.gz')
+    elif template_name in ['MNI305', 'MNIColin27']:
+        template_nii = str(Path(template_dir) / f'tpl-{template_name}' / f'tpl-{template_name}_T1w.nii.gz')
+    else:
+        template_nii = str(Path(template_dir) / f'tpl-{template_name}' / f'tpl-{template_name}_res-01_T1w.nii.gz')
     error_df.to_csv(output_csv_path, index=False)
     heatmap_html = make_toggleable_heatmap([dx, dy, dz, ed], afid_ids)
     scatter_html = make_3d_plot(gt_coords, pred_coords, afid_ids)
