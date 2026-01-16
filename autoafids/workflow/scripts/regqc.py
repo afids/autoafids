@@ -109,7 +109,11 @@ def apply_affine_transform(mat_path, coords):
     return transformed_homogeneous[:, :3]
 
 # --- APPLY WARP (HARMONIZED) ---
-def apply_warp_deformation(transform_path, coords, flip_ras_lps=True, leaddbs=True):
+def apply_warp_deformation(
+        transform_path,
+        coords,
+        flip_ras_lps=True,
+        leaddbs=True):
     """
     Applies a non-linear warp deformation to coordinates
     using a SimpleITK displacement field.
@@ -136,10 +140,12 @@ def apply_warp_deformation(transform_path, coords, flip_ras_lps=True, leaddbs=Tr
         transformed_coords = np.array([
             transform.TransformPoint(point.tolist()) for point in coords
         ])
-    
+
     else:
         d = pd.DataFrame(data=coords, columns=['x','y','z'])
-        transformed_coords_dataframe = ants.apply_transforms_to_points( 3, d, transform_path)
+        transformed_coords_dataframe = ants.apply_transforms_to_points( 3,
+                                                                       d,
+                                                                       transform_path)
         transformed_coords = transformed_coords_dataframe.to_numpy()
 
     if flip_ras_lps:
@@ -699,7 +705,9 @@ def generate_afid_qc_dashboard(
         gt_coords_a= apply_affine_transform(matfile_path,native_coords)
         gt_coords= apply_warp_deformation(warpfile_path,gt_coords_a)
     else:
-        gt_coords= apply_warp_deformation(warpfile_path,native_coords, leaddbs=False)
+        gt_coords= apply_warp_deformation(warpfile_path,
+                                          native_coords,
+                                          leaddbs=False)
     pred_coords, _ = load_fcsv(pred_fcsv_path)
     afids_to_fcsv(gt_coords, output_fcsv_path)
     dx, dy, dz, ed = compute_error_components(gt_coords, pred_coords)
@@ -714,11 +722,17 @@ def generate_afid_qc_dashboard(
     })
 
     if template_name in ['MNI152NLin2009bAsym','MNI152NLin2009bSym']:
-        template_nii = str(Path(template_dir) / f'tpl-{template_name}' / f'tpl-{template_name}_res-1_T1w.nii.gz')
+        template_nii = str(Path(template_dir) /
+                           f'tpl-{template_name}' /
+                           f'tpl-{template_name}_res-1_T1w.nii.gz')
     elif template_name in ['MNI305', 'MNIColin27']:
-        template_nii = str(Path(template_dir) / f'tpl-{template_name}' / f'tpl-{template_name}_T1w.nii.gz')
+        template_nii = str(Path(template_dir) /
+                           f'tpl-{template_name}' /
+                           f'tpl-{template_name}_T1w.nii.gz')
     else:
-        template_nii = str(Path(template_dir) / f'tpl-{template_name}' / f'tpl-{template_name}_res-01_T1w.nii.gz')
+        template_nii = str(Path(template_dir) /
+                           f'tpl-{template_name}' /
+                           f'tpl-{template_name}_res-01_T1w.nii.gz')
     error_df.to_csv(output_csv_path, index=False)
     heatmap_html = make_toggleable_heatmap([dx, dy, dz, ed], afid_ids)
     scatter_html = make_3d_plot(gt_coords, pred_coords, afid_ids)
