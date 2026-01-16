@@ -696,7 +696,7 @@ def generate_afid_qc_dashboard(
         output_html_path,
         output_fcsv_path,
         output_csv_path,subject_nii,
-        template_dir,
+        template_path_or_dir,
         matfile_path,
         warpfile_path
     ):
@@ -721,18 +721,23 @@ def generate_afid_qc_dashboard(
         "ED (mm)": ed
     })
 
-    if template_name in ['MNI152NLin2009bAsym','MNI152NLin2009bSym']:
-        template_nii = str(Path(template_dir) /
-                           f'tpl-{template_name}' /
-                           f'tpl-{template_name}_res-1_T1w.nii.gz')
-    elif template_name in ['MNI305', 'MNIColin27']:
-        template_nii = str(Path(template_dir) /
-                           f'tpl-{template_name}' /
-                           f'tpl-{template_name}_T1w.nii.gz')
+    if template_name:
+        if template_name in ['MNI152NLin2009bAsym','MNI152NLin2009bSym']:
+            template_nii = str(Path(template_path_or_dir) /
+                            f'tpl-{template_name}' /
+                            f'tpl-{template_name}_res-1_T1w.nii.gz')
+        elif template_name in ['MNI305', 'MNIColin27']:
+            template_nii = str(Path(template_path_or_dir) /
+                            f'tpl-{template_name}' /
+                            f'tpl-{template_name}_T1w.nii.gz')
+        else:
+            template_nii = str(Path(template_path_or_dir) /
+                            f'tpl-{template_name}' /
+                            f'tpl-{template_name}_res-01_T1w.nii.gz')
     else:
-        template_nii = str(Path(template_dir) /
-                           f'tpl-{template_name}' /
-                           f'tpl-{template_name}_res-01_T1w.nii.gz')
+        template_nii = template_path_or_dir
+        
+    
     error_df.to_csv(output_csv_path, index=False)
     heatmap_html = make_toggleable_heatmap([dx, dy, dz, ed], afid_ids)
     scatter_html = make_3d_plot(gt_coords, pred_coords, afid_ids)
@@ -751,7 +756,7 @@ if __name__ == "__main__":
         output_fcsv_path=snakemake.output["fcsv"],
         output_csv_path=snakemake.output["csv"],
         subject_nii=snakemake.input["im"],
-        template_dir=snakemake.input["refim_dir"],
+        template_path_or_dir=snakemake.input["refim"],
         matfile_path=snakemake.input["optional_matrix"],
         warpfile_path=snakemake.input["warp"]
     )

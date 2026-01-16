@@ -7,16 +7,12 @@ fmriprep_dir = config.get("FMRIPREP_DIR", False)
 template_name = config.get("template_flow", "")
 
 template_dict = {
-    "Agile12v2016": "resources/regqc/tpl-Agile12v2016_desc-groundtruth_afids.fcsv",
     "MNI152Lin": "resources/regqc/tpl-MNI152Lin_res-01_desc-groundtruth_afids.fcsv",
     "MNI152NLin2009cAsym": "resources/regqc/tpl-MNI152NLin2009cAsym_res-01_desc-groundtruth_afids.fcsv",
     "MNI152NLin6Sym": "resources/regqc/tpl-MNI152NLin6Asym_res-01_desc-groundtruth_afids.fcsv",
     "OASIS30ANTs": "resources/regqc/tpl-OASIS30ANTs_res-01_desc-groundtruth_afids.fcsv",
-    "BigBrainSym": "resources/regqc/BigBrain_space-ICBM2009sym_desc-groundtruth_afids.fcsv",
-    "MNI152NLin2009bAsym": "resources/regqc/tpl-MNI152NLin2009bAsym_res-1_desc-groundtruth_afids.fcsv",
     "MNI152NLin2009cSym": "resources/regqc/tpl-MNI152NLin2009cSym_res-1_desc-groundtruth_afids.fcsv",
     "MNI305": "resources/regqc/tpl-MNI305_desc-groundtruth_afids.fcsv",
-    "PD25": "resources/regqc/tpl-PD25-res-01_desc-groundtruth_afids.fcsv",
     "fsaverage": "resources/regqc/tpl-fsaverage_res-01_den-41k_desc-groundtruth_afids.fcsv",
     "MNI152NLin2009bSym": "resources/regqc/tpl-MNI152NLin2009bSym_res-1_desc-groundtruth_afids.fcsv",
     "MNI152NLin6Asym": "resources/regqc/tpl-MNI152NLin6Asym_res-01_desc-groundtruth_afids.fcsv",
@@ -157,7 +153,7 @@ rule regqc:
         optional_matrix=lambda wildcards: get_optional_matrix_path(
             wildcards.subject
         ),
-        refim_dir=lambda wildcards: get_ref_paths()[0],
+        refim=lambda wildcards: get_ref_paths()[0],
         refcoord=lambda wildcards: get_ref_paths()[1],
     output:
         html=bids(
