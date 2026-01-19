@@ -15,7 +15,7 @@ requires = ["hatchling"]
 
 [tool.pixi.workspace]
 channels = ["conda-forge", "bioconda"]
-platforms = ["linux-64"]
+platforms = ["linux-64", "osx-64"]
 
 [tool.pixi.feature.runtime.dependencies]
 snakebids = ">=0.14.0,<0.15"
