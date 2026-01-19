@@ -308,7 +308,10 @@ def process_distances(
     thresholded = transformed
     thresholded[thresholded < thresh] = 0
     thresholded = (thresholded * 1000000).astype(int)
-    new = skimage.measure.regionprops(thresholded)
+    try:
+        new = skimage.measure.regionprops(thresholded)
+    except MemoryError:
+        new=None
     if not new:
         print("No centroid found for this afid. Results may be suspect.")
         return np.array(
@@ -377,21 +380,7 @@ def apply_model(
         mni_fid_resampled,
         radius,
     )
-    # do it again to improve prediction
-    fid_pred = np.rint(fid_resampled).astype(int)
-    distances2 = predict_distances(
-        radius,
-        model,
-        fid_pred,
-        img_data,
-    )
-    fid_resampled2 = process_distances(
-        distances2,
-        img_data,
-        fid_pred,
-        radius,
-    )
-    return fid_voxel2world(fid_resampled2, img.affine)
+    return fid_voxel2world(fid_resampled, img.affine)
 
 
 def apply_all(

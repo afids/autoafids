@@ -1,0 +1,11 @@
+---
+name: regqc
+channels: [khanlab,conda-forge, defaults]
+dependencies:
+  - python=3.9 
+  - plotly
+  - simpleitk
+  - scipy
+  - matplotlib
+  - pandas
+  - antspyx=0.5.3

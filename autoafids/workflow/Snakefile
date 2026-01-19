@@ -343,6 +343,12 @@ if config["fidqc"]:
     include: "rules/fidqc.smk"
 
 
+if config["LEAD_DBS_DIR"] or config["FMRIPREP_DIR"]:
+    print("..... Registration QC Enabled .....")
+
+    include: "rules/regqc.smk"
+
+
 rule all:
     input:
         models=inputs[config["modality"]].expand(
@@ -364,6 +370,17 @@ rule all:
             )
         )
         if config["fidqc"]
+        else [],
+        regqc=inputs[config["modality"]].expand(
+            bids(
+                root=root,
+                datatype="regqc",
+                desc="reg",
+                suffix="qc.html",
+                **inputs[config["modality"]].wildcards
+            )
+        )
+        if config["LEAD_DBS_DIR"] or config["FMRIPREP_DIR"]
         else [],
         afidspred=inputs[config["modality"]].expand(
             bids(
