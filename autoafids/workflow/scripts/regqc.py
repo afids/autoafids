@@ -109,7 +109,11 @@ def apply_affine_transform(mat_path, coords):
     return transformed_homogeneous[:, :3]
 
 # --- APPLY WARP (HARMONIZED) ---
-def apply_warp_deformation(transform_path, coords, flip_ras_lps=True, leaddbs=True):
+def apply_warp_deformation(
+        transform_path,
+        coords,
+        flip_ras_lps=True,
+        leaddbs=True):
     """
     Applies a non-linear warp deformation to coordinates
     using a SimpleITK displacement field.
@@ -136,10 +140,12 @@ def apply_warp_deformation(transform_path, coords, flip_ras_lps=True, leaddbs=Tr
         transformed_coords = np.array([
             transform.TransformPoint(point.tolist()) for point in coords
         ])
-    
+
     else:
         d = pd.DataFrame(data=coords, columns=['x','y','z'])
-        transformed_coords_dataframe = ants.apply_transforms_to_points( 3, d, transform_path)
+        transformed_coords_dataframe = ants.apply_transforms_to_points( 3,
+                                                                       d,
+                                                                       transform_path)
         transformed_coords = transformed_coords_dataframe.to_numpy()
 
     if flip_ras_lps:
@@ -684,12 +690,13 @@ def render_dashboard_html(
 
 # --- MAIN WRAPPER ---
 def generate_afid_qc_dashboard(
+        template_name,
         gt_fcsv_path,
         pred_fcsv_path,
         output_html_path,
         output_fcsv_path,
         output_csv_path,subject_nii,
-        template_nii,
+        template_path_or_dir,
         matfile_path,
         warpfile_path
     ):
@@ -698,7 +705,9 @@ def generate_afid_qc_dashboard(
         gt_coords_a= apply_affine_transform(matfile_path,native_coords)
         gt_coords= apply_warp_deformation(warpfile_path,gt_coords_a)
     else:
-        gt_coords= apply_warp_deformation(warpfile_path,native_coords, leaddbs=False)
+        gt_coords= apply_warp_deformation(warpfile_path,
+                                          native_coords,
+                                          leaddbs=False)
     pred_coords, _ = load_fcsv(pred_fcsv_path)
     afids_to_fcsv(gt_coords, output_fcsv_path)
     dx, dy, dz, ed = compute_error_components(gt_coords, pred_coords)
@@ -711,6 +720,24 @@ def generate_afid_qc_dashboard(
         "dz (mm)": dz,
         "ED (mm)": ed
     })
+
+    if template_name:
+        if template_name in ['MNI152NLin2009bAsym','MNI152NLin2009bSym']:
+            template_nii = str(Path(template_path_or_dir) /
+                            f'tpl-{template_name}' /
+                            f'tpl-{template_name}_res-1_T1w.nii.gz')
+        elif template_name in ['MNI305', 'MNIColin27']:
+            template_nii = str(Path(template_path_or_dir) /
+                            f'tpl-{template_name}' /
+                            f'tpl-{template_name}_T1w.nii.gz')
+        else:
+            template_nii = str(Path(template_path_or_dir) /
+                            f'tpl-{template_name}' /
+                            f'tpl-{template_name}_res-01_T1w.nii.gz')
+    else:
+        template_nii = template_path_or_dir
+
+
     error_df.to_csv(output_csv_path, index=False)
     heatmap_html = make_toggleable_heatmap([dx, dy, dz, ed], afid_ids)
     scatter_html = make_3d_plot(gt_coords, pred_coords, afid_ids)
@@ -722,13 +749,14 @@ def generate_afid_qc_dashboard(
 
 if __name__ == "__main__":
     generate_afid_qc_dashboard(
+        template_name=snakemake.params['template'],
         gt_fcsv_path=snakemake.input["afidfcsv"],
-        pred_fcsv_path=snakemake.params["refcoord"],
+        pred_fcsv_path=snakemake.input["refcoord"],
         output_html_path=snakemake.output["html"],
         output_fcsv_path=snakemake.output["fcsv"],
         output_csv_path=snakemake.output["csv"],
         subject_nii=snakemake.input["im"],
-        template_nii=snakemake.params["refim"],
+        template_path_or_dir=snakemake.input["refim"],
         matfile_path=snakemake.input["optional_matrix"],
         warpfile_path=snakemake.input["warp"]
     )

@@ -147,6 +147,13 @@ parse_args:
     default: false
     required: false
 
+  --template-flow:
+    help: 'Downloads a template from templateflow and uses it to assess the quality of registration.'
+    choices: ['MNI152Lin', 'MNI152NLin2009cAsym', 'MNI152NLin6Sym', 'OASIS30ANTs', 'MNI152NLin2009cSym', 'MNI305', 'fsaverage', 'MNI152NLin2009bSym',  'MNI152NLin6Asym','MNIColin27']
+    default: false
+    required: false
+    type: str
+
   --fidqc:
     help: 'Generate *.html files for QC of AutoAFIDs outputs. (default: %(default)s)'
     dest: "fidqc"
