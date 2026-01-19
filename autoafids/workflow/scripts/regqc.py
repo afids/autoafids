@@ -736,8 +736,8 @@ def generate_afid_qc_dashboard(
                             f'tpl-{template_name}_res-01_T1w.nii.gz')
     else:
         template_nii = template_path_or_dir
-        
-    
+
+
     error_df.to_csv(output_csv_path, index=False)
     heatmap_html = make_toggleable_heatmap([dx, dy, dz, ed], afid_ids)
     scatter_html = make_3d_plot(gt_coords, pred_coords, afid_ids)
