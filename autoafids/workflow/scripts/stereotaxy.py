@@ -204,11 +204,13 @@ def fids_to_fcsv(fids, fcsv_template, fcsv_output):
     with open(fcsv_output, "w") as f:
         f.write("\n".join(line for line in fcsv))
 
+
 def make_zero(num, threshold=0.0001):
     if abs(num) < threshold:
         return 0
     else:
         return num
+
 
 def mcp_origin(df_afids):
     """
@@ -240,6 +242,7 @@ def mcp_origin(df_afids):
     return df_afids_ori_mcp, (
         np.array([mcp_x.to_numpy(), mcp_y.to_numpy(), mcp_z.to_numpy()])
     )
+
 
 def get_fiducial_index(fid):
     """
@@ -278,7 +281,7 @@ def fcsvtodf(fcsv_path):
     try:
         subject_id = re.search(r"(sub-\w+)", fcsv_path).group(1)
     except Exception as e:
-       print("no subject id found")
+        print("no subject id found")
 
     # Read in .fcsv file, skip header
     df_raw = pd.read_table(fcsv_path, sep=",", header=2)
@@ -303,6 +306,7 @@ def fcsvtodf(fcsv_path):
     df_xyz_clean = df_xyz_clean.astype(float)
 
     return df_xyz_clean, df_raw.shape[0]
+
 
 def compute_distance(fcsv_path, fid1, fid2):
     """
@@ -334,6 +338,7 @@ def compute_distance(fcsv_path, fid1, fid2):
     distance = np.linalg.norm(xyz_diff)
 
     return xyz_diff.flatten(), distance
+
 
 def compute_average(fcsv_path, fid1, fid2):
     """
@@ -400,11 +405,7 @@ def generate_slicer_file(matrix, filename):
 
 
 def acpcmatrix(
-    fcsv_path,
-    midline,
-    center_on_mcp=False,
-    write_matrix=True,
-    transform_file_name=None
+    fcsv_path, midline, center_on_mcp=False, write_matrix=True, transform_file_name=None
 ):
     """
     Computes a 4x4 transformation matrix aligning with the AC-PC axis.
@@ -509,11 +510,11 @@ def transform_afids(fcsv_path, slicer_tfm, midpoint):
         fcsv_df.loc[:, "z"] = tcoords[:, 2]
     else:
         raise ValueError(
-            "New coordinates do not match " +
-            "the number of rows in the original fcsv."
+            "New coordinates do not match " + "the number of rows in the original fcsv."
         )
 
     return fcsv_df, xfm_txt
+
 
 def model_pred(
     in_fcsv: str,
@@ -584,11 +585,9 @@ def model_pred(
     num_cols = df_sub_mcp.select_dtypes(include="number")
     cols_to_modify = (num_cols > -0.0001).all() & (num_cols < 0.0001).all()
 
-    df_sub_mcp.loc[:, cols_to_modify] = (
-        df_sub_mcp.loc[:, cols_to_modify]
-        .applymap(make_zero)
+    df_sub_mcp.loc[:, cols_to_modify] = df_sub_mcp.loc[:, cols_to_modify].applymap(
+        make_zero
     )
-
 
     # Load the trained model components from the pickle file
     with open(model, "rb") as file:
@@ -604,11 +603,7 @@ def model_pred(
     df_sub_mcp = pca.transform(df_sub_mcp)
 
     # Make predictions using Ridge regression models for x, y, z coordinates
-    y_sub = np.column_stack(
-        [
-            ridge.predict(df_sub_mcp) for ridge in ridge_inference
-        ]
-        )
+    y_sub = np.column_stack([ridge.predict(df_sub_mcp) for ridge in ridge_inference])
 
     # Adjust the second predicted x-coordinate to reflect the left hemisphere
     y_sub[1, 0] *= -1

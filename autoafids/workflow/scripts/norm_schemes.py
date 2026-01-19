@@ -35,12 +35,7 @@ def normalize(method, input_im, output_im):
     elif method == "zscore":
         nii_data_normalized = (nii_data - nii_data.mean()) / (nii_data.std())
 
-    nib.save(
-        nib.Nifti1Image(
-            nii_data_normalized,
-            affine=nii_affine), output_im
-            )
-
+    nib.save(nib.Nifti1Image(nii_data_normalized, affine=nii_affine), output_im)
 
 
 normalize(
