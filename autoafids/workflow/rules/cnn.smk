@@ -25,7 +25,7 @@ rule applyfidmodel:
                 datatype="normalize",
                 desc=chosen_norm_method,
                 suffix="T1w.nii.gz",
-                **inputs[config["modality"]].wildcards,
+                **inputs[config["modality"]].wildcards
             )
             if config["modality"] != "T1w"
             else bids(
@@ -34,7 +34,7 @@ rule applyfidmodel:
                 desc=chosen_norm_method,
                 res=config["res"],
                 suffix="T1w.nii.gz",
-                **inputs[config["modality"]].wildcards,
+                **inputs[config["modality"]].wildcards
             )
         ),
         prior=bids(
@@ -52,13 +52,13 @@ rule applyfidmodel:
             datatype="afids-cnn",
             desc="afidscnn",
             suffix="afids.fcsv",
-            **inputs[config["modality"]].wildcards,
+            **inputs[config["modality"]].wildcards
         ),
     log:
         bids(
             root="logs",
             suffix="landmark.log",
-            **inputs[config["modality"]].wildcards,
+            **inputs[config["modality"]].wildcards
         ),
     conda:
         "../envs/tensorflow.yaml"

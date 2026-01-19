@@ -16,10 +16,25 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Setup Pixi environment
-        uses: prefix-dev/setup-pixi@v0.8.14
+      - name: Setup Miniforge and mamba
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          activate-environment: true
+          miniforge-variant: Miniforge3
+          miniforge-version: latest
+          mamba-version: '*'
+          use-mamba: true
+          conda-solver: libmamba
+          auto-activate-base: true
+      - name: Create environment with snakebids
+        run: |
+          mamba create -n snakebids-env snakebids scikit-learn pandas -c bioconda -c conda-forge -y
+      - name: Cache Snakemake Conda environments
+        uses: actions/cache@v4
+        with:
+          path: test_data/autoafids_cache_dir/conda
+          key: conda-env-${{ hashFiles('autoafids/workflow/envs/*.yaml') }}
+          restore-keys: |
+            conda-env-
       - name: Restore cached CNN model
         uses: actions/cache@v4
         with:
@@ -31,16 +46,19 @@ jobs:
       - name: Run wet-run test for T1w modality
         shell: bash -l {0}
         run: |
+          conda activate snakebids-env
           ./autoafids/run.py test_data/bids_wetrun_testing/bids_T1w test_out participant \
             --cores all --force-output --stereotaxy STN --fidqc --conda-frontend mamba | tee autoafids_output.log
       - name: Model accuracy check
         shell: bash -l {0}
         run: |
+          conda activate snakebids-env
           python ./tests/test_fcsv_output.py \
             --autoafids_fcsv ./test_out/sub-001/afids-cnn/*.fcsv \
             --baseline_fcsv ./test_data/bids_wetrun_testing/bids_T1w/sub-001/anat/sub-001*.fcsv | tee test_fcsv_output.log
       - name: Run wet-run test for T2w modality
         shell: bash -l {0}
         run: |-
+          conda activate snakebids-env
           ./autoafids/run.py test_data/bids_wetrun_testing/bids_T2w test_out participant \
             --modality T2w --cores all --force-output --conda-frontend mamba

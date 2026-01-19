@@ -97,7 +97,8 @@ def generate_html_with_keypress(
 
     for label, images in subject_images.items():
         num_slices = len(images)
-        has_reference = reference_images is not None and label in reference_images
+        has_reference = ( reference_images is not None
+                         and label in reference_images )
 
         html_content += f"""
         <div class="container">
@@ -118,7 +119,10 @@ def generate_html_with_keypress(
     """
 
     for label, images in subject_images.items():
-        has_reference = reference_images is not None and label in reference_images
+        has_reference = (
+            reference_images is not None
+            and label in reference_images
+              )
         html_content += f"""
             subjects["{label}"] = {{
                 targetImages: {images},
@@ -165,12 +169,19 @@ def generate_html_with_keypress(
         f.write(html_content)
 
 
-def save_single_slice_in_memory(data, x, y, z, offset, zoom_radius, show_crosshairs):
+def save_single_slice_in_memory(
+        data, x, y, z,
+        offset,
+        zoom_radius,
+        show_crosshairs
+    ):
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 
     for i, (slice_data, coord, title) in enumerate(
         zip(
-            [data[x + offset, :, :], data[:, y + offset, :], data[:, :, z + offset]],
+            [data[x + offset, :, :],
+            data[:, y + offset, :],
+            data[:, :, z + offset]],
             [(y, z), (x, z), (x, y)],
             ["Sagittal", "Coronal", "Axial"],
         )
@@ -192,13 +203,18 @@ def save_single_slice_in_memory(data, x, y, z, offset, zoom_radius, show_crossha
     return base64.b64encode(buffer.read()).decode()
 
 
-def save_mri_slices_as_images(data, x, y, z, jitter, zoom_radius, show_crosshairs=True):
+def save_mri_slices_as_images(
+        data, x, y, z,
+        jitter,
+        zoom_radius,
+        show_crosshairs=True):
     return Parallel(n_jobs=-1)(
         delayed(save_single_slice_in_memory)(
             data, x, y, z, offset, zoom_radius, show_crosshairs
         )
         for offset in range(-jitter, jitter + 1)
     )
+
 
 
 def extract_coordinates_from_fcsv(file_path, label_description):
