@@ -372,37 +372,43 @@ rule all:
                 **inputs[config["modality"]].wildcards,
             ),
         ),
-        fidqc=inputs[config["modality"]].expand(
-            bids(
-                root=root,
-                datatype="fidqc",
-                desc="fidqc",
-                suffix="afids.html",
-                **inputs[config["modality"]].wildcards
+        fidqc=(
+            inputs[config["modality"]].expand(
+                bids(
+                    root=root,
+                    datatype="fidqc",
+                    desc="fidqc",
+                    suffix="afids.html",
+                    **inputs[config["modality"]].wildcards,
+                )
             )
-        )
-        if config["fidqc"]
-        else [],
-        regqc=inputs[config["modality"]].expand(
-            bids(
-                root=root,
-                datatype="regqc",
-                desc="reg",
-                suffix="qc.html",
-                **inputs[config["modality"]].wildcards
+            if config["fidqc"]
+            else []
+        ),
+        regqc=(
+            inputs[config["modality"]].expand(
+                bids(
+                    root=root,
+                    datatype="regqc",
+                    desc="reg",
+                    suffix="qc.html",
+                    **inputs[config["modality"]].wildcards,
+                )
             )
-        )
-        if config["LEAD_DBS_DIR"] or config["FMRIPREP_DIR"]
-        else [],
-        afidspred=inputs[config["modality"]].expand(
-            bids(
-                root=root,
-                datatype="stereotaxy",
-                desc=stereotaxy_target,
-                suffix="native.fcsv",
-                **inputs[config["modality"]].wildcards
+            if config["LEAD_DBS_DIR"] or config["FMRIPREP_DIR"]
+            else []
+        ),
+        afidspred=(
+            inputs[config["modality"]].expand(
+                bids(
+                    root=root,
+                    datatype="stereotaxy",
+                    desc=stereotaxy_target,
+                    suffix="native.fcsv",
+                    **inputs[config["modality"]].wildcards,
+                )
             )
-        )
-        if config["stereotaxy"]
-        else [],
+            if config["stereotaxy"]
+            else []
+        ),
     default_target: True

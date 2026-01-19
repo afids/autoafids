@@ -146,7 +146,7 @@ rule regqc:
             datatype="afids-cnn",
             desc="afidscnn",
             suffix="afids.fcsv",
-            **inputs[config["modality"]].wildcards
+            **inputs[config["modality"]].wildcards,
         ),
         im=lambda wildcards: get_resampled_im(wildcards.subject),
         warp=lambda wildcards: get_warp_path(wildcards.subject),
@@ -161,21 +161,21 @@ rule regqc:
             datatype="regqc",
             desc="reg",
             suffix="qc.html",
-            **inputs[config["modality"]].wildcards
+            **inputs[config["modality"]].wildcards,
         ),
         csv=bids(
             root=root,
             datatype="regqc",
             desc="reg",
             suffix="qc.csv",
-            **inputs[config["modality"]].wildcards
+            **inputs[config["modality"]].wildcards,
         ),
         fcsv=bids(
             root=root,
             datatype="regqc",
             desc="reg",
             suffix="afids.fcsv",
-            **inputs[config["modality"]].wildcards
+            **inputs[config["modality"]].wildcards,
         ),
     params:
         template=template_name,
