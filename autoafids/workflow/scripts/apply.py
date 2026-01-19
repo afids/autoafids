@@ -303,7 +303,7 @@ def process_distances(
     try:
         new = skimage.measure.regionprops(thresholded)
     except MemoryError:
-        new=None
+        new = None
     if not new:
         print("No centroid found for this afid. Results may be suspect.")
         return np.array(
