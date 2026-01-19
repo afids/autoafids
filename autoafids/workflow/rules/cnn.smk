@@ -13,7 +13,7 @@ rule download_cnn_model:
         ),
     shell:
         "wget https://{params.url} -O model.zip && "
-        " unzip -q -d {output.unzip_dir} model.zip || true && "
+        " unzip -q -d {output.unzip_dir} model.zip && "
         " rm model.zip"
 
 
