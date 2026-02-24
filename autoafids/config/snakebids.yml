@@ -180,6 +180,40 @@ parse_args:
     default: work
     type: str
 
+  --detect_with_prior:
+    help: |
+      (Default) Use MNI-registered prior FCSV to place 5 patches around the
+      expected AFID location.  Fast and accurate when a good MNI registration
+      is available.
+    dest: detect_mode
+    action: store_const
+    const: prior
+    default: prior
+
+  --detect_without_prior:
+    help: |
+      Use whole-volume sliding-window inference — no prior registration needed.
+      Slower (scans the full image) but does not depend on MNI registration
+      quality.  Overlap is controlled by --inference-overlap (default 0.5).
+    dest: detect_mode
+    action: store_const
+    const: noprior
+
+  --inference-overlap:
+    help: |
+      Sliding-window overlap for --detect_without_prior (0.0 = no overlap,
+      0.5 = 50%% overlap, 0.75 = 75%% overlap). Lower = fewer patches = faster.
+      Overrides afids_inference.overlap in snakebids.yml. (default: 0.5)
+    dest: inference_overlap
+    type: float
+
+  --inference-batch-size:
+    help: |
+      Number of patches per model forward pass. Larger = faster but more memory.
+      Overrides afids_inference.batch_size in snakebids.yml. (default: 7)
+    dest: inference_batch_size
+    type: int
+
 #--- workflow specific configuration ---
 
 # Nifti template
@@ -199,10 +233,56 @@ singularity:
 resource_urls:
   default: 'files.osf.io/v1/resources/9fptg/providers/osfstorage/?zip='
 
+# Sequential inference configuration
+enable_sequential_inference: False
+
 #Stereotaxy models 
 STN: 'resources/stereotaxy/STN.pkl'
 cZI: 'resources/stereotaxy/STN.pkl' #change to czi model but dummy here for testing
 template_fcsv: 'resources/stereotaxy/target_template.fcsv'
+
+# -----------------------------------------------------------------------
+# PyTorch nnUNet inference configuration (used by apply_with_prior.py)
+# Set one checkpoint path per fiducial (afid_01 … afid_32).
+# patch_size, batch_size, and device are optional (defaults shown).
+# -----------------------------------------------------------------------
+afids_inference:
+  checkpoints:
+    afid_01: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'
+    afid_02: 'resources/afids_cnn_ckpts/afid-02_epoch-964_mae-0.0007.ckpt'
+    afid_03: 'resources/afids_cnn_ckpts/afid-03_epoch-778_mae-0.0008.ckpt'
+    afid_04: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_05: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_06: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_07: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_08: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_09: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_10: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_11: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_12: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_13: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_14: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_15: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_16: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_17: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_18: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_19: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_20: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_21: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_22: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_23: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_24: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_25: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_26: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_27: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_28: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_29: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_30: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_31: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_32: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+  patch_size: 64      # cubic patch size in voxels
+  device: cuda:0       # cpu recommended for parallel mode; cuda:0 for sequential
+  overlap: 0.5        # sliding-window overlap for --detect_without_prior (0.0–0.75)
 
 plugins.validator.skip: False
 root: results

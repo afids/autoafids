@@ -1,7 +1,15 @@
 import snakebids
-from snakebids import bids, generate_inputs, get_wildcard_constraints
+from snakebids import bids, generate_inputs, get_wildcard_constraints, set_bids_spec
 from appdirs import AppDirs
 import warnings
+
+# Suppress snakebids "unrecognized entity" warnings for the {afid} wildcard
+warnings.filterwarnings(
+    "ignore",
+    message="Path generated with unrecognized entities",
+    category=UserWarning,
+)
+set_bids_spec("v0_0_0")
 
 try:
     from autoafids.workflow.lib import (
@@ -345,6 +353,10 @@ rule mni2subfids:
         "scripts/tform_script.py"
 
 
+# If running on GPU, automatically enable sequential inference to avoid spawning 32 parallel jobs
+if config.get("afids_inference", {}).get("device") == "cuda:0":
+    config["enable_sequential_inference"] = True
+
 include: "rules/cnn.smk"
 
 
@@ -360,13 +372,24 @@ if config["LEAD_DBS_DIR"] or config["FMRIPREP_DIR"]:
     include: "rules/regqc.smk"
 
 
+
+# Select the correct FCSV output based on inference mode.
+# Prior mode  → applyfidmodel_gather        → desc="afidscnn"
+# Noprior mode → applyfidmodel_noprior_gather → desc="afidscnn-noprior"
+_fcsv_desc = (
+    "afidscnn"
+    if config.get("detect_mode", "prior") == "prior"
+    else "afidscnn-noprior"
+)
+
+
 rule all:
     input:
         models=inputs[config["modality"]].expand(
             bids(
                 root=root,
                 datatype="afids-cnn",
-                desc="afidscnn",
+                desc=_fcsv_desc,
                 suffix="afids.fcsv",
                 **inputs[config["modality"]].wildcards,
             ),
@@ -416,3 +439,4 @@ rule all:
             else []
         ),
     default_target: True
+
