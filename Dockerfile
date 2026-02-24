@@ -17,11 +17,11 @@ RUN set -e && \
     mamba create -y -n snakebids-env -c conda-forge -c bioconda snakebids unzip && \
     source /opt/conda/etc/profile.d/conda.sh && \
     conda activate snakebids-env && \
-    ./autoafids/run.py test_data/bids_T1w test_out participant --participant-label 001 --use-conda --conda-create-envs-only --cores all --conda-prefix /src/conda-envs && \
+    ./autoafids/run.py test_data/bids_T1w test_out participant --participant-label 002 --use-conda --conda-create-envs-only --cores all --conda-prefix /src/conda-envs && \
     ./autoafids/run.py test_data/bids_T2w test_out participant --modality T2w --use-conda --conda-create-envs-only --cores all --conda-prefix /src/conda-envs && \
     ./autoafids/run.py test_data/bids_ct test_out participant --modality ct --use-conda --conda-create-envs-only --cores all --conda-prefix /src/conda-envs && \
-    ./autoafids/run.py test_data/bids_T1w test_out participant --participant-label 001 --stereotaxy STN --use-conda --conda-create-envs-only --cores all --conda-prefix /src/conda-envs && \
-    ./autoafids/run.py test_data/bids_T1w test_out participant --participant-label 001 --fidqc --use-conda --conda-create-envs-only --cores all --conda-prefix /src/conda-envs && \
+    ./autoafids/run.py test_data/bids_T1w test_out participant --participant-label 002 --stereotaxy STN --use-conda --conda-create-envs-only --cores all --conda-prefix /src/conda-envs && \
+    ./autoafids/run.py test_data/bids_T1w test_out participant --participant-label 002 --fidqc --use-conda --conda-create-envs-only --cores all --conda-prefix /src/conda-envs && \
     conda clean --all -y && \
     rm -rf /opt/conda/pkgs /root/.caches
 
