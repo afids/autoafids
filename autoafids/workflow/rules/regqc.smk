@@ -183,3 +183,45 @@ rule regqc:
         "../envs/regqc.yaml"
     script:
         "../scripts/regqc.py"
+
+
+rule regqc_summary:
+    input:
+        csvs=inputs[config["modality"]].expand(
+            bids(
+                root=root,
+                datatype="regqc",
+                desc="reg",
+                suffix="qc.csv",
+                **inputs[config["modality"]].wildcards,
+            )
+        ),
+        htmls=inputs[config["modality"]].expand(
+            bids(
+                root=root,
+                datatype="regqc",
+                desc="reg",
+                suffix="qc.html",
+                **inputs[config["modality"]].wildcards,
+            )
+        ),
+        fcsvs=inputs[config["modality"]].expand(
+            bids(
+                root=root,
+                datatype="regqc",
+                desc="reg",
+                suffix="afids.fcsv",
+                **inputs[config["modality"]].wildcards,
+            )
+        ),
+    output:
+        summary_html=os.path.join(
+            root, "dataset", "regqc", "dataset_desc-reg_qc_summary.html"
+        ),
+    params:
+        gt_fcsv=lambda wildcards: get_ref_paths()[1],
+    conda:
+        "../envs/regqc.yaml"
+    script:
+        "../scripts/regqc_summary.py"
+
