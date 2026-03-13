@@ -199,6 +199,39 @@ parse_args:
     action: store_const
     const: noprior
 
+  --detect_with_nnlm:
+    help: |
+      Use nnLandmark (nnLM) for whole-volume, single-pass AFID detection.
+      All 32 AFIDs are predicted in one nnU-Net forward pass.
+      The model is downloaded automatically on first use.
+    dest: detect_mode
+    action: store_const
+    const: nnlm
+
+  --nnlm_fold:
+    help: "nnLM fold to use for prediction. (default: %(default)s)"
+    dest: nnlm_fold
+    default: "0"
+    type: str
+
+  --nnlm_plans:
+    help: "nnLM plans identifier. (default: %(default)s)"
+    dest: nnlm_plans
+    default: "nnUNetResEncUNetMPlans"
+    type: str
+
+  --nnlm_checkpoint:
+    help: "nnLM checkpoint filename inside the model folder. (default: %(default)s)"
+    dest: nnlm_checkpoint
+    default: "checkpoint_final.pth"
+    type: str
+
+  --nnlm_device:
+    help: "Device for nnLM inference: cuda or cpu. (default: %(default)s)"
+    dest: nnlm_device
+    default: "cpu"
+    type: str
+
   --inference-overlap:
     help: |
       Sliding-window overlap for --detect_without_prior (0.0 = no overlap,
@@ -232,6 +265,9 @@ singularity:
 # It will be downloaded to ~/.cache/autoafids
 resource_urls:
   default: 'files.osf.io/v1/resources/9fptg/providers/osfstorage/?zip='
+  # nnLM model checkpoint (whole-volume 32-AFID nnLandmark model)
+  # TODO: Replace with the actual OSF/Zenodo URL when the model is published
+  nnlm: 'https://zenodo.org/records/18991189/files/nnlm_model.zip'
 
 # Sequential inference configuration
 enable_sequential_inference: False

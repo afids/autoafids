@@ -353,11 +353,16 @@ rule mni2subfids:
         "scripts/tform_script.py"
 
 
-# If running on GPU, automatically enable sequential inference to avoid spawning 32 parallel jobs
-if config.get("afids_inference", {}).get("device") == "cuda:0":
-    config["enable_sequential_inference"] = True
-
-include: "rules/cnn.smk"
+# ── Detection mode: choose rules to include ──────────────────────────────
+if config.get("detect_mode", "prior") == "nnlm":
+    # nnLandmark mode: single-pass whole-volume detection
+    include: "rules/nnlm.smk"
+else:
+    # Legacy CNN modes (prior / noprior)
+    # If running on GPU, automatically enable sequential inference to avoid spawning 32 parallel jobs
+    if config.get("afids_inference", {}).get("device") == "cuda:0":
+        config["enable_sequential_inference"] = True
+    include: "rules/cnn.smk"
 
 
 if config["fidqc"]:
@@ -373,14 +378,15 @@ if config["LEAD_DBS_DIR"] or config["FMRIPREP_DIR"]:
 
 
 
-# Select the correct FCSV output based on inference mode.
-# Prior mode  → applyfidmodel_gather        → desc="afidscnn"
-# Noprior mode → applyfidmodel_noprior_gather → desc="afidscnn-noprior"
-_fcsv_desc = (
-    "afidscnn"
-    if config.get("detect_mode", "prior") == "prior"
-    else "afidscnn-noprior"
-)
+# Select the correct FCSV output descriptor based on inference mode.
+# prior   → applyfidmodel_gather          → desc="afidscnn"
+# noprior → applyfidmodel_noprior_gather  → desc="afidscnn-noprior"
+# nnlm    → nnlm_to_fcsv                 → desc="afidscnn-nnlm"
+_fcsv_desc = {
+    "prior": "afidscnn",
+    "noprior": "afidscnn-noprior",
+    "nnlm": "afidscnn-nnlm",
+}.get(config.get("detect_mode", "prior"), "afidscnn")
 
 
 rule all:
