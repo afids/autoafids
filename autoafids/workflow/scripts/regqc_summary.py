@@ -24,7 +24,6 @@ import plotly.graph_objects as go
 import plotly.io as pio
 from jinja2 import Template
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -283,7 +282,7 @@ def make_subject_bar(subject_stats: pd.DataFrame) -> str:
 def make_3d_landmark_scatter(
         subject_fcsvs: list,
         gt_coords: np.ndarray = None,
-        gt_labels: list = None,
+        gt_labels: list | None = None,
 ) -> str:
     """Interactive 3D scatter of all subjects' AFIDs in MNI space.
 
@@ -463,7 +462,7 @@ def make_decomposition_bar(decomp_df: pd.DataFrame) -> str:
     ))
     fig.add_trace(go.Bar(
         x=labels, y=df["scatter_rms"],
-        name="Random Scatter σ",
+        name="Random Scatter o",
         marker_color="rgb(49,130,189)",
         hovertemplate="%{x}<br>Scatter = %{y:.2f} mm<extra></extra>",
     ))
@@ -759,9 +758,9 @@ def render_summary_html(
         output_path: str,
         long_df: pd.DataFrame,
         output_dir: str,
-        subject_fcsvs: list = None,
+        subject_fcsvs: list | None = None,
         gt_coords: np.ndarray = None,
-        gt_labels: list = None,
+        gt_labels: list | None = None,
 ) -> str:
     """Build and write the dataset summary HTML file."""
 
