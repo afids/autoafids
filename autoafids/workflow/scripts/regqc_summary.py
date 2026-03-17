@@ -297,7 +297,7 @@ def make_3d_landmark_scatter(
     # Ground truth (template) as large green diamonds
     if gt_coords is not None:
         hover = [
-            f"AFID {l}" for l in (gt_labels or range(1, len(gt_coords) + 1))
+            f"AFID {i}" for i in (gt_labels or range(1, len(gt_coords) + 1))
         ]
         fig.add_trace(go.Scatter3d(
             x=gt_coords[:, 0],
@@ -329,7 +329,7 @@ def make_3d_landmark_scatter(
         all_y.extend(sub["coords"][:, 1].tolist())
         all_z.extend(sub["coords"][:, 2].tolist())
         all_hover.extend(
-            f"{sub['subject_label']} — AFID {l}" for l in sub["labels"]
+            f"{sub['subject_label']} — AFID {i}" for i in sub["labels"]
         )
         all_colour.extend([colour] * n)
 
@@ -387,7 +387,7 @@ def make_bias_vector_3d(
         mode="markers",
         name="AFID Location (MNI)",
         marker=dict(size=4, color="#888", opacity=0.6, symbol="diamond"),
-        text=[f"AFID {l}" for l in df["label"]],
+        text=[f"AFID {i}" for i in df["label"]],
         hovertemplate="%{text}<extra>Ground Truth</extra>",
     ))
 
@@ -451,7 +451,7 @@ def make_bias_vector_3d(
 def make_decomposition_bar(decomp_df: pd.DataFrame) -> str:
     """Grouped bar chart: bias magnitude vs scatter (RMS) per AFID."""
     df = decomp_df.sort_values("label")
-    labels = [f"AFID {l}" for l in df["label"]]
+    labels = [f"AFID {i}" for i in df["label"]]
 
     fig = go.Figure()
     fig.add_trace(go.Bar(
@@ -497,14 +497,29 @@ SUMMARY_TEMPLATE = Template("""\
       margin: 0; padding: 0;
     }
     header {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+      background: linear-gradient(
+            135deg,
+            #1a1a2e 0%,
+            #16213e 60%,
+            #0f3460 100%
+          );
       color: white;
       padding: 36px 48px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.2);
     }
-    header h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 0.5px; }
-    header p  { margin: 6px 0 0; font-size: 14px; color: rgba(255,255,255,0.7); }
-    .container { padding: 36px 48px; max-width: 1500px; margin: auto; }
+    header h1 { margin: 0;
+                font-size: 28px;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+              }
+    header p  { margin: 6px 0 0;
+                font-size: 14px;
+                color: rgba(255,255,255,0.7);
+              }
+    .container { padding: 36px 48px;
+                 max-width: 1500px;
+                 margin: auto;
+                }
     .card {
       background: white;
       border-radius: 14px;
@@ -526,7 +541,12 @@ SUMMARY_TEMPLATE = Template("""\
     }
     .tile:hover { background: #e2e6ea; }
     .tile-label { font-size: 13px; font-weight: 500; color: #666; }
-    .tile-value { font-size: 22px; font-weight: 700; color: #111; margin-top: 4px; }
+    .tile-value {
+                  font-size: 22px;
+                  font-weight: 700;
+                  color: #111;
+                  margin-top: 4px;
+                }
     table {
       width: 100%; border-collapse: collapse; font-size: 14px;
     }
@@ -560,7 +580,10 @@ SUMMARY_TEMPLATE = Template("""\
 <body>
 <header>
   <h1>AutoAFIDs — Dataset Registration QC</h1>
-  <p>{{ n_subjects }} subjects &nbsp;|&nbsp; {{ n_afids }} AFIDs per subject</p>
+  <p>
+    {{ n_subjects }} subjects &nbsp;|&nbsp;
+    {{ n_afids }} AFIDs per subject
+  </p>
 </header>
 <div class="container">
 
@@ -614,14 +637,17 @@ SUMMARY_TEMPLATE = Template("""\
         <tr>
           <td><code>{{ row.subject_label }}</code></td>
           <td>
-            <span class="badge {{ row.badge }}">{{ "%.2f"|format(row.mean_ED) }}</span>
+            <span class="badge {{ row.badge }}">
+                            {{ "%.2f"|format(row.mean_ED) }}
+            </span>
           </td>
           <td>{{ "%.2f"|format(row.median_ED) }}</td>
           <td>{{ "%.2f"|format(row.max_ED) }}</td>
           <td>AFID {{ row.worst_afid }}</td>
           <td>
             {% if row.html_relpath %}
-            <a class="report-link" href="{{ row.html_relpath }}" target="_blank">
+            <a class="report-link"
+              href="{{ row.html_relpath }}" target="_blank">
               Open ↗
             </a>
             {% else %}
@@ -636,13 +662,17 @@ SUMMARY_TEMPLATE = Template("""\
 
   <!-- ── Heatmap ── -->
   <div class="card">
-    <div class="section-title">Registration Error Heatmap (Subjects x AFIDs)</div>
+    <div class="section-title">
+    Registration Error Heatmap (Subjects x AFIDs)
+    </div>
     <div class="plot-wrap">{{ heatmap_html | safe }}</div>
   </div>
 
   <!-- ── AFID Boxplots ── -->
   <div class="card">
-    <div class="section-title">ED Distribution per AFID (across subjects)</div>
+    <div class="section-title">
+      ED Distribution per AFID (across subjects)
+    </div>
     <div class="plot-wrap">{{ boxplot_html | safe }}</div>
   </div>
 
@@ -667,13 +697,18 @@ SUMMARY_TEMPLATE = Template("""\
   <!-- ── Error Decomposition ── -->
   {% if decomp_html %}
   <div class="card">
-    <div class="section-title">Error Decomposition: Systematic Bias vs Random Scatter</div>
+    <div class="section-title">
+    Error Decomposition: Systematic Bias vs Random Scatter
+    </div>
     <p style="color:#666;font-size:13px;margin-top:-10px;margin-bottom:14px;">
       Registration error at each AFID is decomposed into a <strong>systematic
       bias</strong> (mean signed error vector, consistent across subjects —
       shown in <span style="color:#d73027;font-weight:600">red</span>) and
       <strong>random scatter</strong> (standard deviation, varies between
-      subjects — shown in <span style="color:#3182bd;font-weight:600">blue</span>).
+      subjects — shown in
+      <span style="color:#3182bd;font-weight:600">
+                            blue
+      </span>).
       Systematic bias is potentially correctable; random scatter represents
       the precision floor of the registration.
     </p>
@@ -686,7 +721,9 @@ SUMMARY_TEMPLATE = Template("""\
       </div>
       <div class="tile">
         <div class="tile-label">Overall Scatter (mean)</div>
-        <div class="tile-value">{{ "%.2f"|format(decomp_scatter_mean) }} mm</div>
+        <div class="tile-value">
+          {{ "%.2f"|format(decomp_scatter_mean) }} mm
+        </div>
       </div>
       <div class="tile">
         <div class="tile-label">Systematic Fraction</div>
@@ -694,11 +731,17 @@ SUMMARY_TEMPLATE = Template("""\
       </div>
       <div class="tile">
         <div class="tile-label">Most Biased AFID</div>
-        <div class="tile-value">AFID {{ decomp_worst_bias_afid }} ({{ "%.2f"|format(decomp_worst_bias_val) }} mm)</div>
+        <div class="tile-value">
+        AFID {{ decomp_worst_bias_afid }}
+        ({{ "%.2f"|format(decomp_worst_bias_val) }} mm)
+        </div>
       </div>
       <div class="tile">
         <div class="tile-label">Most Variable AFID</div>
-        <div class="tile-value">AFID {{ decomp_worst_scatter_afid }} ({{ "%.2f"|format(decomp_worst_scatter_val) }} mm)</div>
+        <div class="tile-value">
+        AFID {{ decomp_worst_scatter_afid }}
+        ({{ "%.2f"|format(decomp_worst_scatter_val) }} mm)
+        </div>
       </div>
     </div>
 
