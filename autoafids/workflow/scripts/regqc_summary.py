@@ -8,7 +8,7 @@ Columns expected in each CSV:
 Output: one self-contained HTML file with:
   - Dataset stats tiles
   - Subject summary table with hyperlinks to individual reports
-  - Heatmap: subjects × AFIDs coloured by ED
+  - Heatmap: subjects x AFIDs coloured by ED
   - Boxplot: ED distribution per AFID across subjects
   - Bar chart: mean ED per subject (sorted, worst first)
   - 3D scatter: all subjects' AFIDs in MNI space vs ground truth
@@ -192,7 +192,7 @@ def compute_error_decomposition(
 
 def make_heatmap(long_df: pd.DataFrame) -> str:
     """
-    Subjects (rows) × AFIDs (cols), colour = ED (mm).
+    Subjects (rows) x AFIDs (cols), colour = ED (mm).
     Rows sorted by mean ED descending (worst on top).
     """
     pivot = long_df.pivot_table(
@@ -212,7 +212,7 @@ def make_heatmap(long_df: pd.DataFrame) -> str:
         ),
     ))
     fig.update_layout(
-        title="Registration Error (ED mm) — Subjects × AFIDs",
+        title="Registration Error (ED mm) — Subjects x AFIDs",
         height=max(300, 30 * len(pivot)),
         margin=dict(t=50, b=40, l=160, r=20),
         template="plotly_white",
@@ -637,7 +637,7 @@ SUMMARY_TEMPLATE = Template("""\
 
   <!-- ── Heatmap ── -->
   <div class="card">
-    <div class="section-title">Registration Error Heatmap (Subjects × AFIDs)</div>
+    <div class="section-title">Registration Error Heatmap (Subjects x AFIDs)</div>
     <div class="plot-wrap">{{ heatmap_html | safe }}</div>
   </div>
 
@@ -797,7 +797,7 @@ def render_summary_html(
     subject_stats["html_relpath"] = subject_stats["html_path"].apply(_relpath)
     subject_stats["badge"] = subject_stats["mean_ED"].apply(_ed_badge)
 
-    # Dataset-level stats (all subjects × all AFIDs)
+    # Dataset-level stats (all subjects x all AFIDs)
     all_ed = long_df["ED (mm)"]
     dataset_mean   = float(all_ed.mean())
     dataset_median = float(all_ed.median())
