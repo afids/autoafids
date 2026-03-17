@@ -224,4 +224,3 @@ rule regqc_summary:
         "../envs/regqc.yaml"
     script:
         "../scripts/regqc_summary.py"
-
