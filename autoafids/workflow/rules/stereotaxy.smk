@@ -1,6 +1,5 @@
 stereotaxy_target = config["stereotaxy"]
 
-
 rule stereotaxy:
     input:
         afidfcsv=bids(
@@ -36,7 +35,9 @@ rule stereotaxy:
         model=str(Path(workflow.basedir).parent / config[stereotaxy_target]),
         midpoint="PMJ",
         target_fcsv=str(
-            Path(workflow.basedir).parent / config["template_fcsv"]
+            Path(workflow.basedir).parent / (
+                config["cZI_template_fcsv"] if stereotaxy_target == "cZI" else config["template_fcsv"]
+            )
         ),
     conda:
         "../envs/skimage.yaml"
