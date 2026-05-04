@@ -62,6 +62,7 @@ jobs:
         id: build
         run: |
           cd recipe
+          echo $PWD
           OUT=$(conda build . -c conda-forge -c bioconda --output 2>/dev/null)
           echo "PACKAGE_PATH=$OUT" >> $GITHUB_ENV
           conda build . -c conda-forge -c bioconda
