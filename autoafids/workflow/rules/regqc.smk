@@ -215,9 +215,7 @@ rule regqc_summary:
             )
         ),
     output:
-        summary_html=os.path.join(
-            root, "dataset_desc-reg_qc_summary.html"
-        ),
+        summary_html=os.path.join(root, "dataset_desc-reg_qc_summary.html"),
     params:
         gt_fcsv=lambda wildcards: get_ref_paths()[1],
     conda:

@@ -382,11 +382,7 @@ rule all:
         )
         if config["LEAD_DBS_DIR"] or config["FMRIPREP_DIR"]
         else [],
-        regqc_summary=[
-            os.path.join(
-                root, "dataset", "regqc", "dataset_desc-reg_qc_summary.html"
-            )
-        ]
+        regqc_summary=[os.path.join(root, "dataset_desc-reg_qc_summary.html")]
         if config["LEAD_DBS_DIR"] or config["FMRIPREP_DIR"]
         else [],
         afidspred=inputs[config["modality"]].expand(
