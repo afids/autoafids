@@ -25,18 +25,14 @@ jobs:
         with:
           miniforge-variant: Miniforge3
           miniforge-version: latest
-          extra-specs: |
-            conda-build
-            anaconda-client
-            python=3.11
           mamba-version: '*'
           use-mamba: true
           conda-solver: libmamba
           auto-activate-base: true
           clean-conda-cache: true
-      # - name: Install dependencies
-      #   run: |
-      #     mamba install -y -c conda-forge conda-build anaconda-client boa python=3.11
+      - name: Install dependencies
+        run: |
+          mamba install -y -c conda-forge conda-build anaconda-client boa python=3.11
       - name: Get latest commit SHA from main
         id: get_sha
         run: |
