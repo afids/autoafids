@@ -27,11 +27,10 @@ jobs:
           miniforge-version: latest
           mamba-version: '*'
           use-mamba: true
-          conda-solver: libmamba
           auto-activate-base: true
       - name: Install dependencies
         run: |
-          mamba install -y -c conda-forge conda-build anaconda-client boa python=3.11
+          conda install -y -c conda-forge conda-build anaconda-client python=3.11
       - name: Get latest commit SHA from main
         id: get_sha
         run: |
@@ -59,7 +58,7 @@ jobs:
           cd recipe
           OUT=$(conda build . -c conda-forge -c bioconda --output 2>/dev/null)
           echo "PACKAGE_PATH=$OUT" >> $GITHUB_ENV
-          conda mambabuild . -c conda-forge -c bioconda
+          conda build . -c conda-forge -c bioconda
       - name: Upload package to Khanlab channel
         shell: bash -l {0}
         env:
