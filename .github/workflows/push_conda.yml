@@ -13,13 +13,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      # - name: Cache conda build cache
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: /home/runner/miniconda3/conda-bld
-      #     key: ${{ runner.os }}-conda-bld-${{ hashFiles('recipe/meta.yaml') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-conda-bld-
+      - name: Cache conda build cache
+        uses: actions/cache@v3
+        with:
+          path: /home/runner/miniconda3/conda-bld
+          key: ${{ runner.os }}-conda-bld-${{ hashFiles('recipe/meta.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-conda-bld-
       - name: Setup Miniforge and mamba
         uses: conda-incubator/setup-miniconda@v3
         with:
@@ -27,12 +27,10 @@ jobs:
           miniforge-version: latest
           mamba-version: '*'
           use-mamba: true
-          conda-solver: libmamba
           auto-activate-base: true
-          clean-conda-cache: true
       - name: Install dependencies
         run: |
-          mamba install -y -c conda-forge conda-build anaconda-client python=3.11
+          conda install -y -c conda-forge conda-build anaconda-client python=3.11
       - name: Get latest commit SHA from main
         id: get_sha
         run: |
