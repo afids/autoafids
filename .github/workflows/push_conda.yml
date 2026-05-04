@@ -3,7 +3,7 @@
 name: Build and Upload Conda Package
 on:
   push:
-    branches: [main, djay/fix-CI]
+    branches: [main]
   # pull_request:
   #   types: [opened, synchronize, reopened]
   workflow_dispatch:
