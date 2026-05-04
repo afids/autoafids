@@ -8,7 +8,7 @@ try:
     from autoafids.workflow.lib import (
         utils as utils,  # Works when run as a package
     )
-except ImportError:
+except ModuleNotFoundError:
     from workflow.lib import utils as utils  # Works when run directly
 
 if "__file__" not in globals():
