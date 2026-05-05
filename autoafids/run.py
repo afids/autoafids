@@ -25,13 +25,12 @@ app = bidsapp.app(
 conda_prefix = Path(utils.get_download_dir()) / "conda"
 
 # Set templateflow directory
-os.environ['TEMPLATEFLOW_HOME'] = str(
-    Path(utils.get_download_dir()) / "templateflow"
-    )
+os.environ["TEMPLATEFLOW_HOME"] = str(Path(utils.get_download_dir()) / "templateflow")
 
 # Set the environment variable SNAKEMAKE_CONDA_PREFIX if not already set
 if "SNAKEMAKE_CONDA_PREFIX" not in os.environ:
     os.environ["SNAKEMAKE_CONDA_PREFIX"] = str(conda_prefix)
+
 
 def get_parser():
     """Exposes parser for sphinx doc generation, cwd is the docs dir"""
