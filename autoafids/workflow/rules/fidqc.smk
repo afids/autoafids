@@ -5,7 +5,7 @@ rule fidqc:
             datatype="afids-cnn",
             desc="afidscnn",
             suffix="afids.fcsv",
-            **inputs[config["modality"]].wildcards
+            **inputs[config["modality"]].wildcards,
         ),
         im=bids(
             root=str(Path(config["bids_dir"])),
@@ -19,7 +19,7 @@ rule fidqc:
             datatype="fidqc",
             desc="fidqc",
             suffix="afids.html",
-            **inputs[config["modality"]].wildcards
+            **inputs[config["modality"]].wildcards,
         ),
     params:
         refim=str(Path(workflow.basedir).parent / config["templatet1w"]),
