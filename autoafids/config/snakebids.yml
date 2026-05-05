@@ -287,35 +287,35 @@ afids_inference:
     afid_01: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'
     afid_02: 'resources/afids_cnn_ckpts/afid-02_epoch-964_mae-0.0007.ckpt'
     afid_03: 'resources/afids_cnn_ckpts/afid-03_epoch-778_mae-0.0008.ckpt'
-    afid_04: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_05: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_06: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_07: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_08: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_09: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_10: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_11: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_12: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_13: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_14: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_15: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_16: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_17: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_18: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_19: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_20: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_21: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_22: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_23: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_24: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_25: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_26: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_27: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_28: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_29: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_30: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_31: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
-    afid_32: 'resources/afids_cnn_ckpts/afid-01_epoch-820_mae-0.0002.ckpt'  # placeholder
+    afid_04: 'resources/afids_cnn_ckpts/afid-04_epoch-529_mae-0.0007.ckpt'  
+    afid_05: 'resources/afids_cnn_ckpts/afid-05_epoch-628_mae-0.0007.ckpt'  
+    afid_06: 'resources/afids_cnn_ckpts/afid-06_epoch-485_mae-0.0009.ckpt'  
+    afid_07: 'resources/afids_cnn_ckpts/afid-07_epoch-599_mae-0.0008.ckpt'  
+    afid_08: 'resources/afids_cnn_ckpts/afid-08_epoch-455_mae-0.0013.ckpt' 
+    afid_09: 'resources/afids_cnn_ckpts/afid-09_epoch-535_mae-0.0010.ckpt'  
+    afid_10: 'resources/afids_cnn_ckpts/afid-10_epoch-431_mae-0.0009.ckpt'  
+    afid_11: 'resources/afids_cnn_ckpts/afid-11_epoch-735_mae-0.0005.ckpt'  
+    afid_12: 'resources/afids_cnn_ckpts/afid-12_epoch-694_mae-0.0007.ckpt'  
+    afid_13: 'resources/afids_cnn_ckpts/afid-13_epoch-763_mae-0.0006.ckpt'  
+    afid_14: 'resources/afids_cnn_ckpts/afid-14_epoch-405_mae-0.0011.ckpt'  
+    afid_15: 'resources/afids_cnn_ckpts/afid-15_epoch-371_mae-0.0013.ckpt'  
+    afid_16: 'resources/afids_cnn_ckpts/afid-16_epoch-454_mae-0.0012.ckpt'  
+    afid_17: 'resources/afids_cnn_ckpts/afid-17_epoch-291_mae-0.0023.ckpt'  
+    afid_18: 'resources/afids_cnn_ckpts/afid-18_epoch-233_mae-0.0016.ckpt'  
+    afid_19: 'resources/afids_cnn_ckpts/afid-19_epoch-626_mae-0.0011.ckpt'  
+    afid_20: 'resources/afids_cnn_ckpts/afid-20_epoch-720_mae-0.0011.ckpt'  
+    afid_21: 'resources/afids_cnn_ckpts/afid-21_epoch-672_mae-0.0009.ckpt'  
+    afid_22: 'resources/afids_cnn_ckpts/afid-22_epoch-647_mae-0.0008.ckpt'   
+    afid_23: 'resources/afids_cnn_ckpts/afid-23_epoch-656_mae-0.0010.ckpt'   
+    afid_24: 'resources/afids_cnn_ckpts/afid-24_epoch-689_mae-0.0007.ckpt'   
+    afid_25: 'resources/afids_cnn_ckpts/afid-25_epoch-513_mae-0.0013.ckpt'   
+    afid_26: 'resources/afids_cnn_ckpts/afid-26_epoch-784_mae-0.0009.ckpt'  
+    afid_27: 'resources/afids_cnn_ckpts/afid-27_epoch-300_mae-0.0014.ckpt'  
+    afid_28: 'resources/afids_cnn_ckpts/afid-28_epoch-351_mae-0.0009.ckpt'  
+    afid_29: 'resources/afids_cnn_ckpts/afid-29_epoch-394_mae-0.0014.ckpt'  
+    afid_30: 'resources/afids_cnn_ckpts/afid-30_epoch-618_mae-0.0012.ckpt'  
+    afid_31: 'resources/afids_cnn_ckpts/afid-31_epoch-573_mae-0.0009.ckpt'  
+    afid_32: 'resources/afids_cnn_ckpts/afid-32_epoch-561_mae-0.0007.ckpt'  
   patch_size: 64      # cubic patch size in voxels
   device: cuda:0       # cpu recommended for parallel mode; cuda:0 for sequential
   overlap: 0.5        # sliding-window overlap for --detect_without_prior (0.0–0.75)
