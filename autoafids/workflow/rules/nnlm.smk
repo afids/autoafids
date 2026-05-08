@@ -147,7 +147,7 @@ rule nnlm_to_fcsv:
             **inputs[config["modality"]].wildcards,
         ),
     params:
-        fcsv_template=str(Path(workflow.basedir).parent / "resources" / "dummy.fcsv")
+        fcsv_template=str(Path(workflow.basedir).parent / "resources" / "dummy.fcsv"),
     conda:
         "../envs/nibabel.yaml"
     script:

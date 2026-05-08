@@ -32,10 +32,20 @@ warnings.filterwarnings("ignore")
 # ===================================================================
 
 AFIDS_FIELDNAMES = [
-    "id", "x", "y", "z",
-    "ow", "ox", "oy", "oz",
-    "vis", "sel", "lock",
-    "label", "desc", "associatedNodeID",
+    "id",
+    "x",
+    "y",
+    "z",
+    "ow",
+    "ox",
+    "oy",
+    "oz",
+    "vis",
+    "sel",
+    "lock",
+    "label",
+    "desc",
+    "associatedNodeID",
 ]
 
 FCSV_TEMPLATE = (
@@ -93,5 +103,5 @@ for coord_path in snakemake.input.coords:  # noqa: F821
 
 print(f"\n  Writing combined FCSV with {len(afid_coords)} AFIDs...")
 Path(snakemake.output.fcsv).parent.mkdir(parents=True, exist_ok=True)  # noqa: F821
-afids_to_fcsv(afid_coords, snakemake.output.fcsv)                      # noqa: F821
-print(f"  Done → {snakemake.output.fcsv}")                             # noqa: F821
+afids_to_fcsv(afid_coords, snakemake.output.fcsv)  # noqa: F821
+print(f"  Done → {snakemake.output.fcsv}")  # noqa: F821
