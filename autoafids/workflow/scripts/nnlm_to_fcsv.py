@@ -22,17 +22,17 @@ import numpy as np
 
 # ── Load nnLM voxel-space coordinates ────────────────────────────────────────
 with open(snakemake.input.coords_json) as fh:
-    nnlm_raw = json.load(fh)   # {"1": {"coordinates": [x,y,z], ...}, ...}
+    nnlm_raw = json.load(fh)  # {"1": {"coordinates": [x,y,z], ...}, ...}
 
 # ── Load image affine (nibabel i,j,k = slice,row,col) ────────────────────────
 img = nib.load(snakemake.input.t1w)
-affine = img.affine   # 4×4 voxel→RAS matrix
+affine = img.affine  # 4×4 voxel→RAS matrix
 
 # ── Convert voxel → RAS world coords ─────────────────────────────────────────
 # SimpleITK (x,y,z) == (col, row, slice)  →  nibabel (i,j,k) == (slice, row, col)
 afid_world: dict[int, np.ndarray] = {}
 for afid_str, entry in nnlm_raw.items():
-    sx, sy, sz = entry["coordinates"]            # SimpleITK x,y,z
+    sx, sy, sz = entry["coordinates"]  # SimpleITK x,y,z
     # NiBabel expects (x, y, z) index mapping identical to SimpleITK ordering
     nib_ijk = np.array([sx, sy, sz, 1.0])
     # 1) Get RAS world coordinates from the NIfTI affine (this matches true FCSV space)
@@ -43,10 +43,20 @@ for afid_str, entry in nnlm_raw.items():
 fcsv_template = Path(snakemake.params.fcsv_template)
 
 FIELDNAMES = [
-    "id", "x", "y", "z",
-    "ow", "ox", "oy", "oz",
-    "vis", "sel", "lock",
-    "label", "desc", "associatedNodeID",
+    "id",
+    "x",
+    "y",
+    "z",
+    "ow",
+    "ox",
+    "oy",
+    "oz",
+    "vis",
+    "sel",
+    "lock",
+    "label",
+    "desc",
+    "associatedNodeID",
 ]
 
 with fcsv_template.open(encoding="utf-8", newline="") as fh:

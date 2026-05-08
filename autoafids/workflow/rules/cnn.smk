@@ -1,5 +1,6 @@
 # populate the AUTOAFIDS_CACHE_DIR folder as needed
 
+
 rule download_cnn_model:
     params:
         url=config["resource_urls"][config["model"]],
@@ -15,9 +16,11 @@ rule download_cnn_model:
         " unzip -q -d {output.unzip_dir} model.zip && "
         " rm model.zip"
 
+
 _AFIDS = [f"{i:02d}" for i in range(1, 33)]  # ["01", "02", ..., "32"]
 
 if config.get("enable_sequential_inference", False):
+
     rule applyfidmodel_all:
         """Run 5-patch inference for ALL 32 AFIDs using MNI-registered prior location"""
         input:
@@ -27,7 +30,7 @@ if config.get("enable_sequential_inference", False):
                     datatype="normalize",
                     desc=chosen_norm_method,
                     suffix="T1w.nii.gz",
-                    **inputs[config["modality"]].wildcards
+                    **inputs[config["modality"]].wildcards,
                 )
                 if config["modality"] != "T1w"
                 else bids(
@@ -36,7 +39,7 @@ if config.get("enable_sequential_inference", False):
                     desc=chosen_norm_method,
                     res=config["res"],
                     suffix="T1w.nii.gz",
-                    **inputs[config["modality"]].wildcards
+                    **inputs[config["modality"]].wildcards,
                 )
             ),
             prior=bids(
@@ -55,7 +58,8 @@ if config.get("enable_sequential_inference", False):
                     afid=afid,
                     suffix="coord.txt",
                     **inputs[config["modality"]].wildcards,
-                ) for afid in _AFIDS
+                )
+                for afid in _AFIDS
             ],
             probs=[
                 bids(
@@ -64,7 +68,8 @@ if config.get("enable_sequential_inference", False):
                     afid=afid,
                     suffix="probmap.nii.gz",
                     **inputs[config["modality"]].wildcards,
-                ) for afid in _AFIDS
+                )
+                for afid in _AFIDS
             ],
             fcsv=bids(
                 root=root,
@@ -83,14 +88,15 @@ if config.get("enable_sequential_inference", False):
             ckpts=lambda wildcards: {
                 key: str(Path(workflow.basedir).parent / path)
                 for key, path in config["afids_inference"]["checkpoints"].items()
-            }
+            },
         threads: 1
-
         conda:
             "../envs/pytorch.yaml"
         script:
             "../scripts/apply_with_prior_all.py"
+
 else:
+
     # ── WITH PRIOR (SINGLE) ──────────────────────────────────────────────────────
     rule applyfidmodel_single:
         """Run 5-patch inference for ONE AFID using MNI-registered prior location."""
@@ -101,7 +107,7 @@ else:
                     datatype="normalize",
                     desc=chosen_norm_method,
                     suffix="T1w.nii.gz",
-                    **inputs[config["modality"]].wildcards
+                    **inputs[config["modality"]].wildcards,
                 )
                 if config["modality"] != "T1w"
                 else bids(
@@ -110,7 +116,7 @@ else:
                     desc=chosen_norm_method,
                     res=config["res"],
                     suffix="T1w.nii.gz",
-                    **inputs[config["modality"]].wildcards
+                    **inputs[config["modality"]].wildcards,
                 )
             ),
             prior=bids(
@@ -148,10 +154,11 @@ else:
         params:
             ckpt_path=lambda wildcards: str(
                 Path(workflow.basedir).parent
-                / config["afids_inference"]["checkpoints"][f"afid_{int(wildcards.afid):02d}"]
+                / config["afids_inference"]["checkpoints"][
+                    f"afid_{int(wildcards.afid):02d}"
+                ]
             ),
         threads: 1
-
         conda:
             "../envs/pytorch.yaml"
         script:
@@ -166,7 +173,10 @@ else:
                     datatype="afids-cnn",
                     afid="{afid}",
                     suffix="coord.txt",
-                    **{k: getattr(wildcards, k) for k in inputs[config["modality"]].wildcards},
+                    **{
+                        k: getattr(wildcards, k)
+                        for k in inputs[config["modality"]].wildcards
+                    },
                 ),
                 afid=_AFIDS,
             ),
@@ -190,9 +200,11 @@ else:
         script:
             "../scripts/gather_afids.py"
 
+
 # ---------------------------------------------------------------------------
 
 if config.get("enable_sequential_inference", False):
+
     rule applyfidmodel_noprior_all:
         """Whole-volume sliding-window inference for ALL 32 AFIDs (no prior needed)"""
         input:
@@ -202,7 +214,7 @@ if config.get("enable_sequential_inference", False):
                     datatype="normalize",
                     desc=chosen_norm_method,
                     suffix="T1w.nii.gz",
-                    **inputs[config["modality"]].wildcards
+                    **inputs[config["modality"]].wildcards,
                 )
                 if config["modality"] != "T1w"
                 else bids(
@@ -211,7 +223,7 @@ if config.get("enable_sequential_inference", False):
                     desc=chosen_norm_method,
                     res=config["res"],
                     suffix="T1w.nii.gz",
-                    **inputs[config["modality"]].wildcards
+                    **inputs[config["modality"]].wildcards,
                 )
             ),
         output:
@@ -222,7 +234,8 @@ if config.get("enable_sequential_inference", False):
                     afid=afid,
                     suffix="coord.txt",
                     **inputs[config["modality"]].wildcards,
-                ) for afid in _AFIDS
+                )
+                for afid in _AFIDS
             ],
             probs=[
                 bids(
@@ -231,7 +244,8 @@ if config.get("enable_sequential_inference", False):
                     afid=afid,
                     suffix="probmap.nii.gz",
                     **inputs[config["modality"]].wildcards,
-                ) for afid in _AFIDS
+                )
+                for afid in _AFIDS
             ],
             fcsv=bids(
                 root=root,
@@ -250,13 +264,15 @@ if config.get("enable_sequential_inference", False):
             ckpts=lambda wildcards: {
                 key: str(Path(workflow.basedir).parent / path)
                 for key, path in config["afids_inference"]["checkpoints"].items()
-            }
+            },
         threads: 1
         conda:
             "../envs/pytorch.yaml"
         script:
             "../scripts/apply_noprior_all.py"
+
 else:
+
     # ── WITHOUT PRIOR (SINGLE) ──────────────────────────────────────────────────
     rule applyfidmodel_noprior_single:
         """Whole-volume sliding-window inference for ONE AFID — no prior needed."""
@@ -267,7 +283,7 @@ else:
                     datatype="normalize",
                     desc=chosen_norm_method,
                     suffix="T1w.nii.gz",
-                    **inputs[config["modality"]].wildcards
+                    **inputs[config["modality"]].wildcards,
                 )
                 if config["modality"] != "T1w"
                 else bids(
@@ -276,7 +292,7 @@ else:
                     desc=chosen_norm_method,
                     res=config["res"],
                     suffix="T1w.nii.gz",
-                    **inputs[config["modality"]].wildcards
+                    **inputs[config["modality"]].wildcards,
                 )
             ),
         output:
@@ -306,7 +322,9 @@ else:
         params:
             ckpt_path=lambda wildcards: str(
                 Path(workflow.basedir).parent
-                / config["afids_inference"]["checkpoints"][f"afid_{int(wildcards.afid):02d}"]
+                / config["afids_inference"]["checkpoints"][
+                    f"afid_{int(wildcards.afid):02d}"
+                ]
             ),
         threads: 1
         conda:
@@ -323,7 +341,10 @@ else:
                     datatype="afids-cnn-noprior",
                     afid="{afid}",
                     suffix="coord.txt",
-                    **{k: getattr(wildcards, k) for k in inputs[config["modality"]].wildcards},
+                    **{
+                        k: getattr(wildcards, k)
+                        for k in inputs[config["modality"]].wildcards
+                    },
                 ),
                 afid=_AFIDS,
             ),

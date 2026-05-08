@@ -53,6 +53,7 @@ warnings.filterwarnings("ignore")
 # FCSV helpers
 # ===================================================================
 
+
 def fid_voxel2world(fid_voxel: NDArray, nii_affine: NDArray) -> NDArray:
     return (nii_affine[:3, :3].dot(fid_voxel) + nii_affine[:3, 3]).astype(float)
 
@@ -61,6 +62,7 @@ def fid_voxel2world(fid_voxel: NDArray, nii_affine: NDArray) -> NDArray:
 # nnUNet architecture — names MUST match checkpoint keys exactly
 # (encoder_blocks, decoder_blocks, deep_supervision_heads)
 # ===================================================================
+
 
 class ConvBlock(nn.Module):
     def __init__(self, in_channels: int, out_channels: int) -> None:
@@ -73,14 +75,19 @@ class ConvBlock(nn.Module):
             nn.InstanceNorm3d(out_channels, affine=True),
             nn.LeakyReLU(negative_slope=0.01, inplace=True),
         )
-    def forward(self, x): return self.conv_block(x)
+
+    def forward(self, x):
+        return self.conv_block(x)
 
 
 class EncoderBlock(nn.Module):
     def __init__(self, in_channels: int, out_channels: int) -> None:
         super().__init__()
         self.conv_block = ConvBlock(in_channels, out_channels)
-        self.downsample = nn.Conv3d(out_channels, out_channels, kernel_size=3, stride=2, padding=1)
+        self.downsample = nn.Conv3d(
+            out_channels, out_channels, kernel_size=3, stride=2, padding=1
+        )
+
     def forward(self, x):
         skip = self.conv_block(x)
         return skip, self.downsample(skip)
@@ -89,14 +96,19 @@ class EncoderBlock(nn.Module):
 class DecoderBlock(nn.Module):
     def __init__(self, in_channels: int, out_channels: int) -> None:
         super().__init__()
-        self.upsample   = nn.ConvTranspose3d(in_channels, in_channels // 2, kernel_size=2, stride=2)
+        self.upsample = nn.ConvTranspose3d(
+            in_channels, in_channels // 2, kernel_size=2, stride=2
+        )
         self.conv_block = ConvBlock(in_channels, out_channels)
-    def forward(self, x, skip): return self.conv_block(torch.cat([self.upsample(x), skip], 1))
+
+    def forward(self, x, skip):
+        return self.conv_block(torch.cat([self.upsample(x), skip], 1))
 
 
 class nnUNet(nn.Module):
-    def __init__(self, in_channels: int, out_channels: int,
-                 features: Optional[List[int]] = None) -> None:
+    def __init__(
+        self, in_channels: int, out_channels: int, features: Optional[List[int]] = None
+    ) -> None:
         super().__init__()
         if features is None:
             features = [32, 64, 128, 256, 320]
@@ -112,12 +124,15 @@ class nnUNet(nn.Module):
             self.decoder_blocks.append(DecoderBlock(rev[i], rev[i + 1]))
         self.deep_supervision_heads = nn.ModuleList()
         for feat in reversed(features[:-1]):
-            self.deep_supervision_heads.append(nn.Conv3d(feat, out_channels, kernel_size=1))
+            self.deep_supervision_heads.append(
+                nn.Conv3d(feat, out_channels, kernel_size=1)
+            )
 
     def forward(self, x):
         skips = []
         for enc in self.encoder_blocks:
-            skip, x = enc(x); skips.append(skip)
+            skip, x = enc(x)
+            skips.append(skip)
         x = self.bottleneck(x)
         skips = list(reversed(skips))
         for i, dec in enumerate(self.decoder_blocks):
@@ -126,12 +141,18 @@ class nnUNet(nn.Module):
 
 
 class nnUNet_VanillaUNet(nnUNet):
-    def __init__(self, in_channels: int = 1, out_channels: int = 1,
-                 features: Optional[List[int]] = None) -> None:
+    def __init__(
+        self,
+        in_channels: int = 1,
+        out_channels: int = 1,
+        features: Optional[List[int]] = None,
+    ) -> None:
         super().__init__(in_channels, out_channels, features)
 
 
-def _load_model(ckpt_path: str, features: List[int], device: torch.device) -> nnUNet_VanillaUNet:
+def _load_model(
+    ckpt_path: str, features: List[int], device: torch.device
+) -> nnUNet_VanillaUNet:
     model = nnUNet_VanillaUNet(in_channels=1, out_channels=1, features=features)
     ckpt = torch.load(ckpt_path, map_location="cpu")
     raw_sd = ckpt.get("state_dict", ckpt)
@@ -147,6 +168,7 @@ def _load_model(ckpt_path: str, features: List[int], device: torch.device) -> nn
 # Sliding-window inference (no prior)
 # ===================================================================
 
+
 def infer_noprior_single_afid(
     fid: int,
     ckpt_path: str,
@@ -160,7 +182,9 @@ def infer_noprior_single_afid(
     if features is None:
         features = [16, 32, 64]
 
-    device = torch.device(device_str if (device_str == "cpu" or torch.cuda.is_available()) else "cpu")
+    device = torch.device(
+        device_str if (device_str == "cpu" or torch.cuda.is_available()) else "cpu"
+    )
 
     # ---- Image ----
     image_np = img.get_fdata().astype(np.float32)
@@ -181,10 +205,13 @@ def infer_noprior_single_afid(
 
     # ---- Gaussian map ----
     ps = patch_size
+
     def _g1d(n):
-        s = n * 0.125; c = n // 2
+        s = n * 0.125
+        c = n // 2
         x = torch.arange(n, dtype=torch.float32)
-        return torch.exp(-((x - c) ** 2) / (2 * s ** 2))
+        return torch.exp(-((x - c) ** 2) / (2 * s**2))
+
     gmap = torch.einsum("z,y,x->zyx", _g1d(ps), _g1d(ps), _g1d(ps))
     gmap = gmap / gmap.max()
 
@@ -195,8 +222,12 @@ def infer_noprior_single_afid(
     for z in range(0, D, step):
         for y in range(0, H, step):
             for x in range(0, W, step):
-                ze = min(z + ps, D); ye = min(y + ps, H); xe = min(x + ps, W)
-                zs = max(0, ze - ps); ys = max(0, ye - ps); xs = max(0, xe - ps)
+                ze = min(z + ps, D)
+                ye = min(y + ps, H)
+                xe = min(x + ps, W)
+                zs = max(0, ze - ps)
+                ys = max(0, ye - ps)
+                xs = max(0, xe - ps)
                 patch_coords.append((slice(zs, ze), slice(ys, ye), slice(xs, xe)))
 
     num_patches = len(patch_coords)
@@ -219,7 +250,7 @@ def infer_noprior_single_afid(
     t0 = time.perf_counter()
     predictions = []
     for i in range(0, len(model_inputs), batch_size):
-        chunk = torch.stack(model_inputs[i: i + batch_size]).to(device)
+        chunk = torch.stack(model_inputs[i : i + batch_size]).to(device)
         with torch.inference_mode():
             preds = model(chunk)
         predictions.extend(p.cpu() for p in preds)
@@ -241,7 +272,7 @@ def infer_noprior_single_afid(
             zo = max(0, (ps - az) // 2)
             yo = max(0, (ps - ay) // 2)
             xo = max(0, (ps - ax) // 2)
-            w = gmap[zo: zo + az, yo: yo + ay, xo: xo + ax]
+            w = gmap[zo : zo + az, yo : yo + ay, xo : xo + ax]
         pc = pred[0, :az, :ay, :ax]
         out[zs, ys, xs] += pc * w
         cnt[zs, ys, xs] += w
@@ -265,7 +296,6 @@ def infer_noprior_single_afid(
     return pred_world, out  # out = full-volume probability map [D,H,W]
 
 
-
 # ===================================================================
 # Snakemake entry point (All 32 AFIDs)
 # ===================================================================
@@ -275,24 +305,57 @@ from pathlib import Path
 import csv
 
 AFIDS_FIELDNAMES = [
-    "id", "x", "y", "z", "ow", "ox", "oy", "oz", "vis", "sel", "lock",
-    "label", "desc", "associatedNodeID",
+    "id",
+    "x",
+    "y",
+    "z",
+    "ow",
+    "ox",
+    "oy",
+    "oz",
+    "vis",
+    "sel",
+    "lock",
+    "label",
+    "desc",
+    "associatedNodeID",
 ]
 
 AFID_DESCRIPTIONS = [
-    "AC", "PC", "Infracollicular Sulcus", "PMJ",
-    "Superior IPF", "Right Superior LMS", "Left Superior LMS",
-    "Right Inferior LMS", "Left Inferior LMS", "Culmen",
-    "Intermammillary Sulcus", "Right Mammilary Body", "Left Mammilary Body",
-    "Pineal Gland", "Right LV at AC", "Left LV at AC",
-    "Right LV at PC", "Left LV at PC", "Genu of CC", "Splenium of CC",
-    "Right AL Temporal Horn", "Left AL Tempral Horn",
-    "R. Sup. AM Temporal Horn", "L. Sup. AM Temporal Horn",
-    "R Inf. AM Temp Horn", "L Inf. AM Temp Horn",
-    "Right IG Origin", "Left IG Origin",
-    "R Ventral Occipital Horn", "L Ventral Occipital Horn",
-    "R Olfactory Fundus", "L Olfactory Fundus",
+    "AC",
+    "PC",
+    "Infracollicular Sulcus",
+    "PMJ",
+    "Superior IPF",
+    "Right Superior LMS",
+    "Left Superior LMS",
+    "Right Inferior LMS",
+    "Left Inferior LMS",
+    "Culmen",
+    "Intermammillary Sulcus",
+    "Right Mammilary Body",
+    "Left Mammilary Body",
+    "Pineal Gland",
+    "Right LV at AC",
+    "Left LV at AC",
+    "Right LV at PC",
+    "Left LV at PC",
+    "Genu of CC",
+    "Splenium of CC",
+    "Right AL Temporal Horn",
+    "Left AL Tempral Horn",
+    "R. Sup. AM Temporal Horn",
+    "L. Sup. AM Temporal Horn",
+    "R Inf. AM Temp Horn",
+    "L Inf. AM Temp Horn",
+    "Right IG Origin",
+    "Left IG Origin",
+    "R Ventral Occipital Horn",
+    "L Ventral Occipital Horn",
+    "R Olfactory Fundus",
+    "L Olfactory Fundus",
 ]
+
 
 def write_combined_fcsv(afid_coords, fcsv_output):
     header_lines = [
@@ -304,18 +367,31 @@ def write_combined_fcsv(afid_coords, fcsv_output):
     for lbl in range(1, 33):
         c = afid_coords.get(lbl, np.array([0.0, 0.0, 0.0]))
         desc = AFID_DESCRIPTIONS[lbl - 1] if lbl <= len(AFID_DESCRIPTIONS) else ""
-        rows.append({
-            "id": lbl, "x": c[0], "y": c[1], "z": c[2],
-            "ow": "0.000", "ox": "0.000", "oy": "0.000", "oz": "1.000",
-            "vis": 1, "sel": 1, "lock": 1,
-            "label": lbl, "desc": desc, "associatedNodeID": "",
-        })
+        rows.append(
+            {
+                "id": lbl,
+                "x": c[0],
+                "y": c[1],
+                "z": c[2],
+                "ow": "0.000",
+                "ox": "0.000",
+                "oy": "0.000",
+                "oz": "1.000",
+                "vis": 1,
+                "sel": 1,
+                "lock": 1,
+                "label": lbl,
+                "desc": desc,
+                "associatedNodeID": "",
+            }
+        )
     with Path(fcsv_output).open("w", encoding="utf-8", newline="") as f:
         for line in header_lines:
             f.write(line)
         writer = csv.DictWriter(f, fieldnames=AFIDS_FIELDNAMES)
         for row in rows:
             writer.writerow(row)
+
 
 cfg_block = snakemake.config.get("afids_inference", {})
 if not cfg_block:
@@ -341,13 +417,17 @@ for fid in range(1, 33):
         continue
 
     pred_world, prob_map = infer_noprior_single_afid(
-        fid             = fid,
-        ckpt_path       = ckpt_path,
-        img             = img,
-        overlap = snakemake.config["inference_overlap"] if snakemake.config.get("inference_overlap") is not None else cfg_block.get("overlap", 0.5),
-        patch_size      = cfg_block.get("patch_size", 64),
-        batch_size      = snakemake.config.get("inference_batch_size") or 7,
-        device_str      = cfg_block.get("device", "cpu"),
+        fid=fid,
+        ckpt_path=ckpt_path,
+        img=img,
+        overlap=(
+            snakemake.config["inference_overlap"]
+            if snakemake.config.get("inference_overlap") is not None
+            else cfg_block.get("overlap", 0.5)
+        ),
+        patch_size=cfg_block.get("patch_size", 64),
+        batch_size=snakemake.config.get("inference_batch_size") or 7,
+        device_str=cfg_block.get("device", "cpu"),
     )
     combined_coords[fid] = pred_world
 
