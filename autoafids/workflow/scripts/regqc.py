@@ -24,9 +24,7 @@ FCSV_TEMPLATE = (
 )
 
 
-def afids_to_fcsv(
-        transformed_coords, output_path, template_path=FCSV_TEMPLATE
-    ):
+def afids_to_fcsv(transformed_coords, output_path, template_path=FCSV_TEMPLATE):
     """
     Writes transformed AFID coordinates
     to a new FCSV file using a template FCSV.
@@ -59,20 +57,21 @@ def afids_to_fcsv(
                 "lock",
                 "label",
                 "desc",
-                "associatedNodeID"
-                ]
-            )
+                "associatedNodeID",
+            ],
+        )
         rows = list(reader)
 
     # Update coordinates
     for i, row in enumerate(rows):
-        row['x'], row['y'], row['z'] = map(str, transformed_coords[i])
+        row["x"], row["y"], row["z"] = map(str, transformed_coords[i])
 
     # Write updated FCSV
     with open(output_path, "w", newline="") as out_file:
         out_file.writelines(header)
         writer = csv.DictWriter(out_file, fieldnames=reader.fieldnames)
         writer.writerows(rows)
+
 
 # --- LOAD FCSV ---
 def load_fcsv(path):
@@ -84,9 +83,10 @@ def load_fcsv(path):
     - labels: list of coordinate labels
     """
     df = pd.read_csv(path, skiprows=2)
-    coords = df[['x', 'y', 'z']].to_numpy()
-    labels = df['label'].tolist()
+    coords = df[["x", "y", "z"]].to_numpy()
+    labels = df["label"].tolist()
     return coords, labels
+
 
 # --- APPLY 4X4 ---
 def apply_affine_transform(mat_path, coords):
@@ -101,19 +101,16 @@ def apply_affine_transform(mat_path, coords):
     - transformed_coords: np.ndarray of shape (N, 3)
     """
     mat_contents = scipy.io.loadmat(mat_path)
-    transformation_matrix = mat_contents['tmat']
+    transformation_matrix = mat_contents["tmat"]
     homogeneous_coords = np.hstack((coords, np.ones((coords.shape[0], 1))))
     transformed_homogeneous = (
         np.linalg.inv(transformation_matrix) @ homogeneous_coords.T
     ).T
     return transformed_homogeneous[:, :3]
 
+
 # --- APPLY WARP (HARMONIZED) ---
-def apply_warp_deformation(
-        transform_path,
-        coords,
-        flip_ras_lps=True,
-        leaddbs=True):
+def apply_warp_deformation(transform_path, coords, flip_ras_lps=True, leaddbs=True):
     """
     Applies a non-linear warp deformation to coordinates
     using a SimpleITK displacement field.
@@ -132,26 +129,25 @@ def apply_warp_deformation(
     if leaddbs:
 
         transform_image = SimpleITK.ReadImage(transform_path)
-        transform_image = SimpleITK.Cast(
-            transform_image, SimpleITK.sitkVectorFloat64
-        )
+        transform_image = SimpleITK.Cast(transform_image, SimpleITK.sitkVectorFloat64)
         transform = SimpleITK.Transform(transform_image)
 
-        transformed_coords = np.array([
-            transform.TransformPoint(point.tolist()) for point in coords
-        ])
+        transformed_coords = np.array(
+            [transform.TransformPoint(point.tolist()) for point in coords]
+        )
 
     else:
-        d = pd.DataFrame(data=coords, columns=['x','y','z'])
-        transformed_coords_dataframe = ants.apply_transforms_to_points( 3,
-                                                                       d,
-                                                                       transform_path)
+        d = pd.DataFrame(data=coords, columns=["x", "y", "z"])
+        transformed_coords_dataframe = ants.apply_transforms_to_points(
+            3, d, transform_path
+        )
         transformed_coords = transformed_coords_dataframe.to_numpy()
 
     if flip_ras_lps:
         transformed_coords = transformed_coords * np.array([-1, -1, 1])
 
     return transformed_coords
+
 
 # --- COMPUTE ERROR ---
 def compute_error_components(gt, pred):
@@ -167,19 +163,20 @@ def make_toggleable_heatmap(error_components, afid_ids):
     components = ["x", "y", "z", "ED"]
     data_matrix = np.stack(error_components, axis=1)
     y_labels = [f"AFID {i}" for i in afid_ids]
-    fig = go.Figure(data=go.Heatmap(
-        z=data_matrix, x=components, y=y_labels,
-        colorscale=[[0.0, 'rgb(255,255,255)'], [1.0, 'rgb(220,0,0)']],
-        colorbar=dict(title="Error (mm)"),
-        hovertemplate="AFID %{y}<br>%{x} Error = %{z:.2f} mm<extra></extra>"
-    ))
-    fig.update_layout(
-        height=600,
-        width=500,
-        margin=dict(t=0, b=0, l=0, r=0),
-        template='plotly_white'
+    fig = go.Figure(
+        data=go.Heatmap(
+            z=data_matrix,
+            x=components,
+            y=y_labels,
+            colorscale=[[0.0, "rgb(255,255,255)"], [1.0, "rgb(220,0,0)"]],
+            colorbar=dict(title="Error (mm)"),
+            hovertemplate="AFID %{y}<br>%{x} Error = %{z:.2f} mm<extra></extra>",
+        )
     )
-    return pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
+    fig.update_layout(
+        height=600, width=500, margin=dict(t=0, b=0, l=0, r=0), template="plotly_white"
+    )
+    return pio.to_html(fig, full_html=False, include_plotlyjs="cdn")
 
 
 # --- 3D SCATTER PLOT ---
@@ -190,12 +187,10 @@ def make_3d_plot(gt, pred, afid_ids):
             x=gt[:, 0],
             y=gt[:, 1],
             z=gt[:, 2],
-            mode='markers',
-            name='Stereotactic Space',
-            marker=dict(
-                size=6, color='green', opacity=0.7, symbol='diamond'
-            ),
-            text=afid_ids
+            mode="markers",
+            name="Stereotactic Space",
+            marker=dict(size=6, color="green", opacity=0.7, symbol="diamond"),
+            text=afid_ids,
         )
     )
     fig.add_trace(
@@ -203,12 +198,10 @@ def make_3d_plot(gt, pred, afid_ids):
             x=pred[:, 0],
             y=pred[:, 1],
             z=pred[:, 2],
-            mode='markers',
-            name='Registered Subject',
-            marker=dict(
-                size=6, color='red', opacity=0.7, symbol='cross'
-            ),
-            text=afid_ids
+            mode="markers",
+            name="Registered Subject",
+            marker=dict(size=6, color="red", opacity=0.7, symbol="cross"),
+            text=afid_ids,
         )
     )
     for i in range(gt.shape[0]):
@@ -217,25 +210,26 @@ def make_3d_plot(gt, pred, afid_ids):
                 x=[gt[i, 0], pred[i, 0]],
                 y=[gt[i, 1], pred[i, 1]],
                 z=[gt[i, 2], pred[i, 2]],
-                mode='lines',
-                line=dict(color='orange', width=7),
-                showlegend=False
+                mode="lines",
+                line=dict(color="orange", width=7),
+                showlegend=False,
             )
         )
     fig.update_layout(
         scene=dict(
-            xaxis_title='X',
-            yaxis_title='Y',
-            zaxis_title='Z',
-            bgcolor='rgb(250,250,250)'
+            xaxis_title="X",
+            yaxis_title="Y",
+            zaxis_title="Z",
+            bgcolor="rgb(250,250,250)",
         ),
         height=600,
         width=800,
         margin=dict(t=0, b=0, l=0, r=0),
-        template='plotly_white',
-        legend=dict(x=0.7, y=0.9)
+        template="plotly_white",
+        legend=dict(x=0.7, y=0.9),
     )
-    return pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
+    return pio.to_html(fig, full_html=False, include_plotlyjs="cdn")
+
 
 # --- Coordinate Utilities ---
 def world_to_voxel_coords(img, world_coords):
@@ -244,15 +238,17 @@ def world_to_voxel_coords(img, world_coords):
     affine_inv = np.linalg.inv(img.affine)
     return np.round(affine_inv.dot(np.append(world_coords, 1))).astype(int)
 
+
 def get_afid_world_and_voxel_coords(img, fcsv_path, label_num):
     """Get both world and voxel coordinates for a given AFID label."""
     df = pd.read_csv(fcsv_path, skiprows=2)
-    row = df[df['label'] == label_num]
+    row = df[df["label"] == label_num]
     if row.empty:
         return None, None
-    world_coords = row[['x', 'y', 'z']].to_numpy()[0]
+    world_coords = row[["x", "y", "z"]].to_numpy()[0]
     voxel_coords = world_to_voxel_coords(img, world_coords)
     return world_coords, voxel_coords
+
 
 # --- Visualization Utilities ---
 def render_mri_planes(data, coords, zoom=50, show_crosshairs=True):
@@ -295,6 +291,7 @@ def render_mri_planes(data, coords, zoom=50, show_crosshairs=True):
     plt.savefig(buf, format="png", bbox_inches="tight")
     plt.close(fig)
     return base64.b64encode(buf.getvalue()).decode()
+
 
 # --- HTML Utilities ---
 def build_afid_viewer_block(label, error_val, subject_image, ref_image):
@@ -383,15 +380,11 @@ def build_afid_viewer_block(label, error_val, subject_image, ref_image):
     </div>
     """
 
+
 # --- Main Viewer Builder ---
 def generate_qualitative_mri_html(
-        subject_nii,
-        ref_nii,
-        ref_fcsv,
-        ed_errors,
-        labels=list(range(1, 33)),
-        zoom=40
-    ):
+    subject_nii, ref_nii, ref_fcsv, ed_errors, labels=list(range(1, 33)), zoom=40
+):
     """Generates HTML for visual comparison of AFID localization
     on subject vs template MRI."""
     subject_img = nib.as_closest_canonical(nib.load(subject_nii))
@@ -407,14 +400,10 @@ def generate_qualitative_mri_html(
         if world_coords is None:
             continue
         subject_voxel = world_to_voxel_coords(subject_img, world_coords)
-        subject_image = render_mri_planes(
-            subject_data, subject_voxel[:3], zoom=zoom
-        )
+        subject_image = render_mri_planes(subject_data, subject_voxel[:3], zoom=zoom)
         ref_image = render_mri_planes(ref_data, template_voxel[:3], zoom=zoom)
         viewer_blocks.append(
-            build_afid_viewer_block(
-                label, ed_errors[i], subject_image, ref_image
-            )
+            build_afid_viewer_block(label, ed_errors[i], subject_image, ref_image)
         )
 
     return f"""
@@ -450,13 +439,15 @@ def generate_qualitative_mri_html(
     </div>
     """
 
+
 # --- RENDER HTML DASHBOARD ---
 def render_dashboard_html(
-        output_path, heatmap_html, scatter_html, ed_errors, qualitative_html
-    ):
-    stats = pd.Series(ed_errors).describe(percentiles=[.25, .5, .75]).to_dict()
+    output_path, heatmap_html, scatter_html, ed_errors, qualitative_html
+):
+    stats = pd.Series(ed_errors).describe(percentiles=[0.25, 0.5, 0.75]).to_dict()
     std = np.std(ed_errors)
-    template = Template("""
+    template = Template(
+        """
     <html>
     <head>
         <title>AFID Inspector</title>
@@ -669,7 +660,8 @@ def render_dashboard_html(
         </div>
     </body>
     </html>
-    """)
+    """
+    )
     html = template.render(
         stats={
             "Min": stats["min"],
@@ -677,12 +669,12 @@ def render_dashboard_html(
             "Median": stats["50%"],
             "75%": stats["75%"],
             "Max": stats["max"],
-            "Mean": stats["mean"]
+            "Mean": stats["mean"],
         },
         std=std,
         heatmap=heatmap_html,
         scatter=scatter_html,
-        qualitative=qualitative_html
+        qualitative=qualitative_html,
     )
     Path(output_path).write_text(html)
     return output_path
@@ -690,66 +682,68 @@ def render_dashboard_html(
 
 # --- MAIN WRAPPER ---
 def generate_afid_qc_dashboard(
-        template_name,
-        gt_fcsv_path,
-        pred_fcsv_path,
-        output_html_path,
-        output_fcsv_path,
-        output_csv_path,subject_nii,
-        template_path_or_dir,
-        matfile_path,
-        warpfile_path
-    ):
+    template_name,
+    gt_fcsv_path,
+    pred_fcsv_path,
+    output_html_path,
+    output_fcsv_path,
+    output_csv_path,
+    subject_nii,
+    template_path_or_dir,
+    matfile_path,
+    warpfile_path,
+):
     native_coords, afid_ids = load_fcsv(gt_fcsv_path)
     if matfile_path:
-        gt_coords_a= apply_affine_transform(matfile_path,native_coords)
-        gt_coords= apply_warp_deformation(warpfile_path,gt_coords_a)
+        gt_coords_a = apply_affine_transform(matfile_path, native_coords)
+        gt_coords = apply_warp_deformation(warpfile_path, gt_coords_a)
     else:
-        gt_coords= apply_warp_deformation(warpfile_path,
-                                          native_coords,
-                                          leaddbs=False)
+        gt_coords = apply_warp_deformation(warpfile_path, native_coords, leaddbs=False)
     pred_coords, _ = load_fcsv(pred_fcsv_path)
     afids_to_fcsv(gt_coords, output_fcsv_path)
     dx, dy, dz, ed = compute_error_components(gt_coords, pred_coords)
 
     # --- EXPORT TO CSV ---
-    error_df = pd.DataFrame({
-        "AFID": afid_ids,
-        "dx (mm)": dx,
-        "dy (mm)": dy,
-        "dz (mm)": dz,
-        "ED (mm)": ed
-    })
+    error_df = pd.DataFrame(
+        {"AFID": afid_ids, "dx (mm)": dx, "dy (mm)": dy, "dz (mm)": dz, "ED (mm)": ed}
+    )
 
     if template_name:
-        if template_name in ['MNI152NLin2009bAsym','MNI152NLin2009bSym']:
-            template_nii = str(Path(template_path_or_dir) /
-                            f'tpl-{template_name}' /
-                            f'tpl-{template_name}_res-1_T1w.nii.gz')
-        elif template_name in ['MNI305', 'MNIColin27']:
-            template_nii = str(Path(template_path_or_dir) /
-                            f'tpl-{template_name}' /
-                            f'tpl-{template_name}_T1w.nii.gz')
+        if template_name in ["MNI152NLin2009bAsym", "MNI152NLin2009bSym"]:
+            template_nii = str(
+                Path(template_path_or_dir)
+                / f"tpl-{template_name}"
+                / f"tpl-{template_name}_res-1_T1w.nii.gz"
+            )
+        elif template_name in ["MNI305", "MNIColin27"]:
+            template_nii = str(
+                Path(template_path_or_dir)
+                / f"tpl-{template_name}"
+                / f"tpl-{template_name}_T1w.nii.gz"
+            )
         else:
-            template_nii = str(Path(template_path_or_dir) /
-                            f'tpl-{template_name}' /
-                            f'tpl-{template_name}_res-01_T1w.nii.gz')
+            template_nii = str(
+                Path(template_path_or_dir)
+                / f"tpl-{template_name}"
+                / f"tpl-{template_name}_res-01_T1w.nii.gz"
+            )
     else:
         template_nii = template_path_or_dir
-
 
     error_df.to_csv(output_csv_path, index=False)
     heatmap_html = make_toggleable_heatmap([dx, dy, dz, ed], afid_ids)
     scatter_html = make_3d_plot(gt_coords, pred_coords, afid_ids)
     qualitative_html = generate_qualitative_mri_html(
-        subject_nii, template_nii, pred_fcsv_path, ed,zoom=50)
+        subject_nii, template_nii, pred_fcsv_path, ed, zoom=50
+    )
     return render_dashboard_html(
-        output_html_path, heatmap_html, scatter_html, ed, qualitative_html)
+        output_html_path, heatmap_html, scatter_html, ed, qualitative_html
+    )
 
 
 if __name__ == "__main__":
     generate_afid_qc_dashboard(
-        template_name=snakemake.params['template'],
+        template_name=snakemake.params["template"],
         gt_fcsv_path=snakemake.input["afidfcsv"],
         pred_fcsv_path=snakemake.input["refcoord"],
         output_html_path=snakemake.output["html"],
@@ -758,5 +752,5 @@ if __name__ == "__main__":
         subject_nii=snakemake.input["im"],
         template_path_or_dir=snakemake.input["refim"],
         matfile_path=snakemake.input["optional_matrix"],
-        warpfile_path=snakemake.input["warp"]
+        warpfile_path=snakemake.input["warp"],
     )

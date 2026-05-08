@@ -23,10 +23,7 @@ template_dict = {
 def get_warp_path(subject):
     if lead_dbs_dir:
         trans_dir = (
-            Path(lead_dbs_dir)
-            / f"sub-{subject}"
-            / "normalization"
-            / "transformations"
+            Path(lead_dbs_dir) / f"sub-{subject}" / "normalization" / "transformations"
         )
         pattern = f"sub-{subject}*_from-MNI*_to-anchorNative_desc-ants.nii.gz"
         matches = list(trans_dir.glob(pattern))
@@ -43,18 +40,13 @@ def get_warp_path(subject):
         return None
 
     else:
-        raise ValueError(
-            "No LEAD-DBS or fMRIPrep directory provided for warp."
-        )
+        raise ValueError("No LEAD-DBS or fMRIPrep directory provided for warp.")
 
 
 def get_optional_matrix_path(subject):
     if lead_dbs_dir:
         trans_dir = (
-            Path(lead_dbs_dir)
-            / f"sub-{subject}"
-            / "coregistration"
-            / "transformations"
+            Path(lead_dbs_dir) / f"sub-{subject}" / "coregistration" / "transformations"
         )
         pattern = f"sub-{subject}_desc-precoreg_*T1w.mat"
         matches = list(trans_dir.glob(pattern))
@@ -112,19 +104,11 @@ def get_ref_paths():
         )
     else:
         if lead_dbs_dir:
-            refimage = str(
-                Path(workflow.basedir).parent / config["templatet1w_lead"]
-            )
-            refcoordinate = str(
-                Path(workflow.basedir).parent / config["fcsv_mni_lead"]
-            )
+            refimage = str(Path(workflow.basedir).parent / config["templatet1w_lead"])
+            refcoordinate = str(Path(workflow.basedir).parent / config["fcsv_mni_lead"])
         else:
-            refimage = str(
-                Path(workflow.basedir).parent / config["templatet1w"]
-            )
-            refcoordinate = str(
-                Path(workflow.basedir).parent / config["fcsv_mni"]
-            )
+            refimage = str(Path(workflow.basedir).parent / config["templatet1w"])
+            refcoordinate = str(Path(workflow.basedir).parent / config["fcsv_mni"])
     return refimage, refcoordinate
 
 
@@ -146,13 +130,11 @@ rule regqc:
             datatype="afids-cnn",
             desc="afidscnn",
             suffix="afids.fcsv",
-            **inputs[config["modality"]].wildcards
+            **inputs[config["modality"]].wildcards,
         ),
         im=lambda wildcards: get_resampled_im(wildcards.subject),
         warp=lambda wildcards: get_warp_path(wildcards.subject),
-        optional_matrix=lambda wildcards: get_optional_matrix_path(
-            wildcards.subject
-        ),
+        optional_matrix=lambda wildcards: get_optional_matrix_path(wildcards.subject),
         refim=lambda wildcards: get_ref_paths()[0],
         refcoord=lambda wildcards: get_ref_paths()[1],
     output:
@@ -161,21 +143,21 @@ rule regqc:
             datatype="regqc",
             desc="reg",
             suffix="qc.html",
-            **inputs[config["modality"]].wildcards
+            **inputs[config["modality"]].wildcards,
         ),
         csv=bids(
             root=root,
             datatype="regqc",
             desc="reg",
             suffix="qc.csv",
-            **inputs[config["modality"]].wildcards
+            **inputs[config["modality"]].wildcards,
         ),
         fcsv=bids(
             root=root,
             datatype="regqc",
             desc="reg",
             suffix="afids.fcsv",
-            **inputs[config["modality"]].wildcards
+            **inputs[config["modality"]].wildcards,
         ),
     params:
         template=template_name,

@@ -1,6 +1,6 @@
 # Contributing to AutoAFIDs
 
-AutoAFIDs is a Python-based BIDS App for automatic anatomical fiducial detection. Development is managed using **Conda** for dependency and environment management.
+AutoAFIDs is a Python-based BIDS App for automatic anatomical fiducial detection. Development is managed using **pixi** for dependency and environment management.
 
 > 🛠️ These instructions are intended for contributors making code changes to the AutoAFIDs codebase or using advanced features such as Snakemake cluster execution profiles.
 
@@ -8,8 +8,8 @@ AutoAFIDs is a Python-based BIDS App for automatic anatomical fiducial detection
 
 ## 📦 Prerequisites
 
-Ensure **Conda** is installed on your system. You can install Miniconda or Anaconda by following the official guide:  
-👉 [https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
+Ensure **pixi** is installed on your system. You can install pixi by following the official guide:  
+👉 [https://pixi.prefix.dev/latest/installation/](https://pixi.prefix.dev/latest/installation/)
 
 Note: AutoAFIDs primarily supports T1-weighted images. For additional modalities (e.g., T2w), SynthSR will be triggered, though compatibility varies by operating system.
 
@@ -25,9 +25,7 @@ cd autoafids
 2. Create and activate the development environment:
 
 ```bash
-mamba env create -f autoafids-dev.yml
-eval "$(mamba shell hook --shell zsh)"
-mamba activate autoafids-dev
+pixi shell
 ```
 
 3. Run AutoAFIDs with development dependencies:
@@ -43,24 +41,32 @@ mamba activate autoafids-dev
 
 AutoAFIDs uses several tools to ensure clean and consistent code:
 
-- [`ruff`](https://github.com/charliermarsh/ruff) – for linting and formatting
+- [`isort`](https://github.com/pycqa/isort) – for sorting imports. 
 - [`snakefmt`](https://github.com/snakemake/snakefmt) – for formatting Snakemake files
-- [`yamlfix`](https://github.com/lyz-code/yamlfix) – for YAML cleanup
+- [`black`](https://github.com/psf/black) – for formatting Python code
 
 ### Check formatting:
 
+1. Activate the development environment:
+
 ```bash
-ruff check .
-snakefmt --check Snakefile
-yamlfix --check config/
+pixi shell --environment dev
+```
+
+2. Run tools
+
+```bash
+isort autoafids/*.py -c
+snakefmt autoafids --check
+black autoafids --check
 ```
 
 ### Auto-fix formatting:
 
 ```bash
-ruff check . --fix
-snakefmt Snakefile
-yamlfix config/
+isort autoafids/*.py
+snakefmt autoafids
+black autoafids
 ```
 
 ---

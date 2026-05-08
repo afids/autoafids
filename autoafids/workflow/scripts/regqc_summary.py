@@ -28,6 +28,7 @@ from jinja2 import Template
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _parse_bids_entities(filename: str) -> dict:
     """Extract BIDS key-value entities from a filename."""
     entities = {}
@@ -92,7 +93,7 @@ def load_fcsv(path: str) -> tuple:
 
 
 def load_all_fcsvs(
-        fcsv_paths: list,
+    fcsv_paths: list,
 ) -> list:
     """Load all per-subject FCSVs.
 
@@ -106,18 +107,20 @@ def load_all_fcsvs(
             coords, afid_labels = load_fcsv(fp)
         except Exception:
             continue
-        result.append({
-            "subject_label": label,
-            "coords": coords,
-            "labels": afid_labels,
-        })
+        result.append(
+            {
+                "subject_label": label,
+                "coords": coords,
+                "labels": afid_labels,
+            }
+        )
     return result
 
 
 def compute_error_decomposition(
-        subject_fcsvs: list,
-        gt_coords: np.ndarray,
-        gt_labels: list,
+    subject_fcsvs: list,
+    gt_coords: np.ndarray,
+    gt_labels: list,
 ) -> pd.DataFrame:
     """Decompose per-AFID error into systematic bias and random scatter.
 
@@ -157,59 +160,61 @@ def compute_error_decomposition(
     errors = np.stack(all_errors, axis=0)  # (S, N, 3)
 
     # Per-AFID statistics
-    bias = errors.mean(axis=0)          # (N, 3) — systematic
-    scatter = errors.std(axis=0, ddof=1) if errors.shape[0] > 1 \
-        else np.zeros_like(bias)          # (N, 3) — random
+    bias = errors.mean(axis=0)  # (N, 3) — systematic
+    scatter = (
+        errors.std(axis=0, ddof=1) if errors.shape[0] > 1 else np.zeros_like(bias)
+    )  # (N, 3) — random
 
-    bias_mag = np.linalg.norm(bias, axis=1)           # (N,)
-    scatter_rms = np.sqrt((scatter ** 2).mean(axis=1)) # (N,)
+    bias_mag = np.linalg.norm(bias, axis=1)  # (N,)
+    scatter_rms = np.sqrt((scatter**2).mean(axis=1))  # (N,)
     total_error = np.linalg.norm(errors, axis=2).mean(axis=0)  # (N,)
     bias_ratio = bias_mag / (bias_mag + scatter_rms + 1e-9)
 
-    return pd.DataFrame({
-        "label":      gt_labels,
-        "bias_x":     bias[:, 0],
-        "bias_y":     bias[:, 1],
-        "bias_z":     bias[:, 2],
-        "bias_mag":   bias_mag,
-        "scatter_x":  scatter[:, 0],
-        "scatter_y":  scatter[:, 1],
-        "scatter_z":  scatter[:, 2],
-        "scatter_rms": scatter_rms,
-        "total_error": total_error,
-        "bias_ratio": bias_ratio,
-        "n_subjects": errors.shape[0],
-        "gt_x":       gt_coords[:, 0],
-        "gt_y":       gt_coords[:, 1],
-        "gt_z":       gt_coords[:, 2],
-    })
+    return pd.DataFrame(
+        {
+            "label": gt_labels,
+            "bias_x": bias[:, 0],
+            "bias_y": bias[:, 1],
+            "bias_z": bias[:, 2],
+            "bias_mag": bias_mag,
+            "scatter_x": scatter[:, 0],
+            "scatter_y": scatter[:, 1],
+            "scatter_z": scatter[:, 2],
+            "scatter_rms": scatter_rms,
+            "total_error": total_error,
+            "bias_ratio": bias_ratio,
+            "n_subjects": errors.shape[0],
+            "gt_x": gt_coords[:, 0],
+            "gt_y": gt_coords[:, 1],
+            "gt_z": gt_coords[:, 2],
+        }
+    )
 
 
 # ---------------------------------------------------------------------------
 # Plotly chart builders
 # ---------------------------------------------------------------------------
 
+
 def make_heatmap(long_df: pd.DataFrame) -> str:
     """
     Subjects (rows) x AFIDs (cols), colour = ED (mm).
     Rows sorted by mean ED descending (worst on top).
     """
-    pivot = long_df.pivot_table(
-        index="subject_label", columns="AFID", values="ED (mm)"
-    )
+    pivot = long_df.pivot_table(index="subject_label", columns="AFID", values="ED (mm)")
     row_order = pivot.mean(axis=1).sort_values(ascending=False).index
     pivot = pivot.loc[row_order]
 
-    fig = go.Figure(data=go.Heatmap(
-        z=pivot.values,
-        x=[f"AFID {c}" for c in pivot.columns],
-        y=list(pivot.index),
-        colorscale=[[0.0, "rgb(255,255,255)"], [1.0, "rgb(220,0,0)"]],
-        colorbar=dict(title="ED (mm)"),
-        hovertemplate=(
-            "%{y}<br>AFID %{x}<br>ED = %{z:.2f} mm<extra></extra>"
-        ),
-    ))
+    fig = go.Figure(
+        data=go.Heatmap(
+            z=pivot.values,
+            x=[f"AFID {c}" for c in pivot.columns],
+            y=list(pivot.index),
+            colorscale=[[0.0, "rgb(255,255,255)"], [1.0, "rgb(220,0,0)"]],
+            colorbar=dict(title="ED (mm)"),
+            hovertemplate=("%{y}<br>AFID %{x}<br>ED = %{z:.2f} mm<extra></extra>"),
+        )
+    )
     fig.update_layout(
         title="Registration Error (ED mm) — Subjects x AFIDs",
         height=max(300, 30 * len(pivot)),
@@ -229,15 +234,17 @@ def make_afid_boxplot(long_df: pd.DataFrame) -> str:
     fig = go.Figure()
     for afid in afid_ids:
         vals = long_df.loc[long_df["AFID"] == afid, "ED (mm)"]
-        fig.add_trace(go.Box(
-            y=vals,
-            name=f"AFID {afid}",
-            boxpoints=show_points,
-            jitter=0.4,
-            pointpos=0,
-            marker=dict(size=4, opacity=0.5),
-            line=dict(width=1.5),
-        ))
+        fig.add_trace(
+            go.Box(
+                y=vals,
+                name=f"AFID {afid}",
+                boxpoints=show_points,
+                jitter=0.4,
+                pointpos=0,
+                marker=dict(size=4, opacity=0.5),
+                line=dict(width=1.5),
+            )
+        )
     fig.update_layout(
         title="ED Distribution per AFID (across subjects)",
         yaxis_title="ED (mm)",
@@ -256,19 +263,17 @@ def make_subject_bar(subject_stats: pd.DataFrame) -> str:
     """
     df = subject_stats.sort_values("mean_ED", ascending=True)
     colorscale_vals = df["mean_ED"].values
-    norm = (colorscale_vals - colorscale_vals.min()) / (
-        np.ptp(colorscale_vals) + 1e-9
+    norm = (colorscale_vals - colorscale_vals.min()) / (np.ptp(colorscale_vals) + 1e-9)
+    colours = [f"rgb({int(255*v)},{int(255*(1-v))},80)" for v in norm]
+    fig = go.Figure(
+        go.Bar(
+            x=df["mean_ED"],
+            y=df["subject_label"],
+            orientation="h",
+            marker_color=colours,
+            hovertemplate="%{y}<br>Mean ED = %{x:.2f} mm<extra></extra>",
+        )
     )
-    colours = [
-        f"rgb({int(255*v)},{int(255*(1-v))},80)" for v in norm
-    ]
-    fig = go.Figure(go.Bar(
-        x=df["mean_ED"],
-        y=df["subject_label"],
-        orientation="h",
-        marker_color=colours,
-        hovertemplate="%{y}<br>Mean ED = %{x:.2f} mm<extra></extra>",
-    ))
     fig.update_layout(
         title="Mean ED per Subject (sorted best → worst)",
         xaxis_title="Mean ED (mm)",
@@ -280,9 +285,9 @@ def make_subject_bar(subject_stats: pd.DataFrame) -> str:
 
 
 def make_3d_landmark_scatter(
-        subject_fcsvs: list,
-        gt_coords: np.ndarray = None,
-        gt_labels: list | None = None,
+    subject_fcsvs: list,
+    gt_coords: np.ndarray = None,
+    gt_labels: list | None = None,
 ) -> str:
     """Interactive 3D scatter of all subjects' AFIDs in MNI space.
 
@@ -296,31 +301,50 @@ def make_3d_landmark_scatter(
 
     # Ground truth (template) as large green diamonds
     if gt_coords is not None:
-        hover = [
-            f"AFID {i}" for i in (gt_labels or range(1, len(gt_coords) + 1))
-        ]
-        fig.add_trace(go.Scatter3d(
-            x=gt_coords[:, 0],
-            y=gt_coords[:, 1],
-            z=gt_coords[:, 2],
-            mode="markers",
-            name="MNI Ground Truth",
-            marker=dict(
-                size=6, color="green", opacity=0.9, symbol="diamond",
-            ),
-            text=hover,
-            hovertemplate="%{text}<br>x=%{x:.1f} y=%{y:.1f} z=%{z:.1f}"
-                          "<extra>MNI Ground Truth</extra>",
-        ))
+        hover = [f"AFID {i}" for i in (gt_labels or range(1, len(gt_coords) + 1))]
+        fig.add_trace(
+            go.Scatter3d(
+                x=gt_coords[:, 0],
+                y=gt_coords[:, 1],
+                z=gt_coords[:, 2],
+                mode="markers",
+                name="MNI Ground Truth",
+                marker=dict(
+                    size=6,
+                    color="green",
+                    opacity=0.9,
+                    symbol="diamond",
+                ),
+                text=hover,
+                hovertemplate="%{text}<br>x=%{x:.1f} y=%{y:.1f} z=%{z:.1f}"
+                "<extra>MNI Ground Truth</extra>",
+            )
+        )
 
     # Per-subject data — merge into a single trace for scalability
     # (avoids creating N traces which kills performance at N>30)
     all_x, all_y, all_z, all_hover, all_colour = [], [], [], [], []
     colours = [
-        "#e6194b", "#3cb44b", "#4363d8", "#f58231", "#911eb4",
-        "#42d4f4", "#f032e6", "#bfef45", "#fabed4", "#469990",
-        "#dcbeff", "#9A6324", "#fffac8", "#800000", "#aaffc3",
-        "#808000", "#ffd8b1", "#000075", "#a9a9a9", "#000000",
+        "#e6194b",
+        "#3cb44b",
+        "#4363d8",
+        "#f58231",
+        "#911eb4",
+        "#42d4f4",
+        "#f032e6",
+        "#bfef45",
+        "#fabed4",
+        "#469990",
+        "#dcbeff",
+        "#9A6324",
+        "#fffac8",
+        "#800000",
+        "#aaffc3",
+        "#808000",
+        "#ffd8b1",
+        "#000075",
+        "#a9a9a9",
+        "#000000",
     ]
     for i, sub in enumerate(subject_fcsvs):
         colour = colours[i % len(colours)]
@@ -328,22 +352,26 @@ def make_3d_landmark_scatter(
         all_x.extend(sub["coords"][:, 0].tolist())
         all_y.extend(sub["coords"][:, 1].tolist())
         all_z.extend(sub["coords"][:, 2].tolist())
-        all_hover.extend(
-            f"{sub['subject_label']} — AFID {i}" for i in sub["labels"]
-        )
+        all_hover.extend(f"{sub['subject_label']} — AFID {i}" for i in sub["labels"])
         all_colour.extend([colour] * n)
 
-    fig.add_trace(go.Scatter3d(
-        x=all_x, y=all_y, z=all_z,
-        mode="markers",
-        name=f"Subjects (n={len(subject_fcsvs)})",
-        marker=dict(
-            size=3, color=all_colour, opacity=0.5,
-        ),
-        text=all_hover,
-        hovertemplate="%{text}<br>x=%{x:.1f} y=%{y:.1f} z=%{z:.1f}"
-                      "<extra></extra>",
-    ))
+    fig.add_trace(
+        go.Scatter3d(
+            x=all_x,
+            y=all_y,
+            z=all_z,
+            mode="markers",
+            name=f"Subjects (n={len(subject_fcsvs)})",
+            marker=dict(
+                size=3,
+                color=all_colour,
+                opacity=0.5,
+            ),
+            text=all_hover,
+            hovertemplate="%{text}<br>x=%{x:.1f} y=%{y:.1f} z=%{z:.1f}"
+            "<extra></extra>",
+        )
+    )
 
     fig.update_layout(
         scene=dict(
@@ -358,16 +386,18 @@ def make_3d_landmark_scatter(
         template="plotly_white",
         title="AFID Landmarks in MNI Space (all subjects)",
         legend=dict(
-            x=0.82, y=0.95,
+            x=0.82,
+            y=0.95,
             bgcolor="rgba(255,255,255,0.8)",
-            bordercolor="#ccc", borderwidth=1,
+            bordercolor="#ccc",
+            borderwidth=1,
         ),
     )
     return pio.to_html(fig, full_html=False, include_plotlyjs=False)
 
 
 def make_bias_vector_3d(
-        decomp_df: pd.DataFrame,
+    decomp_df: pd.DataFrame,
 ) -> str:
     """3D cone plot showing bias direction and magnitude at each AFID.
 
@@ -382,64 +412,83 @@ def make_bias_vector_3d(
     fig = go.Figure()
 
     # Ground-truth markers
-    fig.add_trace(go.Scatter3d(
-        x=df["gt_x"], y=df["gt_y"], z=df["gt_z"],
-        mode="markers",
-        name="AFID Location (MNI)",
-        marker=dict(size=4, color="#888", opacity=0.6, symbol="diamond"),
-        text=[f"AFID {i}" for i in df["label"]],
-        hovertemplate="%{text}<extra>Ground Truth</extra>",
-    ))
+    fig.add_trace(
+        go.Scatter3d(
+            x=df["gt_x"],
+            y=df["gt_y"],
+            z=df["gt_z"],
+            mode="markers",
+            name="AFID Location (MNI)",
+            marker=dict(size=4, color="#888", opacity=0.6, symbol="diamond"),
+            text=[f"AFID {i}" for i in df["label"]],
+            hovertemplate="%{text}<extra>Ground Truth</extra>",
+        )
+    )
 
     # Bias cones — Plotly Cone trace
-    fig.add_trace(go.Cone(
-        x=df["gt_x"], y=df["gt_y"], z=df["gt_z"],
-        u=df["bias_x"], v=df["bias_y"], w=df["bias_z"],
-        sizemode="absolute",
-        sizeref=max_bias * 0.8,
-        colorscale=[
-            [0.0, "rgb(49,130,189)"],   # blue = mostly random
-            [0.5, "rgb(255,255,100)"],   # yellow
-            [1.0, "rgb(215,48,39)"],     # red = mostly systematic
-        ],
-        cmin=0, cmax=1,
-        colorbar=dict(
-            title="Bias Ratio",
-            tickvals=[0, 0.5, 1],
-            ticktext=["Random", "Mixed", "Systematic"],
-            len=0.6, y=0.5,
-        ),
-        name="Bias Vector",
-        text=[
-            f"AFID {row.label}<br>"
-            f"Bias: {row.bias_mag:.2f} mm<br>"
-            f"Scatter: {row.scatter_rms:.2f} mm<br>"
-            f"Ratio: {row.bias_ratio:.0%} systematic"
-            for _, row in df.iterrows()
-        ],
-        hoverinfo="text",
-    ))
+    fig.add_trace(
+        go.Cone(
+            x=df["gt_x"],
+            y=df["gt_y"],
+            z=df["gt_z"],
+            u=df["bias_x"],
+            v=df["bias_y"],
+            w=df["bias_z"],
+            sizemode="absolute",
+            sizeref=max_bias * 0.8,
+            colorscale=[
+                [0.0, "rgb(49,130,189)"],  # blue = mostly random
+                [0.5, "rgb(255,255,100)"],  # yellow
+                [1.0, "rgb(215,48,39)"],  # red = mostly systematic
+            ],
+            cmin=0,
+            cmax=1,
+            colorbar=dict(
+                title="Bias Ratio",
+                tickvals=[0, 0.5, 1],
+                ticktext=["Random", "Mixed", "Systematic"],
+                len=0.6,
+                y=0.5,
+            ),
+            name="Bias Vector",
+            text=[
+                f"AFID {row.label}<br>"
+                f"Bias: {row.bias_mag:.2f} mm<br>"
+                f"Scatter: {row.scatter_rms:.2f} mm<br>"
+                f"Ratio: {row.bias_ratio:.0%} systematic"
+                for _, row in df.iterrows()
+            ],
+            hoverinfo="text",
+        )
+    )
 
     # Endpoint markers (bias tip) for error lines
     tip_x = df["gt_x"] + df["bias_x"]
     tip_y = df["gt_y"] + df["bias_y"]
     tip_z = df["gt_z"] + df["bias_z"]
-    fig.add_trace(go.Scatter3d(
-        x=tip_x, y=tip_y, z=tip_z,
-        mode="markers",
-        name="Bias Endpoint",
-        marker=dict(size=2, color="red", opacity=0.5),
-        hoverinfo="skip",
-        showlegend=False,
-    ))
+    fig.add_trace(
+        go.Scatter3d(
+            x=tip_x,
+            y=tip_y,
+            z=tip_z,
+            mode="markers",
+            name="Bias Endpoint",
+            marker=dict(size=2, color="red", opacity=0.5),
+            hoverinfo="skip",
+            showlegend=False,
+        )
+    )
 
     fig.update_layout(
         scene=dict(
-            xaxis_title="X (mm)", yaxis_title="Y (mm)", zaxis_title="Z (mm)",
+            xaxis_title="X (mm)",
+            yaxis_title="Y (mm)",
+            zaxis_title="Z (mm)",
             bgcolor="rgb(250,250,250)",
             aspectmode="data",
         ),
-        height=700, width=950,
+        height=700,
+        width=950,
         margin=dict(t=50, b=30, l=20, r=20),
         template="plotly_white",
         title="Systematic Bias Vectors at Each AFID",
@@ -454,18 +503,24 @@ def make_decomposition_bar(decomp_df: pd.DataFrame) -> str:
     labels = [f"AFID {i}" for i in df["label"]]
 
     fig = go.Figure()
-    fig.add_trace(go.Bar(
-        x=labels, y=df["bias_mag"],
-        name="Systematic Bias |μ|",
-        marker_color="rgb(215,48,39)",
-        hovertemplate="%{x}<br>Bias = %{y:.2f} mm<extra></extra>",
-    ))
-    fig.add_trace(go.Bar(
-        x=labels, y=df["scatter_rms"],
-        name="Random Scatter o",
-        marker_color="rgb(49,130,189)",
-        hovertemplate="%{x}<br>Scatter = %{y:.2f} mm<extra></extra>",
-    ))
+    fig.add_trace(
+        go.Bar(
+            x=labels,
+            y=df["bias_mag"],
+            name="Systematic Bias |μ|",
+            marker_color="rgb(215,48,39)",
+            hovertemplate="%{x}<br>Bias = %{y:.2f} mm<extra></extra>",
+        )
+    )
+    fig.add_trace(
+        go.Bar(
+            x=labels,
+            y=df["scatter_rms"],
+            name="Random Scatter o",
+            marker_color="rgb(49,130,189)",
+            hovertemplate="%{x}<br>Scatter = %{y:.2f} mm<extra></extra>",
+        )
+    )
     fig.update_layout(
         barmode="group",
         title="Error Decomposition per AFID: Bias (red) vs Scatter (blue)",
@@ -483,7 +538,8 @@ def make_decomposition_bar(decomp_df: pd.DataFrame) -> str:
 # HTML rendering
 # ---------------------------------------------------------------------------
 
-SUMMARY_TEMPLATE = Template("""\
+SUMMARY_TEMPLATE = Template(
+    """\
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -786,7 +842,8 @@ function sortTable(col) {
 </script>
 </body>
 </html>
-""")
+"""
+)
 
 
 def _ed_badge(mean_ed: float) -> str:
@@ -798,36 +855,35 @@ def _ed_badge(mean_ed: float) -> str:
 
 
 def render_summary_html(
-        output_path: str,
-        long_df: pd.DataFrame,
-        output_dir: str,
-        subject_fcsvs: list | None = None,
-        gt_coords: np.ndarray = None,
-        gt_labels: list | None = None,
+    output_path: str,
+    long_df: pd.DataFrame,
+    output_dir: str,
+    subject_fcsvs: list | None = None,
+    gt_coords: np.ndarray = None,
+    gt_labels: list | None = None,
 ) -> str:
     """Build and write the dataset summary HTML file."""
 
     # Per-subject stats
     grp = long_df.groupby("subject_label")
-    stats = grp["ED (mm)"].agg(
-        mean_ED="mean", median_ED="median", max_ED="max"
-    ).reset_index()
-    worst_afid = (
-        long_df.loc[long_df.groupby("subject_label")["ED (mm)"].idxmax()]
-        [["subject_label", "AFID"]].rename(columns={"AFID": "worst_afid"})
+    stats = (
+        grp["ED (mm)"]
+        .agg(mean_ED="mean", median_ED="median", max_ED="max")
+        .reset_index()
     )
-    html_paths_ser = (
-        long_df.groupby("subject_label")["html_path"].first().reset_index()
-    )
+    worst_afid = long_df.loc[long_df.groupby("subject_label")["ED (mm)"].idxmax()][
+        ["subject_label", "AFID"]
+    ].rename(columns={"AFID": "worst_afid"})
+    html_paths_ser = long_df.groupby("subject_label")["html_path"].first().reset_index()
     subject_stats = (
-        stats
-        .merge(worst_afid, on="subject_label")
+        stats.merge(worst_afid, on="subject_label")
         .merge(html_paths_ser, on="subject_label")
         .sort_values("mean_ED", ascending=False)
     )
 
     # Make relative paths from the output HTML's directory
     out_dir = Path(output_path).parent
+
     def _relpath(p):
         if not p:
             return ""
@@ -841,25 +897,23 @@ def render_summary_html(
 
     # Dataset-level stats (all subjects x all AFIDs)
     all_ed = long_df["ED (mm)"]
-    dataset_mean   = float(all_ed.mean())
+    dataset_mean = float(all_ed.mean())
     dataset_median = float(all_ed.median())
-    dataset_std    = float(all_ed.std())
-    best_ed  = float(subject_stats["mean_ED"].min())
+    dataset_std = float(all_ed.std())
+    best_ed = float(subject_stats["mean_ED"].min())
     worst_ed = float(subject_stats["mean_ED"].max())
     n_subjects = int(subject_stats["subject_label"].nunique())
-    n_afids    = int(long_df["AFID"].nunique())
+    n_afids = int(long_df["AFID"].nunique())
 
     # Build charts
     heatmap_html = make_heatmap(long_df)
     boxplot_html = make_afid_boxplot(long_df)
-    bar_html     = make_subject_bar(subject_stats)
+    bar_html = make_subject_bar(subject_stats)
 
     # 3D landmark scatter (optional — only if fcsv data provided)
     scatter3d_html = ""
     if subject_fcsvs:
-        scatter3d_html = make_3d_landmark_scatter(
-            subject_fcsvs, gt_coords, gt_labels
-        )
+        scatter3d_html = make_3d_landmark_scatter(subject_fcsvs, gt_coords, gt_labels)
 
     # Error decomposition (requires ≥1 subject fcsv + gt)
     decomp_html = False
@@ -873,9 +927,7 @@ def render_summary_html(
     decomp_worst_scatter_afid = "-"
     decomp_worst_scatter_val = 0.0
     if subject_fcsvs and gt_coords is not None:
-        decomp_df = compute_error_decomposition(
-            subject_fcsvs, gt_coords, gt_labels
-        )
+        decomp_df = compute_error_decomposition(subject_fcsvs, gt_coords, gt_labels)
         if not decomp_df.empty:
             decomp_html = True
             decomp_bar_html = make_decomposition_bar(decomp_df)
@@ -883,24 +935,14 @@ def render_summary_html(
             decomp_bias_mean = float(decomp_df["bias_mag"].mean())
             decomp_scatter_mean = float(decomp_df["scatter_rms"].mean())
             decomp_bias_pct = (
-                decomp_bias_mean
-                / (decomp_bias_mean + decomp_scatter_mean + 1e-9)
-                * 100
+                decomp_bias_mean / (decomp_bias_mean + decomp_scatter_mean + 1e-9) * 100
             )
             worst_bias_idx = decomp_df["bias_mag"].idxmax()
-            decomp_worst_bias_afid = decomp_df.loc[
-                worst_bias_idx, "label"
-            ]
-            decomp_worst_bias_val = decomp_df.loc[
-                worst_bias_idx, "bias_mag"
-            ]
+            decomp_worst_bias_afid = decomp_df.loc[worst_bias_idx, "label"]
+            decomp_worst_bias_val = decomp_df.loc[worst_bias_idx, "bias_mag"]
             worst_scatter_idx = decomp_df["scatter_rms"].idxmax()
-            decomp_worst_scatter_afid = decomp_df.loc[
-                worst_scatter_idx, "label"
-            ]
-            decomp_worst_scatter_val = decomp_df.loc[
-                worst_scatter_idx, "scatter_rms"
-            ]
+            decomp_worst_scatter_afid = decomp_df.loc[worst_scatter_idx, "label"]
+            decomp_worst_scatter_val = decomp_df.loc[worst_scatter_idx, "scatter_rms"]
 
     # Render template
     html = SUMMARY_TEMPLATE.render(
@@ -937,8 +979,8 @@ def render_summary_html(
 # Snakemake entry point
 # ---------------------------------------------------------------------------
 
-def main(csv_paths, html_paths, output_html,
-         fcsv_paths=None, gt_fcsv_path=None):
+
+def main(csv_paths, html_paths, output_html, fcsv_paths=None, gt_fcsv_path=None):
     long_df = load_all_csvs(csv_paths, html_paths)
     out_dir = str(Path(output_html).parent)
 
@@ -954,12 +996,15 @@ def main(csv_paths, html_paths, output_html,
             pass
 
     render_summary_html(
-        output_html, long_df, out_dir,
+        output_html,
+        long_df,
+        out_dir,
         subject_fcsvs=subject_fcsvs,
         gt_coords=gt_coords,
         gt_labels=gt_labels,
     )
     print(f"[regqc_summary] Written → {output_html}")
+
 
 # Snakemake script entry point
 fcsv_list = list(snakemake.input.get("fcsvs", []))
@@ -971,4 +1016,3 @@ main(
     fcsv_paths=fcsv_list,
     gt_fcsv_path=gt_path,
 )
-
