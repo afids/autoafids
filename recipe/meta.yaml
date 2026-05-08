@@ -20,7 +20,8 @@ build:
 requirements:
   host:
     - python
-    - poetry-core
+    - hatchling
+    - hatchling-build
     - pip
   run:
     - python >=3.9,<4.0
