@@ -381,12 +381,9 @@ if config["LEAD_DBS_DIR"] or config["FMRIPREP_DIR"]:
 
 
 # Select the correct FCSV output descriptor based on inference mode.
-# prior   → applyfidmodel_gather          → desc="afidscnn"
-# noprior → applyfidmodel_noprior_gather  → desc="afidscnn-noprior"
+
 # nnlm    → nnlm_to_fcsv                 → desc="afidscnn-nnlm"
 _fcsv_desc = {
-    "prior": "afidscnn",
-    "noprior": "afidscnn-noprior",
     "nnlm": "afidscnn-nnlm",
 }.get(config.get("detect_mode", "prior"), "afidscnn")
 
