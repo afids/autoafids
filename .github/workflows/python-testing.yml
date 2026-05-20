@@ -70,3 +70,15 @@ jobs:
       - name: Test fidqc feature
         run: |-
           ./autoafids/run.py test_data/bids_T1w test_out participant --participant-label 002 --fidqc -np
+
+      - name: Test model with prior
+        run: |-
+          ./autoafids/run.py test_data/bids_T1w test_out participant --participant-label 002 --detect_with_prior -np
+
+      - name: Test model without prior with custom inference settings
+        run: |-
+          ./autoafids/run.py test_data/bids_T1w test_out participant --participant-label 002 --detect_without_prior --inference-overlap 0.25 --inference-batch-size 8  -np
+
+      - name: Test nnLandmark model detection
+        run: |-
+          ./autoafids/run.py test_data/bids_T1w test_out participant --participant-label 002 --detect_with_nnlm -np
