@@ -11,9 +11,6 @@ NNLM_MODEL_DIR = Path(download_dir) / "models" / "nnlm"
 
 # ── 0. Download trained model ────────────────────────────────────────────────
 rule download_nnlm_model:
-    """Download the pre-trained nnLM model zip and extract it to the cache dir."""
-    params:
-        url=config["resource_urls"].get("nnlm", ""),
     output:
         model_dir=directory(NNLM_MODEL_DIR),
     log:
@@ -21,6 +18,9 @@ rule download_nnlm_model:
             root="logs",
             suffix="download_nnlm_model.log",
         ),
+    """Download the pre-trained nnLM model zip and extract it to the cache dir."""
+    params:
+        url=config["resource_urls"].get("nnlm", ""),
     shell:
         "mkdir -p {output.model_dir} && "
         "wget -q {params.url} -O nnlm_model.zip > {log} 2>&1 && "
@@ -67,6 +67,18 @@ rule run_nnlm:
             suffix="coords.json",
             **inputs[config["modality"]].wildcards,
         ),
+    log:
+        bids(
+            root="logs",
+            suffix="nnlm.log",
+            **inputs[config["modality"]].wildcards,
+        ),
+    conda:
+        "../envs/nnlm.yaml"
+    threads: 4
+    resources:
+        gpus=lambda wildcards: 1 if config.get("nnlm_device", "cuda") == "cuda" else 0,
+        mem_mb=16000,
     params:
         dataset_id="800",
         fold=config.get("nnlm_fold", "0"),
@@ -74,18 +86,6 @@ rule run_nnlm:
         checkpoint=config.get("nnlm_checkpoint", "checkpoint_final.pth"),
         device=config.get("nnlm_device", "cuda"),
         tmpdir=lambda wildcards: f"/tmp/nnlm_{wildcards.subject}",
-    conda:
-        "../envs/nnlm.yaml"
-    threads: 4
-    resources:
-        gpus=lambda wildcards: 1 if config.get("nnlm_device", "cuda") == "cuda" else 0,
-        mem_mb=16000,
-    log:
-        bids(
-            root="logs",
-            suffix="nnlm.log",
-            **inputs[config["modality"]].wildcards,
-        ),
     shell:
         """
         set -euo pipefail
@@ -146,9 +146,9 @@ rule nnlm_to_fcsv:
             suffix="afids.fcsv",
             **inputs[config["modality"]].wildcards,
         ),
-    params:
-        fcsv_template=str(Path(workflow.basedir).parent / "resources" / "dummy.fcsv"),
     conda:
         "../envs/nibabel.yaml"
+    params:
+        fcsv_template=str(Path(workflow.basedir).parent / "resources" / "dummy.fcsv"),
     script:
         "../scripts/nnlm_to_fcsv.py"

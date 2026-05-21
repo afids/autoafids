@@ -21,10 +21,10 @@ rule fidqc:
             suffix="afids.html",
             **inputs[config["modality"]].wildcards,
         ),
+    conda:
+        "../envs/utils.yaml"
     params:
         refim=str(Path(workflow.basedir).parent / config["templatet1w"]),
         refcoord=str(Path(workflow.basedir).parent / config["fcsv_mni"]),
-    conda:
-        "../envs/utils.yaml"
     script:
         "../scripts/qc.py"

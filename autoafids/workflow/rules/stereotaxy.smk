@@ -32,11 +32,11 @@ rule stereotaxy:
             suffix="ACPC.txt",
             **inputs[config["modality"]].wildcards,
         ),
+    conda:
+        "../envs/skimage.yaml"
     params:
         model=str(Path(workflow.basedir).parent / config[stereotaxy_target]),
         midpoint="PMJ",
         target_fcsv=str(Path(workflow.basedir).parent / config["template_fcsv"]),
-    conda:
-        "../envs/skimage.yaml"
     script:
         "../scripts/stereotaxy.py"

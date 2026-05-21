@@ -139,14 +139,14 @@ if config["modality"] != "T1w":
                 suffix="synthsr_output.txt",
                 **inputs[config["modality"]].wildcards,
             ),
+        conda:
+            "envs/synthsr.yaml"
+        threads: 4
         resources:
             mem_mb=10000,
-        threads: 4
         params:
             modality=config["modality"],
             download_dir=download_dir,
-        conda:
-            "envs/synthsr.yaml"
         script:
             "scripts/run_synthsr.py"
 
@@ -232,10 +232,10 @@ rule norm_im:
             suffix="T1w.nii.gz",
             **inputs[config["modality"]].wildcards,
         ),
-    params:
-        norm_method=chosen_norm_method,
     conda:
         "envs/nibabel.yaml"
+    params:
+        norm_method=chosen_norm_method,
     script:
         "scripts/norm_schemes.py"
 
@@ -251,8 +251,6 @@ if "resample_im" in profile_settings and config["modality"] == "T1w":
                 suffix="T1w.nii.gz",
                 **inputs[config["modality"]].wildcards,
             ),
-        params:
-            res=resolution,
         output:
             resam_im=bids(
                 root=work,
@@ -264,6 +262,8 @@ if "resample_im" in profile_settings and config["modality"] == "T1w":
             ),
         conda:
             "envs/resample.yaml"
+        params:
+            res=resolution,
         script:
             "scripts/resample_img.py"
 
@@ -318,10 +318,10 @@ rule regmni2sub:
             suffix="MNI.nii.gz",
             **inputs[config["modality"]].wildcards,
         ),
-    params:
-        moving=str(Path(workflow.basedir).parent / templatet1w),
     conda:
         "envs/ants.yaml"
+    params:
+        moving=str(Path(workflow.basedir).parent / templatet1w),
     script:
         "scripts/regis_script.py"
 
@@ -335,9 +335,6 @@ rule mni2subfids:
             suffix="xfm.txt",
             **inputs[config["modality"]].wildcards,
         ),
-    params:
-        fcsv=str(Path(workflow.basedir).parent / config["fcsv"]),
-        fcsv_mni=str(Path(workflow.basedir).parent / config["fcsv_mni"]),
     output:
         fcsv_new=bids(
             root=work,
@@ -349,6 +346,9 @@ rule mni2subfids:
         ),
     conda:
         "envs/ants.yaml"
+    params:
+        fcsv=str(Path(workflow.basedir).parent / config["fcsv"]),
+        fcsv_mni=str(Path(workflow.basedir).parent / config["fcsv_mni"]),
     script:
         "scripts/tform_script.py"
 
@@ -389,6 +389,7 @@ _fcsv_desc = {
 
 
 rule all:
+    default_target: True
     input:
         models=inputs[config["modality"]].expand(
             bids(
@@ -443,4 +444,3 @@ rule all:
             if config["stereotaxy"]
             else []
         ),
-    default_target: True

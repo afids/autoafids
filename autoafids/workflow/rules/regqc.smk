@@ -113,12 +113,12 @@ def get_ref_paths():
 
 
 rule download_template:
-    params:
-        template=template_name,
     output:
         template_path=directory(Path(download_dir) / "templateflow"),
     conda:
         "../envs/templateflow.yaml"
+    params:
+        template=template_name,
     script:
         "../scripts/template_flow.py"
 
@@ -159,10 +159,10 @@ rule regqc:
             suffix="afids.fcsv",
             **inputs[config["modality"]].wildcards,
         ),
-    params:
-        template=template_name,
     conda:
         "../envs/regqc.yaml"
+    params:
+        template=template_name,
     script:
         "../scripts/regqc.py"
 
@@ -198,9 +198,9 @@ rule regqc_summary:
         ),
     output:
         summary_html=os.path.join(root, "dataset_desc-reg_qc_summary.html"),
-    params:
-        gt_fcsv=lambda wildcards: get_ref_paths()[1],
     conda:
         "../envs/regqc.yaml"
+    params:
+        gt_fcsv=lambda wildcards: get_ref_paths()[1],
     script:
         "../scripts/regqc_summary.py"
