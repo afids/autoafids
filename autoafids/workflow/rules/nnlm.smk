@@ -11,6 +11,7 @@ NNLM_MODEL_DIR = Path(download_dir) / "models" / "nnlm"
 
 # ── 0. Download trained model ────────────────────────────────────────────────
 rule download_nnlm_model:
+    """Download the pre-trained nnLM model zip and extract it to the cache dir."""
     output:
         model_dir=directory(NNLM_MODEL_DIR),
     log:
@@ -18,7 +19,6 @@ rule download_nnlm_model:
             root="logs",
             suffix="download_nnlm_model.log",
         ),
-    """Download the pre-trained nnLM model zip and extract it to the cache dir."""
     params:
         url=config["resource_urls"].get("nnlm", ""),
     shell:
