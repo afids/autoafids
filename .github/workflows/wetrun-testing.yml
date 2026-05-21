@@ -59,3 +59,10 @@ jobs:
         run: |-
           ./autoafids/run.py test_data/bids_wetrun_testing/bids_T2w test_out participant \
             --modality T2w --cores all --force-output --conda-frontend mamba
+
+      - name: Wet-run nnLandmark whole-volume detection
+        shell: bash -l {0}
+        run: |-
+          ./autoafids/run.py test_data/bids_wetrun_testing/bids_T1w test_out \
+            participant --detect_with_nnlm \
+            --cores all --force-output --conda-frontend mamba | tee autoafids_nnlm.log
