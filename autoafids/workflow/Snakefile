@@ -1,7 +1,9 @@
 import snakebids
-from snakebids import bids, generate_inputs, get_wildcard_constraints
+from snakebids import bids, generate_inputs, get_wildcard_constraints, set_bids_spec
 from appdirs import AppDirs
 import warnings
+
+set_bids_spec("v0_0_0")
 
 try:
     from autoafids.workflow.lib import (
@@ -345,7 +347,13 @@ rule mni2subfids:
         "scripts/tform_script.py"
 
 
-include: "rules/cnn.smk"
+if config.get("detect_mode") == "nnlm":
+
+    include: "rules/nnlm.smk"
+
+else:
+
+    include: "rules/cnn.smk"
 
 
 if config["fidqc"]:
@@ -360,13 +368,16 @@ if config["LEAD_DBS_DIR"] or config["FMRIPREP_DIR"]:
     include: "rules/regqc.smk"
 
 
+_fcsv_desc = "afidscnn-nnlm" if config.get("detect_mode") == "nnlm" else "afidscnn"
+
+
 rule all:
     input:
         models=inputs[config["modality"]].expand(
             bids(
                 root=root,
                 datatype="afids-cnn",
-                desc="afidscnn",
+                desc=_fcsv_desc,
                 suffix="afids.fcsv",
                 **inputs[config["modality"]].wildcards,
             ),
