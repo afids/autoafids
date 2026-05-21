@@ -3,7 +3,7 @@ rule fidqc:
         afidfcsv=bids(
             root=root,
             datatype="afids-cnn",
-            desc="afidscnn",
+            desc=_fcsv_desc,
             suffix="afids.fcsv",
             **inputs[config["modality"]].wildcards,
         ),
