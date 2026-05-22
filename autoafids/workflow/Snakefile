@@ -369,6 +369,7 @@ if config["LEAD_DBS_DIR"] or config["FMRIPREP_DIR"]:
 
     include: "rules/regqc.smk"
 
+
 rule all:
     input:
         models=inputs[config["modality"]].expand(
