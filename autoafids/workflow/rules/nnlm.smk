@@ -141,7 +141,7 @@ rule nnlm_to_fcsv:
     output:
         fcsv=bids(
             root=root,
-            datatype="afids-nnlm",
+            datatype="afids-cnn",
             desc="afidscnn-nnlm",
             suffix="afids.fcsv",
             **inputs[config["modality"]].wildcards,
