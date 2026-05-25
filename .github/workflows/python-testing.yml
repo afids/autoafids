@@ -70,3 +70,19 @@ jobs:
       - name: Test fidqc feature
         run: |-
           ./autoafids/run.py test_data/bids_T1w test_out participant --participant-label 002 --fidqc -np
+
+      - name: Test nnLandmark detection (T1w)
+        run: |-
+          ./autoafids/run.py test_data/bids_T1w test_out participant --participant-label 002 --detect_with_nnlm -np
+
+      - name: Test nnLandmark detection (T2w)
+        run: |-
+          ./autoafids/run.py test_data/bids_T2w test_out participant --modality T2w --detect_with_nnlm -np -c1
+
+      - name: Test nnLandmark with fidqc
+        run: |-
+          ./autoafids/run.py test_data/bids_T1w test_out participant --participant-label 002 --detect_with_nnlm --fidqc -np
+
+      - name: Test nnLandmark with stereotaxy
+        run: |-
+          ./autoafids/run.py test_data/bids_T1w test_out participant --participant-label 002 --detect_with_nnlm --stereotaxy STN -np

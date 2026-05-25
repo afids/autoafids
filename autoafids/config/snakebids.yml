@@ -174,10 +174,43 @@ parse_args:
 
   --workdir:
     help: |
-      Folder for storing working files. If not specified, will be in "work/" subfolder 
-      in the output folder. You can also use environment variables when setting the 
+      Folder for storing working files. If not specified, will be in "work/" subfolder
+      in the output folder. You can also use environment variables when setting the
       workdir, e.g. --workdir '$SLURM_TMPDIR'.
     default: work
+    type: str
+
+  --detect_with_nnlm:
+    help: |
+      Use nnLandmark (nnLM) for whole-volume, single-pass AFID detection.
+      All 32 AFIDs are predicted in one nnU-Net forward pass.
+      The model is downloaded automatically on first use.
+    dest: detect_mode
+    action: store_const
+    const: nnlm
+
+  --nnlm_fold:
+    help: "nnLM fold to use for prediction. (default: %(default)s)"
+    dest: nnlm_fold
+    default: "0"
+    type: str
+
+  --nnlm_plans:
+    help: "nnLM plans identifier. (default: %(default)s)"
+    dest: nnlm_plans
+    default: "nnUNetResEncUNetMPlans"
+    type: str
+
+  --nnlm_checkpoint:
+    help: "nnLM checkpoint filename inside the model folder. (default: %(default)s)"
+    dest: nnlm_checkpoint
+    default: "checkpoint_final.pth"
+    type: str
+
+  --nnlm_device:
+    help: "Device for nnLM inference: cuda or cpu. (default: %(default)s)"
+    dest: nnlm_device
+    default: "cpu"
     type: str
 
 #--- workflow specific configuration ---
@@ -198,6 +231,7 @@ singularity:
 # It will be downloaded to ~/.cache/autoafids
 resource_urls:
   default: 'files.osf.io/v1/resources/9fptg/providers/osfstorage/?zip='
+  nnlm: 'https://zenodo.org/records/18991189/files/nnlm_model.zip'
 
 #Stereotaxy models 
 STN: 'resources/stereotaxy/STN.pkl'

@@ -1,7 +1,9 @@
 import snakebids
-from snakebids import bids, generate_inputs, get_wildcard_constraints
+from snakebids import bids, generate_inputs, get_wildcard_constraints, set_bids_spec
 from appdirs import AppDirs
 import warnings
+
+set_bids_spec("v0_0_0")
 
 try:
     from autoafids.workflow.lib import (
@@ -100,6 +102,8 @@ if config["stereotaxy"] in ["STN", "cZI"]:
     stereotaxy_enabled = True
 else:
     stereotaxy_enabled = False
+
+_fcsv_desc = "afidscnn-nnlm" if config.get("detect_mode") == "nnlm" else "afidscnn"
 
 # The `include:` directive must be at the top level
 if stereotaxy_enabled:
@@ -345,7 +349,13 @@ rule mni2subfids:
         "scripts/tform_script.py"
 
 
-include: "rules/cnn.smk"
+if config.get("detect_mode") == "nnlm":
+
+    include: "rules/nnlm.smk"
+
+else:
+
+    include: "rules/cnn.smk"
 
 
 if config["fidqc"]:
@@ -366,7 +376,7 @@ rule all:
             bids(
                 root=root,
                 datatype="afids-cnn",
-                desc="afidscnn",
+                desc=_fcsv_desc,
                 suffix="afids.fcsv",
                 **inputs[config["modality"]].wildcards,
             ),
