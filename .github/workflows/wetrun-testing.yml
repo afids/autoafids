@@ -36,7 +36,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: test_data/autoafids_cache_dir/models
-          key: static-model-cache-v1
+          key: static-model-cache-v2
 
       - name: Set AUTOAFIDS_CACHE_DIR
         run: |
