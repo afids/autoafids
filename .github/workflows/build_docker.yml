@@ -16,6 +16,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build Docker image
-        run: docker build --no-cache -t jclauneurolab/autoafids:latest .
+        run: docker build --platform linux/amd64 --no-cache -t jclauneurolab/autoafids:latest .
       - name: Push Docker image
         run: docker push jclauneurolab/autoafids:latest
