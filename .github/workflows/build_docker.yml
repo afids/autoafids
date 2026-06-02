@@ -15,7 +15,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build Docker image
-        run: docker build -t jclauneurolab/autoafids:latest .
-      - name: Push Docker image
-        run: docker push jclauneurolab/autoafids:latest
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: jclauneurolab/autoafids:latest
