@@ -5,7 +5,9 @@ WORKDIR /src
 COPY . /src
 
 # Install git so pip can clone remote repository dependencies
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create the environment based on your lockfile and install dependencies
 # This creates an isolated, self-contained environment in /src/.pixi/envs/default
