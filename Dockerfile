@@ -4,6 +4,9 @@ FROM ghcr.io/prefix-dev/pixi:latest AS build
 WORKDIR /src
 COPY . /src
 
+# Install git so pip can clone remote repository dependencies
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+
 # Create the environment based on your lockfile and install dependencies
 # This creates an isolated, self-contained environment in /src/.pixi/envs/default
 RUN pixi install --locked
@@ -29,6 +32,5 @@ COPY --from=build /src /src
 ENV PATH="/src/.pixi/envs/default/bin:$PATH"
 ENV SNAKEMAKE_PROFILE=/src/autoafids/workflow/profiles/docker-conda
 ENV PYTHONNOUSERSITE=1
-ENV SNAKEMAKE_PROFILE=/src/autoafids/autoafids/workflow/profiles/docker-conda
 
 ENTRYPOINT ["/src/entrypoint.sh"]
