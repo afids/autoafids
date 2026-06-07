@@ -27,6 +27,10 @@ FROM ubuntu:24.04 AS production
 
 WORKDIR /src
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgomp1 wget unzip \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy your source code, pre-cached conda environments, and the built Pixi environment
 COPY --from=build /src /src
 
