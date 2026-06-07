@@ -6,7 +6,7 @@ COPY . /src
 
 # Install git so pip can clone remote repository dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgomp1 \
+    libgomp1 git \
     && rm -rf /var/lib/apt/lists/*
 
 # Create the environment based on your lockfile and install dependencies
