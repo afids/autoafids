@@ -73,14 +73,13 @@ rule run_nnlm:
         plans=config.get("nnlm_plans", "nnUNetResEncUNetMPlans"),
         checkpoint=config.get("nnlm_checkpoint", "checkpoint_final.pth"),
         device=config.get("nnlm_device", "cuda"),
-        tmpdir=lambda wildcards, resources: f"{resources.tmpdir}/nnlm_{wildcards.subject}",
+        tmpdir=lambda wildcards: f"/tmp/nnlm_{wildcards.subject}",
     conda:
         "../envs/nnlm.yaml"
     threads: 4
     resources:
         gpus=lambda wildcards: 1 if config.get("nnlm_device", "cuda") == "cuda" else 0,
         mem_mb=16000,
-        tmpdir="tmp",
     log:
         bids(
             root="logs",
@@ -124,7 +123,7 @@ rule run_nnlm:
         cp $TMPDIR/output_dir/{wildcards.subject}.json    {output.coords_json}
 
         # Cleanup temp dir
-        rm -rf $TMPDIR
+        # rm -rf $TMPDIR
         """
 
 
