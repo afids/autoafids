@@ -123,7 +123,7 @@ rule run_nnlm:
         cp $TMPDIR/output_dir/{wildcards.subject}.json    {output.coords_json}
 
         # Cleanup temp dir
-        rm -rf $TMPDIR
+        # rm -rf $TMPDIR
         """
 
 
