@@ -3,6 +3,12 @@ from snakebids import bids, generate_inputs, get_wildcard_constraints, set_bids_
 from appdirs import AppDirs
 import warnings
 
+# Suppress snakebids "unrecognized entity" warnings for the {afid} wildcard
+warnings.filterwarnings(
+    "ignore",
+    message="Path generated with unrecognized entities",
+    category=UserWarning,
+)
 set_bids_spec("v0_0_0")
 
 try:
@@ -349,11 +355,17 @@ rule mni2subfids:
         "scripts/tform_script.py"
 
 
-if config.get("detect_mode") == "nnlm":
+# ── Detection mode: choose rules to include ──────────────────────────────
+if config.get("detect_mode", "prior") == "nnlm":
 
+    # nnLandmark mode: single-pass whole-volume detection
     include: "rules/nnlm.smk"
 
 else:
+    # Legacy CNN modes (prior / noprior)
+    # If running on GPU, automatically enable sequential inference to avoid spawning 32 parallel jobs
+    if config.get("afids_inference", {}).get("device") == "cuda:0":
+        config["enable_sequential_inference"] = True
 
     include: "rules/cnn.smk"
 
@@ -368,6 +380,17 @@ if config["LEAD_DBS_DIR"] or config["FMRIPREP_DIR"]:
     print("..... Registration QC Enabled .....")
 
     include: "rules/regqc.smk"
+
+
+# Select the correct FCSV output descriptor based on inference mode.
+# prior   → applyfidmodel_gather          → desc="afidscnn"
+# noprior → applyfidmodel_noprior_gather  → desc="afidscnn-noprior"
+# nnlm    → nnlm_to_fcsv                 → desc="afidscnn-nnlm"
+_fcsv_desc = {
+    "prior": "afidscnn",
+    "noprior": "afidscnn-noprior",
+    "nnlm": "afidscnn-nnlm",
+}.get(config.get("detect_mode", "prior"), "afidscnn")
 
 
 rule all:
