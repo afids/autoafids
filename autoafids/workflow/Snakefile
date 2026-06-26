@@ -109,6 +109,8 @@ if config["stereotaxy"] in ["STN", "cZI"]:
 else:
     stereotaxy_enabled = False
 
+_fcsv_desc = "afidscnn-nnlm" if config.get("detect_mode") == "nnlm" else "afidscnn"
+
 # The `include:` directive must be at the top level
 if stereotaxy_enabled:
 

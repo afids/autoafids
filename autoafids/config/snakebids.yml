@@ -174,8 +174,8 @@ parse_args:
 
   --workdir:
     help: |
-      Folder for storing working files. If not specified, will be in "work/" subfolder 
-      in the output folder. You can also use environment variables when setting the 
+      Folder for storing working files. If not specified, will be in "work/" subfolder
+      in the output folder. You can also use environment variables when setting the
       workdir, e.g. --workdir '$SLURM_TMPDIR'.
     default: work
     type: str
