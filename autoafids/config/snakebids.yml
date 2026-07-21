@@ -143,7 +143,7 @@ parse_args:
 
   --stereotaxy:
     help: 'Predict stereotactic target coordinates from output AFIDs. Also supplies AC-PC transform matrix (4x4) in the process.{STN = subthalamic nucelus, cZI = caudal zona incerta}'
-    choices: ['STN','cZI']
+    choices: ['STN','cZI', 'fct']
     default: false
     required: false
 
@@ -236,8 +236,11 @@ resource_urls:
 #Stereotaxy models 
 STN: 'resources/stereotaxy/STN.pkl'
 cZI: 'resources/stereotaxy/cZI.pkl'
+fct: 'resources/stereotaxy/fct.pkl'
+
 template_fcsv: 'resources/stereotaxy/target_template.fcsv'
 cZI_template_fcsv: 'resources/stereotaxy/cZI_target_template.fcsv'
+fct_template_fcsv: 'resources/stereotaxy/fct_target_template.fcsv'
 
 plugins.validator.skip: False
 root: results

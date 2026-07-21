@@ -43,8 +43,8 @@ rule stereotaxy:
         target_fcsv=str(
             Path(workflow.basedir).parent
             / (
-                config["cZI_template_fcsv"]
-                if stereotaxy_target == "cZI"
+                config["cZI_template_fcsv"] if stereotaxy_target == "cZI"
+                else config["fct_template_fcsv"] if stereotaxy_target == "fct"
                 else config["template_fcsv"]
             )
         ),

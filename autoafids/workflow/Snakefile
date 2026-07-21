@@ -96,7 +96,7 @@ resolution = float(config["res"])
 
 templatet1w = config["templatet1w"]
 
-if config["stereotaxy"] in ["STN", "cZI"]:
+if config["stereotaxy"] in ["STN", "cZI", "fct"]:
     stereotaxy_target = config["stereotaxy"]
     print("..... Stereotaxy Target Enabled .....")
     stereotaxy_enabled = True
