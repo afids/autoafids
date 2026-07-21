@@ -28,8 +28,8 @@ NODES = {
     "norm_im":           (3.2, 6.0, "#2C7FB8"),
     "regmni2sub":        (6.4, 6.0, "#5FB316"),
     "resample_im":       (3.2, 4.5, "#B01E2E"),
-    "mni2subfids":       (6.2, 4.5, "#CE7B1E"),
-    "download_cnn_model":(9.2, 4.5, "#22B455"),
+    "mni2subfids":       (6.1, 4.5, "#CE7B1E"),
+    "download_cnn_model":(9.25, 4.5, "#22B455"),
     "applyfidmodel":     (5.0, 3.0, "#17BEBB"),
     "regqc":             (2.9, 1.5, "#9CBE1F"),
     "stereotaxy":        (5.0, 1.5, "#C0157F"),
@@ -37,8 +37,8 @@ NODES = {
     "all":               (5.0, 0.0, "#22C7E0"),
 }
 
-# per-node half-width, sized to the label so text never overflows the box
-HALFW = {n: max(0.72, 0.24 + 0.058 * len(n)) for n in NODES}
+LABEL_FS = 11.5                    # label font size (pt)
+PAD_X = 0.30                       # horizontal padding each side (data units)
 
 INPUTS = {"T2w", "FLAIR", "ct", "T1w"}
 
@@ -68,10 +68,23 @@ EDGES = [
 BOX_H = 0.42                       # half-height in data units
 ARROW = "#8A8A8A"
 
-fig, ax = plt.subplots(figsize=(8.2, 9.4))
-ax.set_xlim(-0.3, 10.8)
+fig, ax = plt.subplots(figsize=(8.4, 9.4))
+ax.set_xlim(-0.3, 11.0)
 ax.set_ylim(-0.9, 9.8)
 ax.axis("off")
+
+# Measure the rendered width of every label so boxes are sized to the text
+# (never overflow), then remove the probes.
+fig.canvas.draw()
+inv = ax.transData.inverted()
+HALFW = {}
+for name, (x, y, _) in NODES.items():
+    t = ax.text(x, y, name, ha="center", va="center", fontsize=LABEL_FS)
+    bb = t.get_window_extent(renderer=fig.canvas.get_renderer())
+    x0, _ = inv.transform((bb.x0, bb.y0))
+    x1, _ = inv.transform((bb.x1, bb.y1))
+    HALFW[name] = (x1 - x0) / 2.0 + PAD_X
+    t.remove()
 
 
 def anchor(node, side):
@@ -88,7 +101,7 @@ def draw_edge(src, dst, style, rad=0.0):
         p0, p1, connectionstyle=f"arc3,rad={rad}",
         arrowstyle="-|>", mutation_scale=13, lw=1.6,
         color=ARROW, linestyle=style, shrinkA=1, shrinkB=3,
-        zorder=1, capstyle="round"))
+        zorder=1, capstyle="round", clip_on=False))
 
 
 # straight edges
@@ -104,7 +117,7 @@ p1 = anchor("applyfidmodel", "left")
 ax.add_patch(FancyArrowPatch(
     p0, p1, connectionstyle="arc3,rad=-0.55", arrowstyle="-|>",
     mutation_scale=13, lw=1.6, color=ARROW, linestyle="dashed",
-    shrinkA=3, shrinkB=3, zorder=1, capstyle="round"))
+    shrinkA=3, shrinkB=3, zorder=1, capstyle="round", clip_on=False))
 ax.text(0.55, 5.15, "if SynthSR", fontsize=12, style="italic",
         color="#333333", ha="center", va="center")
 
@@ -115,9 +128,10 @@ for name, (x, y, ec) in NODES.items():
     ax.add_patch(FancyBboxPatch(
         (x - w, y - BOX_H), 2 * w, 2 * BOX_H,
         boxstyle="round,pad=0.02,rounding_size=0.18",
-        mutation_aspect=1.0, fc="white", ec=ec, lw=lw, zorder=2))
+        mutation_aspect=1.0, fc="white", ec=ec, lw=lw, zorder=2,
+        clip_on=False))
     ax.text(x, y, name, ha="center", va="center", zorder=3,
-            fontsize=11.5, color="#1a1a1a", family="sans-serif")
+            fontsize=LABEL_FS, color="#1a1a1a", family="sans-serif")
 
 fig.savefig(OUT, dpi=220, bbox_inches="tight", facecolor="white")
 print(f"wrote {OUT}")
