@@ -11,6 +11,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
+from matplotlib.path import Path as MplPath
 
 OUT = Path(__file__).with_name("dag.png")
 
@@ -111,15 +112,29 @@ for src, dst, style in EDGES:
 # applyfidmodel -> all, curving left past the QC row
 draw_edge("applyfidmodel", "all", "solid", rad=0.42)
 
-# the "if SynthSR" branch: norm_im feeds the detector directly for non-T1w
-p0 = anchor("norm_im", "left")
-p1 = anchor("applyfidmodel", "left")
+# the "if SynthSR" branch: norm_im feeds the detector directly for non-T1w.
+# Route it as a rounded bracket down the left margin so it never crosses the
+# resample_im / regmni2sub columns, entering applyfidmodel from the left.
+sx, sy = anchor("norm_im", "left")           # leave norm_im heading left
+ex, ey = anchor("applyfidmodel", "left")     # enter applyfidmodel from left
+Lx = 1.55                                    # x of the vertical run (left margin)
+r = 0.28                                      # corner radius
+verts = [
+    (sx, sy),
+    (Lx + r, sy),
+    (Lx, sy), (Lx, sy - r),                  # corner: turn downward
+    (Lx, ey + r),
+    (Lx, ey), (Lx + r, ey),                  # corner: turn rightward
+    (ex, ey),
+]
+codes = [MplPath.MOVETO, MplPath.LINETO, MplPath.CURVE3, MplPath.CURVE3,
+         MplPath.LINETO, MplPath.CURVE3, MplPath.CURVE3, MplPath.LINETO]
 ax.add_patch(FancyArrowPatch(
-    p0, p1, connectionstyle="arc3,rad=-0.55", arrowstyle="-|>",
-    mutation_scale=13, lw=1.6, color=ARROW, linestyle="dashed",
-    shrinkA=3, shrinkB=3, zorder=1, capstyle="round", clip_on=False))
-ax.text(0.55, 5.15, "if SynthSR", fontsize=12, style="italic",
-        color="#333333", ha="center", va="center")
+    path=MplPath(verts, codes), arrowstyle="-|>", mutation_scale=13, lw=1.6,
+    color=ARROW, linestyle="dashed", shrinkA=2, shrinkB=2,
+    zorder=1, capstyle="round", joinstyle="round", clip_on=False))
+ax.text(Lx - 0.18, (sy + ey) / 2, "if SynthSR", fontsize=12, style="italic",
+        color="#333333", ha="right", va="center")
 
 # nodes on top
 for name, (x, y, ec) in NODES.items():
