@@ -1,0 +1,152 @@
+#!/usr/bin/env python3
+"""Render the AutoAFIDs pipeline overview (docs/images/dag.png).
+
+A hand-laid, all-features-enabled view of the Snakemake rulegraph that mirrors
+the rules in ``autoafids/workflow`` (Snakefile + rules/*.smk). Colours and the
+rounded-box style follow Snakemake's own ``--rulegraph`` output. Regenerate with:
+
+    python docs/images/make_dag.py
+"""
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
+from matplotlib.path import Path as MplPath
+
+OUT = Path(__file__).with_name("dag.png")
+
+# node -> (x, y, edge colour). y increases upward; solid rule boxes get a
+# saturated outline, input files stay black-on-white.
+NODES = {
+    # inputs
+    "T2w":               (1.3, 9.0, "#111111"),
+    "FLAIR":             (3.2, 9.0, "#111111"),
+    "ct":                (5.0, 9.0, "#111111"),
+    "T1w":               (6.9, 9.0, "#111111"),
+    # rules
+    "synthsr":           (3.2, 7.5, "#8E44AD"),
+    "n4_bias_correction":(6.4, 7.5, "#C4B400"),
+    "norm_im":           (3.2, 6.0, "#2C7FB8"),
+    "regmni2sub":        (6.4, 6.0, "#5FB316"),
+    "resample_im":       (3.2, 4.5, "#B01E2E"),
+    "mni2subfids":       (6.1, 4.5, "#CE7B1E"),
+    "download_cnn_model":(9.25, 4.5, "#22B455"),
+    "applyfidmodel":     (5.0, 3.0, "#17BEBB"),
+    "regqc":             (2.9, 1.5, "#9CBE1F"),
+    "stereotaxy":        (5.0, 1.5, "#C0157F"),
+    "fidqc":             (7.1, 1.5, "#B4C11E"),
+    "all":               (5.0, 0.0, "#22C7E0"),
+}
+
+LABEL_FS = 11.5                    # label font size (pt)
+PAD_X = 0.30                       # horizontal padding each side (data units)
+
+INPUTS = {"T2w", "FLAIR", "ct", "T1w"}
+
+# (src, dst, style): "solid" | "dashed"
+EDGES = [
+    ("T2w", "synthsr", "dashed"),
+    ("FLAIR", "synthsr", "dashed"),
+    ("ct", "synthsr", "dashed"),
+    ("T1w", "n4_bias_correction", "dashed"),
+    ("synthsr", "norm_im", "solid"),
+    ("synthsr", "regmni2sub", "solid"),
+    ("n4_bias_correction", "norm_im", "solid"),
+    ("n4_bias_correction", "regmni2sub", "solid"),
+    ("norm_im", "resample_im", "solid"),
+    ("regmni2sub", "mni2subfids", "solid"),
+    ("resample_im", "applyfidmodel", "solid"),
+    ("mni2subfids", "applyfidmodel", "solid"),
+    ("download_cnn_model", "applyfidmodel", "solid"),
+    ("applyfidmodel", "regqc", "solid"),
+    ("applyfidmodel", "stereotaxy", "solid"),
+    ("applyfidmodel", "fidqc", "solid"),
+    ("regqc", "all", "solid"),
+    ("stereotaxy", "all", "solid"),
+    ("fidqc", "all", "solid"),
+]
+
+BOX_H = 0.42                       # half-height in data units
+ARROW = "#8A8A8A"
+
+fig, ax = plt.subplots(figsize=(8.4, 9.4))
+ax.set_xlim(-0.3, 11.0)
+ax.set_ylim(-0.9, 9.8)
+ax.axis("off")
+
+# Measure the rendered width of every label so boxes are sized to the text
+# (never overflow), then remove the probes.
+fig.canvas.draw()
+inv = ax.transData.inverted()
+HALFW = {}
+for name, (x, y, _) in NODES.items():
+    t = ax.text(x, y, name, ha="center", va="center", fontsize=LABEL_FS)
+    bb = t.get_window_extent(renderer=fig.canvas.get_renderer())
+    x0, _ = inv.transform((bb.x0, bb.y0))
+    x1, _ = inv.transform((bb.x1, bb.y1))
+    HALFW[name] = (x1 - x0) / 2.0 + PAD_X
+    t.remove()
+
+
+def anchor(node, side):
+    x, y, _ = NODES[node]
+    w = HALFW[node]
+    return {"top": (x, y + BOX_H), "bottom": (x, y - BOX_H),
+            "left": (x - w, y), "right": (x + w, y)}[side]
+
+
+def draw_edge(src, dst, style, rad=0.0):
+    p0 = anchor(src, "bottom")
+    p1 = anchor(dst, "top")
+    ax.add_patch(FancyArrowPatch(
+        p0, p1, connectionstyle=f"arc3,rad={rad}",
+        arrowstyle="-|>", mutation_scale=13, lw=1.6,
+        color=ARROW, linestyle=style, shrinkA=1, shrinkB=3,
+        zorder=1, capstyle="round", clip_on=False))
+
+
+# straight edges
+for src, dst, style in EDGES:
+    draw_edge(src, dst, style)
+
+# applyfidmodel -> all, curving left past the QC row
+draw_edge("applyfidmodel", "all", "solid", rad=0.42)
+
+# the "if SynthSR" branch: norm_im feeds the detector directly for non-T1w.
+# Route it as a rounded bracket down the left margin so it never crosses the
+# resample_im / regmni2sub columns, entering applyfidmodel from the left.
+sx, sy = anchor("norm_im", "left")           # leave norm_im heading left
+ex, ey = anchor("applyfidmodel", "left")     # enter applyfidmodel from left
+Lx = 1.55                                    # x of the vertical run (left margin)
+r = 0.28                                      # corner radius
+verts = [
+    (sx, sy),
+    (Lx + r, sy),
+    (Lx, sy), (Lx, sy - r),                  # corner: turn downward
+    (Lx, ey + r),
+    (Lx, ey), (Lx + r, ey),                  # corner: turn rightward
+    (ex, ey),
+]
+codes = [MplPath.MOVETO, MplPath.LINETO, MplPath.CURVE3, MplPath.CURVE3,
+         MplPath.LINETO, MplPath.CURVE3, MplPath.CURVE3, MplPath.LINETO]
+ax.add_patch(FancyArrowPatch(
+    path=MplPath(verts, codes), arrowstyle="-|>", mutation_scale=13, lw=1.6,
+    color=ARROW, linestyle="dashed", shrinkA=2, shrinkB=2,
+    zorder=1, capstyle="round", joinstyle="round", clip_on=False))
+ax.text(Lx - 0.18, (sy + ey) / 2, "if SynthSR", fontsize=12, style="italic",
+        color="#333333", ha="right", va="center")
+
+# nodes on top
+for name, (x, y, ec) in NODES.items():
+    w = HALFW[name]
+    lw = 2.4 if name in INPUTS else 2.6
+    ax.add_patch(FancyBboxPatch(
+        (x - w, y - BOX_H), 2 * w, 2 * BOX_H,
+        boxstyle="round,pad=0.02,rounding_size=0.18",
+        mutation_aspect=1.0, fc="white", ec=ec, lw=lw, zorder=2,
+        clip_on=False))
+    ax.text(x, y, name, ha="center", va="center", zorder=3,
+            fontsize=LABEL_FS, color="#1a1a1a", family="sans-serif")
+
+fig.savefig(OUT, dpi=220, bbox_inches="tight", facecolor="white")
+print(f"wrote {OUT}")
