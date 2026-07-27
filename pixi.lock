@@ -3161,7 +3161,7 @@ packages:
 - pypi: ./
   name: autoafids
   version: 0.0.1
-  sha256: 0dc18ac6803502205c4d9619acef37aae4e582342f90c8b025453df6e1851fd5
+  sha256: 29220a6dc8a4669bd3c05cbfadf1200ed37e0bd73ab62642d37d754b9ed35276
   requires_python: '>=3.11,<3.13'
 - conda: https://conda.anaconda.org/conda-forge/linux-64/backports.zstd-1.4.0-py312h90b7ffd_0.conda
   sha256: e8c83696e6529ac1909a96690c58624bb376312fd0768409380cd9b05e248c9b
