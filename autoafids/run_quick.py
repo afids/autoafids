@@ -1,30 +1,19 @@
 #!/usr/bin/env python3
 import os
 import shutil
-import tempfile
 import subprocess
 import sys
+import tempfile
 from argparse import ArgumentParser
 from pathlib import Path
 
 IMAGE_MODALITY = {
-    "T1w": {
-        "suffix": "T1w",
-        "use_derivatives": False
-    },
-    "T2w": {
-        "suffix": "T2w",
-        "use_derivatives": False
-    },
-    "FLAIR": {
-        "suffix": "flair",
-        "use_derivatives": False
-    },
-    "CT": {
-        "suffix": "ct",
-        "use_derivatives": False
-    }
+    "T1w": {"suffix": "T1w", "use_derivatives": False},
+    "T2w": {"suffix": "T2w", "use_derivatives": False},
+    "FLAIR": {"suffix": "flair", "use_derivatives": False},
+    "CT": {"suffix": "ct", "use_derivatives": False},
 }
+
 
 def check_conda_installation():
     try:
@@ -37,7 +26,8 @@ def check_conda_installation():
         error_message = "Conda is not installed on your system or not found in PATH"
         print(error_message)
         return False
-    
+
+
 def gen_parser():
     parser = ArgumentParser(description="Run autoafids for a single subject.")
 
@@ -51,25 +41,21 @@ def gen_parser():
     parser.add_argument(
         "-o", "--output", required=True, help="Path to your desired output folder."
     )
-    parser.add_argument(
-        "-s", "--subject", required=True, help="SUBJECT ID (e.g., 001)"
-    )
+    parser.add_argument("-s", "--subject", required=True, help="SUBJECT ID (e.g., 001)")
     parser.add_argument(
         "-m",
         "--modality",
         required=True,
-        choices=list(
-            IMAGE_MODALITY.keys()
-        ),
-        help="Image modality - chose between: " + ", ".join(IMAGE_MODALITY.keys())
+        choices=list(IMAGE_MODALITY.keys()),
+        help="Image modality - chose between: " + ", ".join(IMAGE_MODALITY.keys()),
     )
     parser.add_argument(
         "-n",
         "--dry-run",
         action="store_true",
-        help="Execute a dry run without actually running the full pipeline."
+        help="Execute a dry run without actually running the full pipeline.",
     )
-    
+
     return parser
 
 
@@ -78,7 +64,9 @@ def main():
     script_path = Path(__file__).resolve().parent / "run.py"
 
     if not check_conda_installation():
-        print("Please activate conda and install snakebids to continue using autoafids quick.")
+        print(
+            "Please activate conda and install snakebids to continue using autoafids quick."
+        )
         sys.exit(1)
 
     if "SNAKEMAKE_PROFILE" in os.environ:
@@ -121,7 +109,7 @@ def main():
             "--nolock",
             "--modality",
             args.modality,
-            "--detect-with-nnlm"
+            "--detect-with-nnlm",
         ]
 
         if args.dry_run:
@@ -159,10 +147,11 @@ def main():
             else:
                 print(
                     f"Warning: Expected output directory {temp_subject_dir} not found."
-                ) 
+                )
 
         except subprocess.CalledProcessError as e:
             print(f"Error: {e}")
+
 
 if __name__ == "__main__":
     main()
