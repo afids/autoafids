@@ -22,6 +22,7 @@ getting_started/conda
 
 usage/cli
 usage/useful_options
+usage/quick
 ```
 
 ```{toctree}
