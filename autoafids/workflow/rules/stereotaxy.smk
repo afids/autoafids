@@ -48,7 +48,11 @@ rule stereotaxy:
                 else (
                     config["fct_template_fcsv"]
                     if stereotaxy_target == "fct"
+                    else(
+                    config["RN_template_fcsv"]
+                    if stereotaxy_target == "RN"
                     else config["template_fcsv"]
+                    )
                 )
             )
         ),
