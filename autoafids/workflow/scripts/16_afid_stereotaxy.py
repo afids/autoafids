@@ -1,11 +1,11 @@
 import pickle
-import re
 import warnings
+import re
 
 import numpy as np
 import pandas as pd
 
-print("[STEREOTAXY] Running 32-AFID model prediction...")
+print("[STEREOTAXY] Running 16-AFID model prediction...")
 # Suppress specific warnings after all imports
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
@@ -16,34 +16,16 @@ right_afids = [
     "x_12",
     "x_15",
     "x_17",
-    "x_21",
-    "x_23",
-    "x_25",
-    "x_27",
-    "x_29",
-    "x_31",
     "y_6",
     "y_8",
     "y_12",
     "y_15",
     "y_17",
-    "y_21",
-    "y_23",
-    "y_25",
-    "y_27",
-    "y_29",
-    "y_31",
     "z_6",
     "z_8",
     "z_12",
     "z_15",
     "z_17",
-    "z_21",
-    "z_23",
-    "z_25",
-    "z_27",
-    "z_29",
-    "z_31",
 ]
 left_afids = [
     "x_7",
@@ -51,34 +33,16 @@ left_afids = [
     "x_13",
     "x_16",
     "x_18",
-    "x_22",
-    "x_24",
-    "x_26",
-    "x_28",
-    "x_30",
-    "x_32",
     "y_7",
     "y_9",
     "y_13",
     "y_16",
     "y_18",
-    "y_22",
-    "y_24",
-    "y_26",
-    "y_28",
-    "y_30",
-    "y_32",
     "z_7",
     "z_9",
     "z_13",
     "z_16",
     "z_18",
-    "z_22",
-    "z_24",
-    "z_26",
-    "z_28",
-    "z_30",
-    "z_32",
 ]
 combined_lables = [
     "AC",
@@ -88,26 +52,17 @@ combined_lables = [
     "SIPF",
     "SLMS",
     "ILMS",
-    "CUL",
     "IMS",
     "MB",
-    "PG",
     "LVAC",
     "LVPC",
-    "GENU",
-    "SPLE",
-    "ALTH",
-    "SAMTH",
-    "IAMTH",
-    "IGO",
-    "VOH",
-    "OSF",
 ]
 combined_lables = [
     element + axis for axis in ["x", "y", "z"] for element in combined_lables
 ]
-right = [6, 8, 12, 15, 17, 21, 23, 25, 27, 29, 31]
-left = [7, 9, 13, 16, 18, 22, 24, 26, 28, 30, 32]
+
+right = [6, 8, 12, 15, 17]
+left = [7, 9, 13, 16, 18]
 
 # Dictionary for AFID labels
 afids_labels = {
@@ -120,29 +75,13 @@ afids_labels = {
     7: "LSLMS",
     8: "RILMS",
     9: "LILMS",
-    10: "CUL",
     11: "IMS",
     12: "RMB",
     13: "LMB",
-    14: "PG",
     15: "RLVAC",
     16: "LLVAC",
     17: "RLVPC",
     18: "LLVPC",
-    19: "GENU",
-    20: "SPLE",
-    21: "RALTH",
-    22: "LALTH",
-    23: "RSAMTH",
-    24: "LSAMTH",
-    25: "RIAMTH",
-    26: "LIAMTH",
-    27: "RIGO",
-    28: "LIGO",
-    29: "RVOH",
-    30: "LVOH",
-    31: "ROSF",
-    32: "LOSF",
 }
 
 
@@ -162,14 +101,23 @@ def dftodfml(fcsvdf):
     # Extract the x, y, z coordiantes and store them
     # in data science friendly format
     # (i.e., features in cols and subject in rows)
+
+    # define labels that are fed into the model (mandatory labels)
+    allowed_labels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 15, 16, 17, 18]
+
+    # filter for those labels
+    fcsvdf = fcsvdf[fcsvdf["label"].isin(allowed_labels)]
+
+    # use the label column as the indicator for fiducial
+    label = fcsvdf["label"].astype(int).tolist()
+
     df_xyz = fcsvdf[["x", "y", "z"]].melt().transpose()
 
-    # Use number of row in fcsv to make number points
-    colnames = [
-        f"{axis}_{i % int(fcsvdf.shape[0]) + 1}"
-        for axis in ["x", "y", "z"]
-        for i in range(int(fcsvdf.shape[0]))
-    ]
+    # Use labels in the fcsv to make number points
+    # NOTE: DataFrame.melt() stacks values by column (all x, then all y,
+    # then all z), so colnames must be ordered the same way (axis outer,
+    # point inner) or every name gets paired with the wrong value.
+    colnames = [f"{axis}_{i}" for axis in ["x", "y", "z"] for i in label]
 
     # Reassign features to be descriptive of coordinate
     df_xyz.columns = colnames
@@ -230,9 +178,14 @@ def mcp_origin(df_afids):
     mcp_z = (df_afids["z_1"] + df_afids["z_2"]) / 2
 
     # subtract MCP coordinates from afids at appropriate coords
-    df_afids_mcpx = df_afids.transpose()[0:32] - mcp_x
-    df_afids_mcpy = df_afids.transpose()[32:64] - mcp_y
-    df_afids_mcpz = df_afids.transpose()[64:98] - mcp_z
+    # NOTE: block size must match the actual number of points per axis
+    # (was hardcoded to 32, which assumed the full 32-AFID protocol;
+    # this pipeline only uses a subset, e.g. 16 points -> 48 columns).
+    n_pts = df_afids.shape[1] // 3
+    df_afids_t = df_afids.transpose()
+    df_afids_mcpx = df_afids_t[0:n_pts] - mcp_x
+    df_afids_mcpy = df_afids_t[n_pts : 2 * n_pts] - mcp_y
+    df_afids_mcpz = df_afids_t[2 * n_pts : 3 * n_pts] - mcp_z
 
     # concat the three coords and take transpose
     frames = [df_afids_mcpx, df_afids_mcpy, df_afids_mcpz]
@@ -281,8 +234,9 @@ def fcsvtodf(fcsv_path):
     # Extract the subject ID from the file path (naming is in bids-like)
     try:
         subject_id = re.search(r"(sub-\w+)", fcsv_path).group(1)
-    except Exception as e:
-        print("no subject id found")
+    except AttributeError:
+        print(f"No subject ID found in: {fcsv_path}, using 'unknown'")
+        subject_id = "unknown"
 
     # Read in .fcsv file, skip header
     df_raw = pd.read_table(fcsv_path, sep=",", header=2)
@@ -555,11 +509,9 @@ def model_pred(
     fcsvdf_xfm = transform_afids(in_fcsv, slicer_tfm, midpoint)
     xfm_txt = fcsvdf_xfm[1]  # Transformation matrix in array form
     df_sub = dftodfml(fcsvdf_xfm[0])[0]
-
     # Compute MCP (midpoint of the collicular plate)
     # and center the fiducials on the MCP
     df_sub_mcp, mcp = mcp_origin(df_sub)
-
     # Reflect left hemisphere fiducials onto the right hemisphere.
     # This works because the data has already been ACPC-aligned
     # and MCP-centered.
@@ -577,7 +529,6 @@ def model_pred(
     # Standardize column names for concatenation
     df_sub_mcp.columns = combined_lables
     df_sub_mcp_l.columns = combined_lables
-
     # Combine the original and mirrored dataframes into a single dataset
     df_sub_mcp = pd.concat([df_sub_mcp, df_sub_mcp_l], ignore_index=True)
 
@@ -591,21 +542,22 @@ def model_pred(
     )
 
     # Load the trained model components from the pickle file
-    with open(model, "rb") as file:
-        objects_dict = pickle.load(file)
+    try:
+        with open(model, "rb") as file:
+            objects_dict = pickle.load(file)
+    except Exception as e:
+        print("Error:", e)
 
     # Extract preprocessing objects and Ridge regression models
     standard_scaler = objects_dict["standard_scaler"]
     pca = objects_dict["pca"]
     ridge_inference = [objects_dict["x"], objects_dict["y"], objects_dict["z"]]
-
     # Apply standard scaling and PCA transformation to the data
     df_sub_mcp = standard_scaler.transform(df_sub_mcp.values)
     df_sub_mcp = pca.transform(df_sub_mcp)
 
     # Make predictions using Ridge regression models for x, y, z coordinates
     y_sub = np.column_stack([ridge.predict(df_sub_mcp) for ridge in ridge_inference])
-
     # Adjust the second predicted x-coordinate to reflect the left hemisphere
     y_sub[1, 0] *= -1
 
@@ -613,25 +565,23 @@ def model_pred(
     fids_to_fcsv(y_sub, template_fcsv, target_mcp)
 
     # Convert MCP-centered coordinates to native space
-    stn_r_mcp = y_sub[0, :] + mcp.ravel()
-    stn_l_mcp = y_sub[1, :] + mcp.ravel()
-
+    target_r_mcp = y_sub[0, :] + mcp.ravel()
+    target_l_mcp = y_sub[1, :] + mcp.ravel()
     # Create vectors for right and left fiducials with homogeneous coordinates
-    vecr = np.hstack([stn_r_mcp.ravel(), 1])
-    vecl = np.hstack([stn_l_mcp.ravel(), 1])
+    vecr = np.hstack([target_r_mcp.ravel(), 1])
+    vecl = np.hstack([target_l_mcp.ravel(), 1])
 
     # Apply the inverse transformation matrix
     # to convert coordinates to native space
-    stn_r_native = np.linalg.inv(xfm_txt) @ vecr.T
-    stn_l_native = np.linalg.inv(xfm_txt) @ vecl.T
-
+    target_r_native = np.linalg.inv(xfm_txt) @ vecr.T
+    target_l_native = np.linalg.inv(xfm_txt) @ vecl.T
     # Store the final native-space coordinates in a matrix
-    stncoords = np.zeros((2, 3))
-    stncoords[0, :] = stn_r_native[:3]
-    stncoords[1, :] = stn_l_native[:3]
+    targetcoords = np.zeros((2, 3))
+    targetcoords[0, :] = target_r_native[:3]
+    targetcoords[1, :] = target_l_native[:3]
 
     # Save the native-space coordinates to the output file
-    fids_to_fcsv(stncoords, template_fcsv, target_native)
+    fids_to_fcsv(targetcoords, template_fcsv, target_native)
 
 
 model_pred(

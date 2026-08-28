@@ -40,15 +40,28 @@ rule stereotaxy:
     params:
         model=str(Path(workflow.basedir).parent / config[stereotaxy_target]),
         midpoint="PMJ",
+        target=stereotaxy_target,
         target_fcsv=str(
             Path(workflow.basedir).parent
             / (
                 config["cZI_template_fcsv"]
                 if stereotaxy_target == "cZI"
-                else config["template_fcsv"]
+                else (
+                    config["fct_template_fcsv"]
+                    if stereotaxy_target == "fct"
+                    else (
+                        config["RN_template_fcsv"]
+                        if stereotaxy_target == "RN"
+                        else config["template_fcsv"]
+                    )
+                )
             )
         ),
     conda:
         "../envs/skimage.yaml"
     script:
-        "../scripts/stereotaxy.py"
+        (
+            "../scripts/16_afid_stereotaxy.py"
+            if stereotaxy_target in ["RN", "fct", "cZI"]
+            else "../scripts/stereotaxy.py"
+        )
