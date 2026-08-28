@@ -5,6 +5,7 @@ import warnings
 import numpy as np
 import pandas as pd
 
+print("[STEREOTAXY] Running 32-AFID model prediction...")
 # Suppress specific warnings after all imports
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 

@@ -5,6 +5,7 @@ import re
 import numpy as np
 import pandas as pd
 
+print("[STEREOTAXY] Running 16-AFID model prediction...")
 # Suppress specific warnings after all imports
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
@@ -83,6 +84,7 @@ afids_labels = {
     18: "LLVPC",
 }
 
+
 def dftodfml(fcsvdf):
     """
     Convert a datafrane (assumes RAS coordinate system)
@@ -99,14 +101,14 @@ def dftodfml(fcsvdf):
     # Extract the x, y, z coordiantes and store them
     # in data science friendly format
     # (i.e., features in cols and subject in rows)
-    
+
     # define labels that are fed into the model (mandatory labels)
-    allowed_labels = [1,2,3,4,5,6,7,8,9,11,12,13,15,16,17,18]
-    
+    allowed_labels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 15, 16, 17, 18]
+
     # filter for those labels
     fcsvdf = fcsvdf[fcsvdf["label"].isin(allowed_labels)]
 
-    # use the label column as the indicator for fiducial  
+    # use the label column as the indicator for fiducial
     label = fcsvdf["label"].astype(int).tolist()
 
     df_xyz = fcsvdf[["x", "y", "z"]].melt().transpose()
@@ -115,11 +117,7 @@ def dftodfml(fcsvdf):
     # NOTE: DataFrame.melt() stacks values by column (all x, then all y,
     # then all z), so colnames must be ordered the same way (axis outer,
     # point inner) or every name gets paired with the wrong value.
-    colnames = [
-        f"{axis}_{i}"
-        for axis in ["x", "y", "z"]
-        for i in label
-    ]
+    colnames = [f"{axis}_{i}" for axis in ["x", "y", "z"] for i in label]
 
     # Reassign features to be descriptive of coordinate
     df_xyz.columns = colnames
@@ -155,11 +153,13 @@ def fids_to_fcsv(fids, fcsv_template, fcsv_output):
     with open(fcsv_output, "w") as f:
         f.write("\n".join(line for line in fcsv))
 
+
 def make_zero(num, threshold=0.0001):
     if abs(num) < threshold:
         return 0
     else:
         return num
+
 
 def mcp_origin(df_afids):
     """
@@ -184,8 +184,8 @@ def mcp_origin(df_afids):
     n_pts = df_afids.shape[1] // 3
     df_afids_t = df_afids.transpose()
     df_afids_mcpx = df_afids_t[0:n_pts] - mcp_x
-    df_afids_mcpy = df_afids_t[n_pts:2 * n_pts] - mcp_y
-    df_afids_mcpz = df_afids_t[2 * n_pts:3 * n_pts] - mcp_z
+    df_afids_mcpy = df_afids_t[n_pts : 2 * n_pts] - mcp_y
+    df_afids_mcpz = df_afids_t[2 * n_pts : 3 * n_pts] - mcp_z
 
     # concat the three coords and take transpose
     frames = [df_afids_mcpx, df_afids_mcpy, df_afids_mcpz]
@@ -196,6 +196,7 @@ def mcp_origin(df_afids):
     return df_afids_ori_mcp, (
         np.array([mcp_x.to_numpy(), mcp_y.to_numpy(), mcp_z.to_numpy()])
     )
+
 
 def get_fiducial_index(fid):
     """
@@ -236,7 +237,7 @@ def fcsvtodf(fcsv_path):
     except AttributeError:
         print(f"No subject ID found in: {fcsv_path}, using 'unknown'")
         subject_id = "unknown"
-        
+
     # Read in .fcsv file, skip header
     df_raw = pd.read_table(fcsv_path, sep=",", header=2)
 
@@ -260,6 +261,7 @@ def fcsvtodf(fcsv_path):
     df_xyz_clean = df_xyz_clean.astype(float)
 
     return df_xyz_clean, df_raw.shape[0]
+
 
 def compute_distance(fcsv_path, fid1, fid2):
     """
@@ -291,6 +293,7 @@ def compute_distance(fcsv_path, fid1, fid2):
     distance = np.linalg.norm(xyz_diff)
 
     return xyz_diff.flatten(), distance
+
 
 def compute_average(fcsv_path, fid1, fid2):
     """
@@ -357,11 +360,7 @@ def generate_slicer_file(matrix, filename):
 
 
 def acpcmatrix(
-    fcsv_path,
-    midline,
-    center_on_mcp=False,
-    write_matrix=True,
-    transform_file_name=None
+    fcsv_path, midline, center_on_mcp=False, write_matrix=True, transform_file_name=None
 ):
     """
     Computes a 4x4 transformation matrix aligning with the AC-PC axis.
@@ -466,11 +465,11 @@ def transform_afids(fcsv_path, slicer_tfm, midpoint):
         fcsv_df.loc[:, "z"] = tcoords[:, 2]
     else:
         raise ValueError(
-            "New coordinates do not match " +
-            "the number of rows in the original fcsv."
+            "New coordinates do not match " + "the number of rows in the original fcsv."
         )
 
     return fcsv_df, xfm_txt
+
 
 def model_pred(
     in_fcsv: str,
@@ -538,9 +537,8 @@ def model_pred(
     num_cols = df_sub_mcp.select_dtypes(include="number")
     cols_to_modify = (num_cols > -0.0001).all() & (num_cols < 0.0001).all()
 
-    df_sub_mcp.loc[:, cols_to_modify] = (
-        df_sub_mcp.loc[:, cols_to_modify]
-        .applymap(make_zero)
+    df_sub_mcp.loc[:, cols_to_modify] = df_sub_mcp.loc[:, cols_to_modify].applymap(
+        make_zero
     )
 
     # Load the trained model components from the pickle file
@@ -559,11 +557,7 @@ def model_pred(
     df_sub_mcp = pca.transform(df_sub_mcp)
 
     # Make predictions using Ridge regression models for x, y, z coordinates
-    y_sub = np.column_stack(
-        [
-            ridge.predict(df_sub_mcp) for ridge in ridge_inference
-        ]
-        )
+    y_sub = np.column_stack([ridge.predict(df_sub_mcp) for ridge in ridge_inference])
     # Adjust the second predicted x-coordinate to reflect the left hemisphere
     y_sub[1, 0] *= -1
 
@@ -588,6 +582,7 @@ def model_pred(
 
     # Save the native-space coordinates to the output file
     fids_to_fcsv(targetcoords, template_fcsv, target_native)
+
 
 model_pred(
     in_fcsv=snakemake.input.afidfcsv,
